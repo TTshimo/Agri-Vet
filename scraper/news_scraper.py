@@ -1,6 +1,7 @@
 import os
 import json
 import hashlib
+import re
 import feedparser
 from datetime import datetime, timezone
 import firebase_admin
@@ -42,6 +43,14 @@ FEEDS = [
 ]
 
 # ── Helpers ───────────────────────────────────────────────────────────────────
+def strip_html(text: str) -> str:
+    """Remove HTML tags and decode common entities."""
+    text = re.sub(r"<[^>]+>", "", text)
+    text = text.replace("&amp;", "&").replace("&lt;", "<").replace("&gt;", ">")
+    text = text.replace("&quot;", '"').replace("&#39;", "'").replace("&nbsp;", " ")
+    return re.sub(r"\s+", " ", text).strip()
+
+
 def make_id(url: str) -> str:
     """Stable doc ID from URL so duplicates are overwritten."""
     return hashlib.md5(url.encode()).hexdigest()
@@ -72,8 +81,8 @@ def scrape():
                 ref = db.collection("news").document(doc_id)
 
                 data = {
-                    "title": entry.get("title", "").strip(),
-                    "summary": entry.get("summary", "")[:300].strip(),
+                    "title": strip_html(entry.get("title", "")),
+                    "summary": strip_html(entry.get("summary", ""))[:300],
                     "url": url,
                     "source": feed_config["source"],
                     "category": feed_config["category"],
@@ -87,7 +96,7 @@ def scrape():
             print(f"Error fetching {feed_config['source']}: {e}")
 
     batch.commit()
-    print(f"✅ Written {count} articles to Firestore.")
+    print(f"Written {count} articles to Firestore.")
 
 
 if __name__ == "__main__":
