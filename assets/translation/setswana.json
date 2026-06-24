@@ -1,0 +1,259 @@
+{
+  "app_name": "AgriVet",
+  "tagline": "Alafa tshimo ya gago.",
+
+  "nav": {
+    "home": "Gae",
+    "diagnose": "Tlhatlhoba",
+    "community": "Setšhaba",
+    "learn": "Ithuta",
+    "profile": "Ka game"
+  },
+
+  "greeting": {
+    "morning": "Moso o montle",
+    "afternoon": "Dumelang",
+    "evening": "Dumelang"
+  },
+
+  "home": {
+    "attention": "Go na le eng gompieno?",
+    "run_diagnosis": "Simolola tlhatlhobo",
+    "animal_diagnosis": "Tlhatlhobo ya leruo",
+    "animal_subtitle": "Dikgomo, dipodi, dikoko",
+    "plant_diagnosis": "Tlhatlhobo ya dijwalo",
+    "plant_subtitle": "Mabele, mmidi, ditamati, ditapole, melegapu",
+    "recent_activity": "Se se dirafetseng ga tshwane",
+    "no_diagnoses": "Ga go na tlhatlhobo e e tlogetsweng",
+    "no_diagnoses_sub": "Simolola tlhatlhobo ya gago ya ntlha o dirisa dikonopo tse di fa godimo."
+  },
+
+  "diagnosis": {
+    "animal_title": "Tlhatlhobo ya leruo",
+    "plant_title": "Tlhatlhobo ya dijwalo",
+    "upload_prompt": "Tsaya setshwantsho",
+    "upload_tip": "Dipholo tse di siameng: lesedi le le siameng, gaufi le sebaka se se amegeng",
+    "camera": "Setsaya ditshwantsho",
+    "gallery": "Galori",
+    "animal_type": "Kgetha mofuta wa leruo",
+    "describe": "Tlhalosa se o se lemogileng",
+    "analyse": "Lekola setshwantsho",
+    "result_title": "Maduo tsa tlhatlhobo",
+    "english": "Sekgoa",
+    "setswana": "Setswana",
+    "confidence": "Bonnete jwa",
+    "affects": "E amana le",
+    "spreads_by": "E anamela ka",
+    "urgency": "Bofefo",
+    "what_to_do": "Se o tshwanetse go se dira jaanong",
+    "symptoms": "Sesupi sa bolwetsi",
+    "prevention": "Thibelo",
+    "risk_high": "Kotsi e kgolo",
+    "risk_medium": "Kotsi e botlana",
+    "risk_none": "Leruo e itekanetseng",
+    "urgent": "Bofefo jo bo tlhokegang",
+    "monitor": "Lebelela",
+    "healthy": "E itekanetseng"
+  },
+
+  "diseases": {
+    "foot and mouth": {
+      "display_name": "Bolwetsi jwa Tlhako le Molomo",
+      "affects": "Dikgomo, dipodi, dinku",
+      "spreads_by": "Kopano le leruo le lweleng, mafelo a a amegeng",
+      "urgency": "Arola ka bonako",
+      "what_to_do": "Arola leruo le lweleng ka bonako. Ikgolaganya le ngaka ya leruo kgotsa ofisi ya DVS. Se tsamaise leruo. Begela balaodi, bolwetsi jwa tlhako le molomo ke bolwetsi jo bo begiwang mo pusong.",
+      "symptoms": "Mabutswi mo dinao, molomong le lelémeng. Molapo o feteletseng, go sa je, pholo e e fokotsegile.",
+      "prevention": "Entiwa ya metlha, thibela go tsamaisa leruo, dirisa dikgato tsa tshireletso ya bophelo."
+    },
+    "goat pox": {
+      "display_name": "Lerwalwa la Dipodi",
+      "affects": "Dipodi, dinku",
+      "spreads_by": "Kopano le leruo tse di lweleng, mowa",
+      "urgency": "Arola mme o alafe",
+      "what_to_do": "Arola leruo. Ikgolaganya le ngaka ya leruo go bona kalafi. Enta leruo tse di itekanetse go sireletsa.",
+      "symptoms": "Diphupho tse di tshogileng mo letlalong, feberu, molapo wa nko, go thata go hema.",
+      "prevention": "Entiwa ya ngwaga le ngwaga, tlhokomelo ya leruo, efoga kopano le leruo tse di lweleng."
+    },
+    "healthy cattle": {
+      "display_name": "Dikgomo tse di Itekanetse",
+      "urgency": "Ga go na se se tlhokegang",
+      "what_to_do": "Dikgomo tsa gago di bonala di itekanetseng. Tswelela go di lebelela ka metlha, di ente le go di fepa sentle.",
+      "symptoms": "Ga go na matshwao a bolwetsi.",
+      "prevention": "Boloka ditlhatlhobo tsa metlha, dientiwa le metsi a a hlwekisitsweng le dijo tse di siameng."
+    },
+    "healthy chicken": {
+      "display_name": "Dikgogo tse di Itekanetse",
+      "urgency": "Ga go na se se tlhokegang",
+      "what_to_do": "Dikgogo tsa gago di bonala di itekanetseng. Tswelela go di lebelela ka metlha le go di tlhokomela sentle.",
+      "symptoms": "Ga go na matshwao a bolwetsi.",
+      "prevention": "Boloka tshireletso ya bophelo, dientiwa tsa metlha, madulo a a hlwekisitsweng."
+    },
+    "healthy goat": {
+      "display_name": "Dipodi tse di Itekanetse",
+      "urgency": "Ga go na se se tlhokegang",
+      "what_to_do": "Dipodi tsa gago di bonala di itekanetseng. Tswelela go di lebelela ka metlha le go di tlhokomela sentle.",
+      "symptoms": "Ga go na matshwao a bolwetsi.",
+      "prevention": "Boloka ditlhatlhobo tsa metlha, dientiwa le metsi a a hlwekisitsweng le dijo tse di siameng."
+    },
+    "lumpy cow disease": {
+      "display_name": "Bolwetsi jwa Ditshwepe tsa Kgomo",
+      "affects": "Dikgomo",
+      "spreads_by": "Dikeledi (dimosetlhe, diphefo), kopano le leruo tse di lweleng",
+      "urgency": "Alafa mme o lebelele",
+      "what_to_do": "Arola dikgomo tse di amegeng. Ikgolaganya le ngaka ya leruo go bona kalafi. Enta lolelo lote. Laola dikeledi mo tshimong.",
+      "symptoms": "Ditshwepe tse di phahamileng mo mmeleng, feberu, molapo wa nko, pholo e e fokotsegile, maotwana a a bidibala.",
+      "prevention": "Entiwa ya ngwaga le ngwaga, taolo ya dikeledi, tlhokomelo ya leruo."
+    },
+    "salmonella": {
+      "display_name": "Bolwetsi jwa Salmonella",
+      "affects": "Dikgogo, dikgomo, dikolobe",
+      "spreads_by": "Dijo le metsi a a konaletsweng, masepa",
+      "urgency": "Alafa ka bonako",
+      "what_to_do": "Arola leruo tse di amegeng. Ikgolaganya le ngaka ya leruo go bona kalafi. Hlwekisa madulo. Lekola merano ya dijo le metsi.",
+      "symptoms": "Maphoko, go lapa, pholo e e fokotsegile, go swa ga dino tse di monnye.",
+      "prevention": "Metsi a a hlwekisitsweng le dijo tse di siameng, tshireletso ya bophelo, thibela dinonyane tsa naga mo mafelong a dikgogo."
+    },
+    "coccidiosis": {
+      "display_name": "Bolwetsi jwa Coccidiosis",
+      "affects": "Dikgogo, dikgomo, dipodi",
+      "spreads_by": "Dijo, metsi le mabu a a konaletsweng",
+      "urgency": "Alafa ka bonako",
+      "what_to_do": "Ikgolaganya le ngaka ya leruo go bona meriana. Hlwekisa le go omisa madulo. Arola dino tse di monnye go tswa go tse di godileng.",
+      "symptoms": "Maphoko a a nang le madi, go lapa, khulo e e bosula, mmala o o sa tlwaelegang mo dikgogong.",
+      "prevention": "Madulo a a omileng a a hlwekisitsweng, efoga go tletlega, diriisa dijo tse di sireleditsweng mo dinong tse di monnye."
+    },
+    "watermelon mosaic virus": {
+      "display_name": "Bolwetsi jwa Mosaic jwa Legapu",
+      "affects": "Melegapu, magaka, mabungu",
+      "spreads_by": "Dikeledi tsa aphid, dimela tse di konaletsweng",
+      "urgency": "Laola mme o lebelele",
+      "what_to_do": "Tlosa mme o senya dimela tse di konaletsweng. Laola palo ya diaphid ka setlhare. Se jale melegapu gaufi le mafelo a a konaletsweng.",
+      "symptoms": "Mmala wa botala jo bo sootho-botala o o garologaneng mo matlharen, leungo le le sennang sebopego le le le nonneng, khulo e e emeng.",
+      "prevention": "Diriisa mefuta e e ganang bolwetsi, laola diaphid, tlosa magora fa gare ga tshimo."
+    },
+    "healthy watermelon": {
+      "display_name": "Legapu le le Itekanetse",
+      "urgency": "Ga go na se se tlhokegang",
+      "what_to_do": "Legapu la gago le bonala le itekanetseng. Tswelela go le lebelela ka metlha, go le nesa le go le fepa sentle.",
+      "symptoms": "Ga go na matshwao a bolwetsi.",
+      "prevention": "Boloka tshireletso ya dibjalo, laola dikeledi, netefatsa go nesa go go siameng."
+    },
+    "sorghum cereal grain mold": {
+      "display_name": "Bolwetsi jwa Obomela wa Mabele",
+      "affects": "Mabele",
+      "spreads_by": "Dipora tsa obomela, pula e e feteletseng",
+      "urgency": "Laola fa o kotula",
+      "what_to_do": "Kotula pele ga nako mo dikgaolong tse di nang le pula e ntsi. Omisa lebese ka bonako morago ga kotulo. Diriisa setlhare sa obomela fa o bona matshwao pele.",
+      "symptoms": "Mmala wa boshibidu kgotsa obomela mo dihlohlong tsa lebese, lebese le le senang boleng.",
+      "prevention": "Diriisa mefuta e e ganang obomela, efoga go diegelwa ga kotulo, tokafatsa go ntsha metsi mo tshimong."
+    },
+    "sorghum covered kernel smut": {
+      "display_name": "Bolwetsi jwa Smut ya Mabele",
+      "affects": "Mabele",
+      "spreads_by": "Dipora tse di mo molapon, peo e e konaletsweng",
+      "urgency": "Alafa peo pele ga go jala",
+      "what_to_do": "Se jale peo e e konaletsweng. Alafa peo ka setlhare sa obomela pele ga go jala. Diriisa phuthologo ya dibjalo.",
+      "symptoms": "Lebese le le nang le obomela o o apareditsweng ke letlalo, pholo e e fokotsegile thata.",
+      "prevention": "Diriisa peo e e hlwekisitsweng, diteramente tsa peo, phuthologo ya dibjalo."
+    },
+    "potato late blight": {
+      "display_name": "Bolwetsi jwa Blight ya Legapu",
+      "affects": "Melegapu, dimatamatisi",
+      "spreads_by": "Dipora tsa obomela tse di thusiwang ke mowa, pula",
+      "urgency": "Dira ka bonako",
+      "what_to_do": "Diriisa setlhare ka bonako. Tlosa mme o senya dimela tse di konaletsweng. Efoga go nesa mo godimo ga matlhare.",
+      "symptoms": "Dinkatla tse di fifetseng tsa metsi mo matlharen le matlhobong, obomela o o tshweu mo tlase ga matlhare, mekwelo e e bofeng.",
+      "prevention": "Diriisa mefuta e e ganang bolwetsi, diriisa setlhare sa thibelo sa obomela, efoga maemo a a omeletseng."
+    },
+    "tomato late blight": {
+      "display_name": "Bolwetsi jwa Blight ya Dimatamatisi",
+      "affects": "Dimatamatisi, melegapu",
+      "spreads_by": "Dipora tsa obomela tse di thusiwang ke mowa, pula",
+      "urgency": "Dira ka bonako",
+      "what_to_do": "Diriisa setlhare ka bonako. Tlosa mme o senya dimela tse di konaletsweng. Efoga go nesa mo godimo ga matlhare.",
+      "symptoms": "Dinkatla tse di fifetseng tsa metsi mo matlharen le leungong, obomela o o tshweu mo tlase, go wela ga semela ka bonako.",
+      "prevention": "Diriisa mefuta e e ganang bolwetsi, diriisa setlhare sa thibelo sa obomela, tokafatsa go gololosega ga mowa."
+    },
+    "healthy potato": {
+      "display_name": "Legapu le le Itekanetse",
+      "urgency": "Ga go na se se tlhokegang",
+      "what_to_do": "Semela sa gago se bonala se itekanetseng. Tswelela go se lebelela ka metlha le go se tlhokomela sentle.",
+      "symptoms": "Ga go na matshwao a bolwetsi.",
+      "prevention": "Boloka tshireletso ya dibjalo, laola dikeledi, netefatsa go nesa go go siameng."
+    },
+    "healthy tomato": {
+      "display_name": "Tamati e e Itekanetse",
+      "urgency": "Ga go na se se tlhokegang",
+      "what_to_do": "Semela sa gago se bonala se itekanetseng. Tswelela go se lebelela ka metlha le go se tlhokomela sentle.",
+      "symptoms": "Ga go na matshwao a bolwetsi.",
+      "prevention": "Boloka tshireletso ya dibjalo, laola dikeledi, netefatsa go nesa go go siameng."
+    }
+  },
+
+  "community": {
+    "title": "Setšhaba",
+    "subtitle": "Abelana kitso le balemi ba bangwe",
+    "new_post": "Tlhagisa",
+    "no_posts": "Ga go na diposo",
+    "no_posts_sub": "Nna wa ntlha go abelana le setšhaba.",
+    "like": "Rata",
+    "reply": "Araba",
+    "replies": "Dikarabo"
+  },
+
+  "learn": {
+    "title": "Ithuta",
+    "subtitle": "Bona tshedimosetso ka bolwetsi",
+    "animal_diseases": "Bolwetsi jwa leruo",
+    "crop_diseases": "Bolwetsi jwa dibjalo"
+  },
+
+  "profile": {
+    "title": "Profaele",
+    "verified_farmer": "Molemi yo o Netefaditsweng",
+    "diagnoses": "Ditlhatlhobo",
+    "posts": "Diposo",
+    "crops": "Dibjalo",
+    "farm_details": "Dintlha tsa tshimo",
+    "farm_name": "Leina la tshimo",
+    "location": "Lefelo",
+    "animals_kept": "leruo tse di bolokiwang",
+    "settings": "Dipeelo"
+  },
+
+  "settings": {
+    "title": "Dipeelo",
+    "preferences": "Dikgetho",
+    "default_language": "Puo e e tlwaelegang",
+    "diagnosis_language": "Puo ya dipholo tsa tlhatlhobo",
+    "dark_mode": "Sefahleho se se fifetseng",
+    "dark_mode_sub": "Fetola sefahleho sa app",
+    "offline_mode": "Tiriso e e sa diriseng inthanete",
+    "offline_mode_sub": "Boloka dilo go se na inthanete",
+    "notifications": "Dikitsiso",
+    "disease_alerts": "Dikitsiso tsa bolwetsi",
+    "disease_alerts_sub": "Maaka a bolwetsi mo tikologong ya gago",
+    "community_replies": "Dikarabo tsa setšhaba",
+    "community_replies_sub": "Fa mongwe a araba poso ya gago",
+    "account": "Akhaonto",
+    "change_password": "Fetola phasewete",
+    "sign_out": "Tswa"
+  },
+
+  "news": {
+    "title": "Dikgang",
+    "subtitle": "Diphetogo tsa temo mo Botswana"
+  },
+
+  "common": {
+    "cancel": "Khansela",
+    "save": "Boloka",
+    "confirm": "Netefatsa",
+    "loading": "E a laola...",
+    "error": "Phoso",
+    "success": "Go atlegile",
+    "no_internet": "Ga go na kgolagano ya inthanete",
+    "try_again": "Leka gape"
+  }
+}

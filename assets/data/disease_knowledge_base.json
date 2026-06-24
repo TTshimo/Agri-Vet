@@ -1,0 +1,1295 @@
+{
+  "animals": {
+    "foot and mouth": {
+      "display_name": {
+        "en": "Foot and Mouth Disease",
+        "tn": "Bolwetsi jwa Dinao le Molomo"
+      },
+      "risk_level": "high",
+      "affects": {
+        "en": "Cattle, goats, sheep, pigs",
+        "tn": "Dikgomo, dipodi, dinku, dikolobe"
+      },
+      "spreads_by": {
+        "en": "Direct contact, contaminated surfaces, air",
+        "tn": "Kopano e tshwanang, mafelo a a konaletsweng, mowa"
+      },
+      "visual_symptoms": {
+        "en": "Blisters and sores on hooves, mouth, tongue and teats. Excessive drooling. Lameness.",
+        "tn": "Mabutswi le dintho mo dinao, molomong, lelémeng le mabeleng. Molapo o feteletseng. Go tlhokafalela."
+      },
+      "behavioral_questions": [
+        {
+          "id": "eating",
+          "question": {
+            "en": "Is the animal eating and drinking normally?",
+            "tn": "A phoofolo e ja le go nwa ka tshwano?"
+          },
+          "options": {
+            "en": ["Yes, normally", "Eating less than usual", "Refused food completely"],
+            "tn": ["Ee, ka tshwano", "E ja go ne go ne", "E ganile dijo gotlhe"]
+          },
+          "weights": {
+            "Yes, normally": 0,
+            "Eating less than usual": 0.1,
+            "Refused food completely": 0.25
+          }
+        },
+        {
+          "id": "mobility",
+          "question": {
+            "en": "How is the animal moving?",
+            "tn": "Phoofolo e tsamaya jang?"
+          },
+          "options": {
+            "en": ["Moving normally", "Limping slightly", "Severely lame or not moving"],
+            "tn": ["E tsamaya ka tshwano", "E gafela go ne go ne", "E gafela thata kgotsa ga e tsamayi"]
+          },
+          "weights": {
+            "Moving normally": 0,
+            "Limping slightly": 0.15,
+            "Severely lame or not moving": 0.3
+          }
+        },
+        {
+          "id": "spread",
+          "question": {
+            "en": "Are other animals in the herd showing similar symptoms?",
+            "tn": "A diphoofolo tse dingwe mo lolelong di bontsha matshwao a tshwanang?"
+          },
+          "options": {
+            "en": ["No, only this one", "1-2 others affected", "Many animals affected"],
+            "tn": ["Nnyaa, fela yone e", "1-2 tse dingwe di amegile", "Diphoofolo di le dintsi di amegile"]
+          },
+          "weights": {
+            "No, only this one": 0,
+            "1-2 others affected": 0.15,
+            "Many animals affected": 0.35
+          }
+        },
+        {
+          "id": "duration",
+          "question": {
+            "en": "How long have you noticed these symptoms?",
+            "tn": "O lemogile matshwao aa go tswa leng?"
+          },
+          "options": {
+            "en": ["Just noticed today", "1-2 days", "3-5 days", "More than 5 days"],
+            "tn": ["Ke lemogile gompieno", "Malatsi 1-2", "Malatsi 3-5", "Go feta malatsi 5"]
+          },
+          "weights": {
+            "Just noticed today": 0,
+            "1-2 days": 0.05,
+            "3-5 days": 0.15,
+            "More than 5 days": 0.25
+          }
+        },
+        {
+          "id": "saliva",
+          "question": {
+            "en": "Is there excessive drooling or foaming from the mouth?",
+            "tn": "A go na le molapo o feteletseng kgotsa marothodi go tswa molomong?"
+          },
+          "options": {
+            "en": ["No", "Some drooling", "Heavy drooling or foaming"],
+            "tn": ["Nnyaa", "Go na le molapo go ne go ne", "Molapo o montsi thata kgotsa marothodi"]
+          },
+          "weights": {
+            "No": 0,
+            "Some drooling": 0.1,
+            "Heavy drooling or foaming": 0.2
+          }
+        }
+      ],
+      "risk_thresholds": {
+        "low": 0.1,
+        "medium": 0.3,
+        "high": 0.5
+      },
+      "recommendations": {
+        "low": {
+          "en": "Early signs detected. Isolate this animal from the rest of the herd immediately as a precaution. Monitor closely for the next 24 hours. Check all other animals for similar symptoms.",
+          "tn": "Matshwao a ntlha a bonwe. Arola phoofolo eno go tswa mo lolelong ka bonako jaaka boikepo. Lebelela ka kelotlhoko maatla mo diureng tse 24 tse di latelang. Lekola diphoofolo tsotlhe tse dingwe go bona matshwao a tshwanang."
+        },
+        "medium": {
+          "en": "Moderate concern. Isolate the animal immediately. Contact your local DVS office or vet within 24 hours. Do not move any animals off the farm. FMD is a notifiable disease — you are legally required to report it.",
+          "tn": "Dikgang tsa bogare. Arola phoofolo ka bonako. Ikgolaganya le ofisi ya DVS ya gago kgotsa ngaka ya diphoofolo mo diureng tse 24. Se goge diphoofolo kwa tshimong. FMD ke bolwetsi jo bo begiwang — o na le molao wa go bo bega."
+        },
+        "high": {
+          "en": "URGENT: Strong indicators of Foot and Mouth Disease. Isolate ALL animals immediately. Call DVS emergency line now. Do not move animals, vehicles or people between farms. This is a national emergency disease.",
+          "tn": "BOFEFO: Matshwao a maatsi a Bolwetsi jwa Dinao le Molomo. Arola diphoofolo TSOTLHE ka bonako. Leletsa mola wa tshoganyetso wa DVS jaanong. Se goge diphoofolo, dikoloi kgotsa batho gare ga tshimo le tshimo. Ke bolwetsi jwa tshoganyetso ya lefatshe."
+        }
+      },
+      "treatment": {
+        "en": "There is no specific cure for FMD. Treatment is supportive: clean and disinfect sores, provide soft feed and clean water, use anti-inflammatory medication under vet guidance, and keep animals comfortable. Vaccination is the primary prevention method.",
+        "tn": "Ga go na kalafi e e rileng ya FMD. Kalafi ke ya go thusa: hlwekisa mme o tshidise dintho, fa dijo tse di boleta le metsi a a hlwekisitsweng, diriisa meriana ya go fokotsa go baba go tswa mo kaelong ya ngaka, mme o boloke diphoofolo di iketla. Entiwa ke mokgwa wa ntlha wa thibelo."
+      },
+      "prevention": {
+        "en": "Vaccinate all susceptible animals annually. Restrict movement of animals, people and vehicles. Maintain strict biosecurity. Report any suspicious cases immediately to DVS.",
+        "tn": "Enta diphoofolo tsotlhe tse di amegwang ngwaga le ngwaga. Thibelela go tsamaisa diphoofolo, batho le dikoloi. Boloka tshireletso e e tiileng ya bophelo. Bega matsatsa otlhe a a belaelwang ka bonako go DVS."
+      },
+      "when_to_call_vet": {
+        "en": "Call a vet or DVS IMMEDIATELY. FMD is a notifiable disease. Do not wait.",
+        "tn": "Leletsa ngaka ya diphoofolo kgotsa DVS KA BONAKO. FMD ke bolwetsi jo bo begiwang. Se letela."
+      }
+    },
+
+    "lumpy cow disease": {
+      "display_name": {
+        "en": "Lumpy Skin Disease",
+        "tn": "Bolwetsi jwa Ditshwepe tsa Letlalo"
+      },
+      "risk_level": "medium",
+      "affects": {
+        "en": "Cattle",
+        "tn": "Dikgomo"
+      },
+      "spreads_by": {
+        "en": "Insect bites (mosquitoes, flies, ticks), direct contact",
+        "tn": "Meno a dikeledi (dimosetlhe, diphefo, dikgaka), kopano e tshwanang"
+      },
+      "visual_symptoms": {
+        "en": "Raised circular skin nodules 2-5cm across the entire body. Nodules may weep fluid. Swollen lymph nodes visible on neck and legs.",
+        "tn": "Ditshwepe tse di phahamileng tsa go bopama tsa 2-5cm mo mmeleng wotlhe. Ditshwepe di ka tsholola metsi. Maotwana a a rulagantsweng a bonala mo molaleng le maotong."
+      },
+      "behavioral_questions": [
+        {
+          "id": "fever",
+          "question": {
+            "en": "Does the animal feel hot to touch or appear feverish?",
+            "tn": "A phoofolo e utlwala go tjhesa fa o e ama kgotsa e bonala e na le feberu?"
+          },
+          "options": {
+            "en": ["No fever signs", "Slightly warm", "Clearly feverish and lethargic"],
+            "tn": ["Ga go na matshwao a feberu", "Go tjhesa go ne go ne", "Feberu e bonala le go lapa"]
+          },
+          "weights": {
+            "No fever signs": 0,
+            "Slightly warm": 0.1,
+            "Clearly feverish and lethargic": 0.3
+          }
+        },
+        {
+          "id": "milk",
+          "question": {
+            "en": "Has milk production dropped significantly?",
+            "tn": "A go bona pholo e fokotsegile thata?"
+          },
+          "options": {
+            "en": ["No change", "Slight reduction", "Significant drop or stopped completely"],
+            "tn": ["Ga go fetoge sepe", "Go fokotsegilwe go ne go ne", "Go fokotsegile thata kgotsa go emisitswe gotlhe"]
+          },
+          "weights": {
+            "No change": 0,
+            "Slight reduction": 0.1,
+            "Significant drop or stopped completely": 0.2
+          }
+        },
+        {
+          "id": "nodules_spread",
+          "question": {
+            "en": "Where are the nodules located?",
+            "tn": "Ditshwepe di kwa kae?"
+          },
+          "options": {
+            "en": ["One area only", "Several areas on the body", "All over the body including face and legs"],
+            "tn": ["Fela mo lefelong le le lengwe", "Mafelo a mmalwa mo mmeleng", "Mo mmeleng wotlhe go akaretsa sefahlego le maoto"]
+          },
+          "weights": {
+            "One area only": 0,
+            "Several areas on the body": 0.15,
+            "All over the body including face and legs": 0.3
+          }
+        },
+        {
+          "id": "insects",
+          "question": {
+            "en": "Have you noticed many insects around your animals recently?",
+            "tn": "A o lemogile dikeledi di le dintsi fa gare ga diphoofolo tsa gago moragonyana?"
+          },
+          "options": {
+            "en": ["No unusual insects", "Some insects", "Heavy insect activity"],
+            "tn": ["Ga go na dikeledi tse di sa tlwaelegang", "Dikeledi tse dingwe", "Tiro e ntsi ya dikeledi"]
+          },
+          "weights": {
+            "No unusual insects": 0,
+            "Some insects": 0.05,
+            "Heavy insect activity": 0.15
+          }
+        }
+      ],
+      "risk_thresholds": {
+        "low": 0.1,
+        "medium": 0.25,
+        "high": 0.45
+      },
+      "recommendations": {
+        "low": {
+          "en": "Mild nodules detected. Isolate the animal and monitor daily. Apply insect repellent to all animals. Check other cattle for similar nodules. Contact a vet if symptoms worsen within 48 hours.",
+          "tn": "Ditshwepe tse di boleta di bonwe. Arola phoofolo mme o lebelele letsatsi le letsatsi. Beela diphoofolo tsotlhe setlhare sa go leleka dikeledi. Lekola dikgomo tse dingwe go bona ditshwepe tse di tshwanang. Ikgolaganya le ngaka fa matshwao a bola mo diureng tse 48."
+        },
+        "medium": {
+          "en": "Multiple nodules with behavioral changes. Isolate immediately. Start supportive care — anti-inflammatory medication, wound care for open nodules, fly control. Contact a vet within 24 hours for diagnosis confirmation and treatment plan.",
+          "tn": "Ditshwepe di le dintsi le diphetogo tsa maitshwaro. Arola ka bonako. Simolola tlhokomelo ya go thusa — meriana ya go fokotsa go baba, tlhokomelo ya dintho tse di buletsweng, taolo ya diphefo. Ikgolaganya le ngaka mo diureng tse 24 go netefatsa supego le lenaneo la kalafi."
+        },
+        "high": {
+          "en": "Severe Lumpy Skin Disease presentation. Immediate vet consultation required. Isolate all affected animals. Begin aggressive insect control across the farm. Vaccinate unaffected animals. Document and photograph all cases.",
+          "tn": "Bontsha jwa Bolwetsi jwa Ditshwepe jwa go tlhoka. Go hlokafalela ga go bua le ngaka ka bonako. Arola diphoofolo tsotlhe tse di amegeng. Simolola taolo e e tiileng ya dikeledi mo tshimong yotlhe. Enta diphoofolo tse di sa amegwang. Kwala mme o tsaaya ditshwantsho tsa matsatsa otlhe."
+        }
+      },
+      "treatment": {
+        "en": "No specific antiviral treatment exists. Supportive care includes: anti-inflammatory drugs (e.g. meloxicam), antibiotics to prevent secondary infections, wound dressing for open nodules, and good nutrition. Insect control is critical to prevent spread.",
+        "tn": "Ga go na kalafi e e rileng ya antiviral. Tlhokomelo ya go thusa e akaretsa: meriana ya go fokotsa go baba (e.g. meloxicam), dikhemikhale tsa bolwetsi go thibela dikgwaetso tsa bobedi, go apesa dintho tse di buletsweng, le dijo tse di siameng. Taolo ya dikeledi ke ya botlhokwa go thibela go anamela."
+      },
+      "prevention": {
+        "en": "Annual vaccination with registered LSD vaccine. Maintain insect control programs. Quarantine new animals for 28 days. Avoid moving animals during outbreaks.",
+        "tn": "Entiwa ya ngwaga le ngwaga ka entiwa e e rejistoritsweng ya LSD. Boloka mananeo a taolo ya dikeledi. Goga diphoofolo tse di tshang mo malatsi a 28. Efoga go tsamaisa diphoofolo fa go na le maaka."
+      },
+      "when_to_call_vet": {
+        "en": "Contact a vet within 24 hours. Call immediately if the animal stops eating, develops severe fever, or nodules open and become infected.",
+        "tn": "Ikgolaganya le ngaka mo diureng tse 24. Leletsa ka bonako fa phoofolo e emisa go ja, e bona feberu e e masisi, kgotsa ditshwepe di bula mme di konaletsiwa."
+      }
+    },
+
+    "goat pox": {
+      "display_name": {
+        "en": "Goat Pox",
+        "tn": "Lerwalwa la Dipodi"
+      },
+      "risk_level": "medium",
+      "affects": {
+        "en": "Goats, sheep",
+        "tn": "Dipodi, dinku"
+      },
+      "spreads_by": {
+        "en": "Direct contact, respiratory secretions, contaminated equipment",
+        "tn": "Kopano e tshwanang, ditshengwa tsa go hema, dithulaganyo tse di konaletsweng"
+      },
+      "visual_symptoms": {
+        "en": "Raised skin lesions on hairless areas — inside ears, groin, armpits, around eyes and mouth. Lesions progress from raised red spots to vesicles to crusted scabs.",
+        "tn": "Dintho tse di phahamileng tsa letlalo mo mafelong a se nang boya — ka fa teng ga ditsebe, fa fatshe ga mpa, fa fa tlase ga maphago, gaufi le matlho le molomo. Dintho di nna go tswa mo dintsheng tse di mfwifi tse di phahamileng go ya mo mabutswing go ya mo dikometeng."
+      },
+      "behavioral_questions": [
+        {
+          "id": "breathing",
+          "question": {
+            "en": "Is the animal having difficulty breathing or showing nasal discharge?",
+            "tn": "A phoofolo e na le bothata jwa go hema kgotsa e bontsha go ntsha mo nokeng?"
+          },
+          "options": {
+            "en": ["Breathing normally", "Some nasal discharge", "Laboured breathing or heavy discharge"],
+            "tn": ["E hema ka tshwano", "Go ntsha go ne go ne mo nokeng", "Go hema ka thata kgotsa go ntsha go gontsi"]
+          },
+          "weights": {
+            "Breathing normally": 0,
+            "Some nasal discharge": 0.1,
+            "Laboured breathing or heavy discharge": 0.3
+          }
+        },
+        {
+          "id": "lesion_stage",
+          "question": {
+            "en": "What do the skin lesions look like?",
+            "tn": "Dintho tsa letlalo di bonala jang?"
+          },
+          "options": {
+            "en": ["Raised red spots only", "Fluid-filled blisters", "Crusted scabs or open sores"],
+            "tn": ["Fela dintsi tse di mfwifi tse di phahamileng", "Mabutswi a a tletseng metsi", "Dikome tse di agilweng kgotsa dintho tse di buletsweng"]
+          },
+          "weights": {
+            "Raised red spots only": 0,
+            "Fluid-filled blisters": 0.15,
+            "Crusted scabs or open sores": 0.25
+          }
+        },
+        {
+          "id": "new_animals",
+          "question": {
+            "en": "Have any new animals been introduced to the herd recently?",
+            "tn": "A go na le diphoofolo tse di tshang tse di tsenngwang mo lolelong moragonyana?"
+          },
+          "options": {
+            "en": ["No new animals", "Yes, within the last 2 weeks", "Yes, within the last month"],
+            "tn": ["Ga go na diphoofolo tse di tshang", "Ee, mo dibikeng tse 2 tse di fetileng", "Ee, mo kgweding e e fetileng"]
+          },
+          "weights": {
+            "No new animals": 0,
+            "Yes, within the last 2 weeks": 0.2,
+            "Yes, within the last month": 0.1
+          }
+        }
+      ],
+      "risk_thresholds": {
+        "low": 0.1,
+        "medium": 0.25,
+        "high": 0.45
+      },
+      "recommendations": {
+        "low": {
+          "en": "Early stage lesions. Isolate the affected animal. Monitor other goats closely. Ensure clean housing and reduce stress on animals.",
+          "tn": "Dintho tsa seemo sa ntlha. Arola phoofolo e e amegeng. Lebelela dipodi tse dingwe ka kelotlhoko. Netefatsa madulo a a hlwekisitsweng le go fokotsa kgateletso mo diphoofolo."
+        },
+        "medium": {
+          "en": "Active Goat Pox infection. Isolate all affected animals. Contact a vet for antiviral treatment and to vaccinate healthy animals. Disinfect housing and equipment. Restrict movement of animals.",
+          "tn": "Tshwaetso e e tshwereng ya Lerwalwa la Dipodi. Arola diphoofolo tsotlhe tse di amegeng. Ikgolaganya le ngaka ya diphoofolo go bona kalafi ya antiviral le go enta diphoofolo tse di itekanetse. Tshidisa madulo le dithulaganyo. Thibelela go tsamaisa diphoofolo."
+        },
+        "high": {
+          "en": "Severe Goat Pox outbreak. Emergency vet consultation needed. Isolate entire herd from outside contact. Begin vaccination of unaffected animals immediately. Notify local veterinary authorities.",
+          "tn": "Maaka a masisi a Lerwalwa la Dipodi. Go hlokafalela ga go bua le ngaka ya diphoofolo ka tshoganyetso. Arola lolelo lotlhe go tswa mo kopanong ya kwa ntle. Simolola entiwa ya diphoofolo tse di sa amegwang ka bonako. Begela balaodi ba diphoofolo ba lefelo."
+        }
+      },
+      "treatment": {
+        "en": "Supportive treatment only. Antiviral drugs may be prescribed by a vet. Clean and disinfect lesions daily. Provide good nutrition and clean water. Separate young animals from adults as kids are more vulnerable.",
+        "tn": "Kalafi ya go thusa fela. Meriana ya antiviral e ka laelwa ke ngaka ya diphoofolo. Hlwekisa mme o tshidise dintho letsatsi le letsatsi. Fa dijo tse di siameng le metsi a a hlwekisitsweng. Arola diphokojwe go tswa go bagolo fa diphokojwe di na le kotsing e ntsi."
+      },
+      "prevention": {
+        "en": "Annual vaccination. Quarantine new animals for at least 3 weeks. Avoid contact with infected herds. Maintain clean housing and reduce overcrowding.",
+        "tn": "Entiwa ya ngwaga le ngwaga. Goga diphoofolo tse di tshang go ya bonnye dibeke tse 3. Efoga kopano le majalo a a lweleng. Boloka madulo a a hlwekisitsweng le go fokotsa go tletlega."
+      },
+      "when_to_call_vet": {
+        "en": "Contact a vet within 24 hours. Call immediately if breathing difficulties develop or lesions become severely infected.",
+        "tn": "Ikgolaganya le ngaka mo diureng tse 24. Leletsa ka bonako fa go boa bothata jwa go hema kgotsa dintho di konaletsiwa thata."
+      }
+    },
+
+    "salmonella": {
+      "display_name": {
+        "en": "Salmonellosis",
+        "tn": "Bolwetsi jwa Salmonella"
+      },
+      "risk_level": "medium",
+      "affects": {
+        "en": "Poultry, cattle, pigs — also transmissible to humans",
+        "tn": "Dikgogo, dikgomo, dikolobe — e ka fetela le go batho"
+      },
+      "spreads_by": {
+        "en": "Contaminated feed and water, feces, rodents, wild birds",
+        "tn": "Dijo le metsi a a konaletsweng, masepa, dipeba, dinonyane tsa naga"
+      },
+      "visual_symptoms": {
+        "en": "Diarrhoea (sometimes bloody), pale comb in poultry, drooping wings, ruffled feathers, swollen joints.",
+        "tn": "Maphoko (go na le madi fa e ka nna), kopane e tshweu mo dikgogong, maphiko a a ko fatshe, mebalabala e e thebilweng, maotwana a a rulagantsweng."
+      },
+      "behavioral_questions": [
+        {
+          "id": "diarrhea",
+          "question": {
+            "en": "What does the stool/droppings look like?",
+            "tn": "Masepa a bonala jang?"
+          },
+          "options": {
+            "en": ["Normal", "Loose or watery", "Bloody or very dark"],
+            "tn": ["A tshwana le tlwaelo", "A boleta kgotsa a na le metsi", "A na le madi kgotsa a fifetse thata"]
+          },
+          "weights": {
+            "Normal": 0,
+            "Loose or watery": 0.15,
+            "Bloody or very dark": 0.35
+          }
+        },
+        {
+          "id": "deaths",
+          "question": {
+            "en": "Have any animals died suddenly in your flock/herd?",
+            "tn": "A diphoofolo dipe di sule ka bonako mo lolelong la gago?"
+          },
+          "options": {
+            "en": ["No deaths", "1-2 deaths", "Several sudden deaths"],
+            "tn": ["Ga go na tse di suleng", "Go sule 1-2", "Go sule di le dintsi ka bonako"]
+          },
+          "weights": {
+            "No deaths": 0,
+            "1-2 deaths": 0.25,
+            "Several sudden deaths": 0.45
+          }
+        },
+        {
+          "id": "feed_water",
+          "question": {
+            "en": "Have you changed feed or water sources recently?",
+            "tn": "A o fetotse merano ya dijo kgotsa metsi moragonyana?"
+          },
+          "options": {
+            "en": ["No changes", "Changed feed source", "Changed water source", "Changed both"],
+            "tn": ["Ga go na diphetogo", "O fetotse morano wa dijo", "O fetotse morano wa metsi", "O fetotse bobedi"]
+          },
+          "weights": {
+            "No changes": 0,
+            "Changed feed source": 0.1,
+            "Changed water source": 0.1,
+            "Changed both": 0.2
+          }
+        },
+        {
+          "id": "rodents",
+          "question": {
+            "en": "Have you seen rodents or wild birds near feed or water?",
+            "tn": "A o bonye dipeba kgotsa dinonyane tsa naga gaufi le dijo kgotsa metsi?"
+          },
+          "options": {
+            "en": ["No", "Occasionally", "Yes, frequently"],
+            "tn": ["Nnyaa", "Fa gare ga gare", "Ee, gantsi"]
+          },
+          "weights": {
+            "No": 0,
+            "Occasionally": 0.05,
+            "Yes, frequently": 0.2
+          }
+        }
+      ],
+      "risk_thresholds": {
+        "low": 0.1,
+        "medium": 0.3,
+        "high": 0.5
+      },
+      "recommendations": {
+        "low": {
+          "en": "Mild signs detected. Provide fresh clean water and remove any suspect feed. Improve sanitation in housing. Monitor closely for 48 hours. Wash hands thoroughly after handling animals — Salmonella can infect humans.",
+          "tn": "Matshwao a boleta a bonwe. Fa metsi a a hlwekisitsweng a a tshweletseng mme o tlose dijo dipe tse di belaelwang. Tokafatsa boitekanelo mo madulwaneng. Lebelela ka kelotlhoko mo diureng tse 48. Tlhapa diatla ka kelotlhoko morago ga go tshwara diphoofolo — Salmonella e ka tshwaetsa batho."
+        },
+        "medium": {
+          "en": "Active Salmonellosis suspected. Isolate sick animals immediately. Contact a vet for antibiotic treatment. Remove and safely dispose of contaminated feed. Thoroughly disinfect water troughs and feeders. Practice strict hygiene — this disease can spread to people.",
+          "tn": "Go solofela Salmonellosis e e tshwereng. Arola diphoofolo tse di lweleng ka bonako. Ikgolaganya le ngaka ya diphoofolo go bona kalafi ya dikhemikhale tsa bolwetsi. Tlose mme o lahlele dijo tse di konaletsweng ka bolokoswane. Tshidisa maobelo a metsi le metso ya dijo ka kelotlhoko. Diriisa boitekanelo jo bo tiileng — bolwetsi jono bo ka anamela go batho."
+        },
+        "high": {
+          "en": "SEVERE: Multiple deaths and active spread. Emergency vet required. Isolate all animals. Test water and feed sources immediately. This is a zoonotic disease — protect yourself and your family by wearing gloves and washing hands. Notify health authorities.",
+          "tn": "GO MASISI: Go swa ga diphoofolo di le dintsi le go anamela go tshwereng. Go hlokafalela ga ngaka ya tshoganyetso. Arola diphoofolo tsotlhe. Lekola merano ya metsi le dijo ka bonako. Ke bolwetsi jo bo fetang go tswa mo diphoofolo go ya go batho — itshireletse wena le lelapa la gago ka go apara diforepo le go tlhapa diatla. Begela balaodi ba bophelo."
+        }
+      },
+      "treatment": {
+        "en": "Antibiotic treatment prescribed by vet (e.g. trimethoprim, enrofloxacin). Fluid therapy for dehydrated animals. Remove contaminated feed and water. Probiotics may help recovery. Note: antibiotic resistance is increasing — always use prescribed antibiotics only.",
+        "tn": "Kalafi ya dikhemikhale tsa bolwetsi e laelwa ke ngaka (e.g. trimethoprim, enrofloxacin). Kalafi ya metsi ya diphoofolo tse di siileng metsi. Tlose dijo le metsi a a konaletsweng. Diprobiotics di ka thusa go fola. Ela tlhoko: kgaolo ya dikhemikhale tsa bolwetsi e a gola — diriisa fela dikhemikhale tse di laelwang."
+      },
+      "prevention": {
+        "en": "Keep feed and water sources rodent and wild bird proof. Clean and disinfect housing regularly. Quarantine new birds for 2 weeks. Practice strict hygiene when handling animals and eggs.",
+        "tn": "Boloka merano ya dijo le metsi e le ya poroteko go tswa go dikhunama le dinonyane tsa naga. Hlwekisa mme o tshidise madulo ka gantsi. Goga dinonyane tse di tshang mo dibikeng tse 2. Diriisa boitekanelo jo bo tiileng fa o tshwara diphoofolo le mahe."
+      },
+      "when_to_call_vet": {
+        "en": "Contact a vet within 24 hours. Call immediately if animals are dying or you or family members develop diarrhoea or fever after contact with animals.",
+        "tn": "Ikgolaganya le ngaka mo diureng tse 24. Leletsa ka bonako fa diphoofolo di a swa kgotsa fa wena kgotsa maloko a lelapa a bona maphoko kgotsa feberu morago ga kopano le diphoofolo."
+      }
+    },
+
+    "coccidiosis": {
+      "display_name": {
+        "en": "Coccidiosis",
+        "tn": "Bolwetsi jwa Coccidiosis"
+      },
+      "risk_level": "medium",
+      "affects": {
+        "en": "Poultry, cattle, goats — especially young animals",
+        "tn": "Dikgogo, dikgomo, dipodi — bogolo jang dino"
+      },
+      "spreads_by": {
+        "en": "Contaminated litter, feed, water, and soil. Oocysts survive long periods in environment.",
+        "tn": "Mabu a a konaletsweng, dijo, metsi le molapo. Dioocyst di phela nako e telele mo tikologe."
+      },
+      "visual_symptoms": {
+        "en": "Bloody or mucousy diarrhoea, pale appearance, ruffled feathers in poultry, hunched posture, weight loss, reduced growth in young animals.",
+        "tn": "Maphoko a na le madi kgotsa makhoe, go bonala go tshweu, mebalabala e e thebilweng mo dikgogong, go inama, go latlhegelwa ke boima, go gola go fokotsegileng mo dinong."
+      },
+      "behavioral_questions": [
+        {
+          "id": "age",
+          "question": {
+            "en": "What is the age of the affected animals?",
+            "tn": "Diphoofolo tse di amegeng di na le dingwaga tse difi?"
+          },
+          "options": {
+            "en": ["Young animals under 6 months", "6 months to 1 year", "Adult animals"],
+            "tn": ["Dino tse di ka fa tlase ga dikgwedi tse 6", "Dikgwedi tse 6 go ya ngwageng o le mongwe", "Diphoofolo tse di godileng"]
+          },
+          "weights": {
+            "Young animals under 6 months": 0.3,
+            "6 months to 1 year": 0.15,
+            "Adult animals": 0
+          }
+        },
+        {
+          "id": "crowding",
+          "question": {
+            "en": "Are the animals kept in crowded or wet/damp conditions?",
+            "tn": "A diphoofolo di bolokiwa mo maemong a a tletleng kgotsa a a omang/gogang?"
+          },
+          "options": {
+            "en": ["Good space and dry conditions", "Slightly crowded", "Very crowded or wet/damp litter"],
+            "tn": ["Sebaka se se siameng le maemo a a omileng", "Go tletlega go ne go ne", "Go tletlega thata kgotsa mabu a a omang/gogang"]
+          },
+          "weights": {
+            "Good space and dry conditions": 0,
+            "Slightly crowded": 0.1,
+            "Very crowded or wet/damp litter": 0.3
+          }
+        },
+        {
+          "id": "growth",
+          "question": {
+            "en": "Are affected animals noticeably smaller or lighter than others of the same age?",
+            "tn": "A diphoofolo tse di amegeng di bonala di le tshesane kgotsa di le bonenepi go feta tse dingwe tsa bogolo jo bo tshwanang?"
+          },
+          "options": {
+            "en": ["Same size as others", "Slightly smaller", "Significantly stunted"],
+            "tn": ["Di tshwana le bogolo jwa tse dingwe", "Di le tshesane go ne go ne", "Di gola go fokotsegileng thata"]
+          },
+          "weights": {
+            "Same size as others": 0,
+            "Slightly smaller": 0.1,
+            "Significantly stunted": 0.25
+          }
+        }
+      ],
+      "risk_thresholds": {
+        "low": 0.1,
+        "medium": 0.25,
+        "high": 0.45
+      },
+      "recommendations": {
+        "low": {
+          "en": "Mild coccidiosis signs. Improve housing conditions — ensure dry litter, reduce crowding, clean water at all times. Separate young animals from adults. Monitor for worsening symptoms.",
+          "tn": "Matshwao a boleta a coccidiosis. Tokafatsa maemo a madulo — netefatsa mabu a a omileng, fokotsa go tletlega, metsi a a hlwekisitsweng nako yotlhe. Arola dino go tswa go bagolo. Lebelela matshwao a a bolang."
+        },
+        "medium": {
+          "en": "Active coccidiosis. Contact a vet for anticoccidial medication (e.g. toltrazuril, amprolium). Clean and dry all housing immediately. Separate sick from healthy animals, and young from adults.",
+          "tn": "Coccidiosis e e tshwereng. Ikgolaganya le ngaka ya diphoofolo go bona meriana ya anticoccidial (e.g. toltrazuril, amprolium). Hlwekisa mme o omise madulo otlhe ka bonako. Arola tse di lweleng go tswa go tse di itekanetse, le dino go tswa go bagolo."
+        },
+        "high": {
+          "en": "Severe coccidiosis with possible deaths. Emergency vet care required. Begin treatment immediately with prescribed anticoccidials. Replace all litter. Disinfect entire housing. Treat all animals in the group, not just visibly sick ones.",
+          "tn": "Coccidiosis e e masisi le go ka swa. Go hlokafalela ga tlhokomelo ya ngaka ya tshoganyetso. Simolola kalafi ka bonako ka anticoccidials tse di laelwang. Fetola mabu otlhe. Tshidisa madulo otlhe. Alafa diphoofolo tsotlhe mo setlhopeng, e seng fela tse di bonalang di lwela."
+        }
+      },
+      "treatment": {
+        "en": "Anticoccidial drugs: toltrazuril (Baycox) or amprolium in water. Treat the entire group. Ensure electrolytes and vitamins in water for recovery. Clean and dry the environment — oocysts are destroyed by drying and sunlight.",
+        "tn": "Meriana ya anticoccidial: toltrazuril (Baycox) kgotsa amprolium mo metsing. Alafa setlhopa sotlhe. Netefatsa dikemikele le divithamene mo metsing go thusa go fola. Hlwekisa mme o omise tikologe — dioocyst di senngwa ke go oma le letsatsi."
+      },
+      "prevention": {
+        "en": "Keep litter dry at all times. Avoid overcrowding. Use coccidiostats in feed for young animals at risk. Clean and disinfect housing between batches. Do not mix age groups.",
+        "tn": "Boloka mabu a a omileng nako yotlhe. Efoga go tletlega. Diriisa coccidiostats mo dijong tsa dino tse di nang le kotsing. Hlwekisa mme o tshidise madulo gare ga dikarolo. O se ka wa kopanya diphoofolo tsa dingwaga tse di farologaneng."
+      },
+      "when_to_call_vet": {
+        "en": "Contact a vet if bloody diarrhoea is present or animals are dying. Early treatment is key to survival, especially in young animals.",
+        "tn": "Ikgolaganya le ngaka fa go na le maphoko a na le madi kgotsa diphoofolo di a swa. Kalafi ya ntlha ke ya botlhokwa go phela, bogolo jang mo dinong."
+      }
+    },
+
+    "healthy cattle": {
+      "display_name": {
+        "en": "Healthy Cattle",
+        "tn": "Dikgomo tse di Itekanetse"
+      },
+      "risk_level": "none",
+      "affects": { "en": "N/A", "tn": "Ga go amege sepe" },
+      "spreads_by": { "en": "N/A", "tn": "Ga go anamele sepe" },
+      "visual_symptoms": {
+        "en": "No disease symptoms detected. Animal appears healthy.",
+        "tn": "Ga go na matshwao a bolwetsi a bonweng. Phoofolo e bonala e itekanetseng."
+      },
+      "behavioral_questions": [],
+      "risk_thresholds": { "low": 0, "medium": 0, "high": 1 },
+      "recommendations": {
+        "low": {
+          "en": "Your animal appears healthy! Continue regular monitoring, maintain vaccination schedules, provide clean water and balanced nutrition. Schedule a routine vet checkup every 6 months.",
+          "tn": "Phoofolo ya gago e bonala e itekanetseng! Tswelela go lebelela ka metlha, boloka lenaneo la dientiwa, fa metsi a a hlwekisitsweng le dijo tse di釣釣tshwanelang. Beela go bua le ngaka ka metlha mo dikgweding tse 6."
+        },
+        "medium": { "en": "", "tn": "" },
+        "high": { "en": "", "tn": "" }
+      },
+      "treatment": { "en": "No treatment needed.", "tn": "Ga go hlokafalele kalafi." },
+      "prevention": {
+        "en": "Maintain regular vaccinations, deworming, tick control, and annual vet checks.",
+        "tn": "Boloka dientiwa tsa metlha, go ntsha diboko, taolo ya dikgaka, le ditlhatlhobo tsa ngaka tsa ngwaga le ngwaga."
+      },
+      "when_to_call_vet": {
+        "en": "Schedule a routine checkup every 6 months. Call immediately if you notice sudden changes in behaviour, eating, or appearance.",
+        "tn": "Beela tlhatlhobo ya metlha dikgwedi tse 6 le dikgwedi tse 6. Leletsa ka bonako fa o lemoga diphetogo tse di bonako mo maitshwarong, go ja, kgotsa go bonala."
+      }
+    },
+
+    "healthy chicken": {
+      "display_name": {
+        "en": "Healthy Chicken",
+        "tn": "Kgogo e e Itekanetse"
+      },
+      "risk_level": "none",
+      "affects": { "en": "N/A", "tn": "Ga go amege sepe" },
+      "spreads_by": { "en": "N/A", "tn": "Ga go anamele sepe" },
+      "visual_symptoms": {
+        "en": "No disease symptoms detected. Bird appears healthy.",
+        "tn": "Ga go na matshwao a bolwetsi a bonweng. Nonyana e bonala e itekanetseng."
+      },
+      "behavioral_questions": [],
+      "risk_thresholds": { "low": 0, "medium": 0, "high": 1 },
+      "recommendations": {
+        "low": {
+          "en": "Your bird appears healthy! Maintain biosecurity, clean housing, balanced feed, and fresh water at all times. Vaccinate according to your national poultry vaccination schedule.",
+          "tn": "Nonyana ya gago e bonala e itekanetseng! Boloka tshireletso ya bophelo, madulo a a hlwekisitsweng, dijo tse di tshwanelang, le metsi a a tshweletseng nako yotlhe. Enta go latela lenaneo la gago la entiwa ya dikgogo la lefatshe."
+        },
+        "medium": { "en": "", "tn": "" },
+        "high": { "en": "", "tn": "" }
+      },
+      "treatment": { "en": "No treatment needed.", "tn": "Ga go hlokafalele kalafi." },
+      "prevention": {
+        "en": "Clean housing, rodent control, vaccination, quarantine new birds, avoid wild bird contact.",
+        "tn": "Madulo a a hlwekisitsweng, taolo ya dikhunama, entiwa, goga dinonyane tse di tshang, efoga kopano le dinonyane tsa naga."
+      },
+      "when_to_call_vet": {
+        "en": "Call if you notice sudden deaths, respiratory distress, drop in egg production, or unusual behaviour in multiple birds.",
+        "tn": "Leletsa fa o lemoga go swa go bonako, mathata a go hema, go fokotsegilwa ga mae, kgotsa maitshwaro a a sa tlwaelegang mo dinonyane di le dintsi."
+      }
+    },
+
+    "healthy goat": {
+      "display_name": {
+        "en": "Healthy Goat",
+        "tn": "Podi e e Itekanetse"
+      },
+      "risk_level": "none",
+      "affects": { "en": "N/A", "tn": "Ga go amege sepe" },
+      "spreads_by": { "en": "N/A", "tn": "Ga go anamele sepe" },
+      "visual_symptoms": {
+        "en": "No disease symptoms detected. Animal appears healthy.",
+        "tn": "Ga go na matshwao a bolwetsi a bonweng. Phoofolo e bonala e itekanetseng."
+      },
+      "behavioral_questions": [],
+      "risk_thresholds": { "low": 0, "medium": 0, "high": 1 },
+      "recommendations": {
+        "low": {
+          "en": "Your goat appears healthy! Maintain regular deworming every 3 months, annual vaccination, hoof trimming, and clean water and browse.",
+          "tn": "Podi ya gago e bonala e itekanetseng! Boloka go ntsha diboko ka metlha dikgwedi tse 3 le dikgwedi tse 3, entiwa ya ngwaga le ngwaga, go kgaola dinao, le metsi a a hlwekisitsweng le dijang."
+        },
+        "medium": { "en": "", "tn": "" },
+        "high": { "en": "", "tn": "" }
+      },
+      "treatment": { "en": "No treatment needed.", "tn": "Ga go hlokafalele kalafi." },
+      "prevention": {
+        "en": "Regular deworming, vaccination, hoof care, quarantine new animals, provide mineral supplements.",
+        "tn": "Go ntsha diboko ka metlha, entiwa, tlhokomelo ya dinao, goga diphoofolo tse di tshang, fa dikotla tsa madirela."
+      },
+      "when_to_call_vet": {
+        "en": "Call if you notice loss of appetite, unusual discharge, lameness, bloating, or sudden weight loss.",
+        "tn": "Leletsa fa o lemoga go latlhegelwa ke takatso ya go ja, go ntsha go sa tlwaelegang, go gafela, go rora, kgotsa go latlhegelwa ke boima jo bo bonako."
+      }
+    }
+  },
+
+  "plants": {
+    "watermelon mosaic virus": {
+      "display_name": {
+        "en": "Watermelon Mosaic Virus",
+        "tn": "Bolwetsi jwa Mosaic jwa Legapu"
+      },
+      "risk_level": "medium",
+      "affects": {
+        "en": "Watermelon, cucumber, squash, pumpkin",
+        "tn": "Melegapu, magaka, mabungu, mapompone"
+      },
+      "spreads_by": {
+        "en": "Aphid insects, infected plant material, grafting tools",
+        "tn": "Dikeledi tsa aphid, dimela tse di konaletsweng, didirisiwa tsa go tlhoma"
+      },
+      "visual_symptoms": {
+        "en": "Yellow-green mosaic mottling on leaves. Leaf distortion and curling. Fruit with uneven colour, small size or warty surface. Stunted plant growth.",
+        "tn": "Go mmina ga mmala wa botala jo bo sootho-botala mo matlharen. Go phatalogana le go phetologa ga matlhare. Leungo le le nang le mmala o o sa lekalekang, bogolo jo bonnyane kgotsa bogobe mo go jona. Go gola go emeng ga semela."
+      },
+      "behavioral_questions": [
+        {
+          "id": "leaf_pattern",
+          "question": {
+            "en": "What does the leaf discolouration pattern look like?",
+            "tn": "Setshwantsho sa go fetoga ga mmala wa matlhare se bonala jang?"
+          },
+          "options": {
+            "en": ["Uniform yellowing", "Mosaic/mottled pattern of light and dark green", "Brown or black lesions"],
+            "tn": ["Go ntshwa ga mmala o tshwanang", "Setshwantsho sa mosaic/go mmina ga botala jo bosweu le jo bo fifetseng", "Dintho tse di tshweu kgotsa tse di ntsho"]
+          },
+          "weights": {
+            "Uniform yellowing": 0,
+            "Mosaic/mottled pattern of light and dark green": 0.3,
+            "Brown or black lesions": 0
+          }
+        },
+        {
+          "id": "plant_spread",
+          "question": {
+            "en": "How many plants are affected?",
+            "tn": "Dimela di le kae tse di amegeng?"
+          },
+          "options": {
+            "en": ["Just one plant", "A few plants in one area", "Many plants across the field"],
+            "tn": ["Fela semela se le sengwe", "Dimela di sele mo lefelong le le lengwe", "Dimela di le dintsi mo tshimong yotlhe"]
+          },
+          "weights": {
+            "Just one plant": 0,
+            "A few plants in one area": 0.15,
+            "Many plants across the field": 0.35
+          }
+        },
+        {
+          "id": "aphids",
+          "question": {
+            "en": "Can you see small insects on the underside of leaves?",
+            "tn": "A o ka bona dikeledi tse dinnye mo tlase ga matlhare?"
+          },
+          "options": {
+            "en": ["No insects visible", "A few insects", "Heavy infestation of small insects"],
+            "tn": ["Ga go na dikeledi tse di bonalang", "Dikeledi di sele", "Go tlhagela go gontsi ga dikeledi tse dinnye"]
+          },
+          "weights": {
+            "No insects visible": 0,
+            "A few insects": 0.15,
+            "Heavy infestation of small insects": 0.35
+          }
+        },
+        {
+          "id": "fruit_quality",
+          "question": {
+            "en": "How does the fruit look on affected plants?",
+            "tn": "Leungo le bonala jang mo dimeleng tse di amegeng?"
+          },
+          "options": {
+            "en": ["No fruit yet", "Fruit looks normal", "Fruit is small, misshapen or has bumpy skin"],
+            "tn": ["Ga go na leungo le legeso", "Leungo le bonala le tlwaelekile", "Leungo le le nnye, le le fetotsegileng kgotsa le na le letlalo le le bogobe"]
+          },
+          "weights": {
+            "No fruit yet": 0,
+            "Fruit looks normal": 0,
+            "Fruit is small, misshapen or has bumpy skin": 0.25
+          }
+        }
+      ],
+      "risk_thresholds": {
+        "low": 0.1,
+        "medium": 0.3,
+        "high": 0.5
+      },
+      "recommendations": {
+        "low": {
+          "en": "Early mosaic virus signs on a few plants. Remove and destroy affected leaves. Apply insecticide to control aphid vectors. Do not work on healthy plants after touching affected ones without washing hands. Monitor other plants daily.",
+          "tn": "Matshwao a ntlha a bolwetsi jwa mosaic mo dimeleng di sele. Tlose mme o senya matlhare a a amegeng. Diriisa setlhare sa go bolaya dikeledi go laola diaflid. O se ka wa dira mo dimeleng tse di itekanetse morago ga go ama tse di amegeng ntle le go tlhapa diatla. Lebelela dimela tse dingwe letsatsi le letsatsi."
+        },
+        "medium": {
+          "en": "Moderate mosaic virus spread. Remove all visibly infected plants and destroy them away from the field. Spray remaining plants with recommended insecticide for aphid control. Do not replant cucurbits in this area this season. Consider reflective mulch to deter aphids.",
+          "tn": "Go anamela ga bolwetsi jwa mosaic jwa bogare. Tlose dimela tsotlhe tse di bonalang di konaletsiwa mme o di senya kwa ntle ga tshimo. Kofa dimela tse di setseng ka setlhare se se kailweng sa go bolaya dikeledi go laola diaflid. O se ka wa jala dimela tse di tshwanang mo lefelong leno dikgwedi tse di latelang. Nayang malwethi a a nyenyang matlhare go thibela diaflid."
+        },
+        "high": {
+          "en": "Severe outbreak across the field. Remove and burn all infected plants. Do NOT compost them. Apply systemic insecticide. Do not plant cucurbit crops in this field for at least one season. Source virus-resistant varieties for replanting.",
+          "tn": "Maaka a masisi mo tshimong yotlhe. Tlose mme o tshube dimela tsotlhe tse di konaletsweng. O SE ka wa di bea mo dirakeng. Diriisa setlhare sa go bolaya dikeledi sa systemic. O se ka wa jala dibjalo tse di tshwanang mo tshimong eno go ya bonnye go ya go kotulo e e latelang. Batlhela mefuta e e ganang bolwetsi go jala gape."
+        }
+      },
+      "treatment": {
+        "en": "No cure for viral infections. Management only: remove infected plants, control aphid vectors with insecticide (e.g. imidacloprid, pyrethroids), use reflective mulches, and plant resistant varieties in future seasons.",
+        "tn": "Ga go na kalafi ya tshwaetso ya borokgwe. Taolo fela: tlose dimela tse di konaletsweng, laola diaflid ka setlhare sa go bolaya dikeledi (e.g. imidacloprid, pyrethroids), diriisa malwethi a a nyenyang matlhare, le go jala mefuta e e ganang bolwetsi mo dikgweding tse di latelang."
+      },
+      "prevention": {
+        "en": "Plant virus-resistant varieties. Use reflective silver mulch to confuse aphids. Apply preventive insecticides. Remove and destroy weeds around the field. Avoid planting near infected cucurbit fields.",
+        "tn": "Jala mefuta e e ganang bolwetsi. Diriisa malwethi a selefera a a nyenyang matlhare go dida diaflid. Diriisa dikhemikele tsa thibelo. Tlose mme o senya magora gaufi le tshimo. Efoga go jala gaufi le mafelo a tshimo a a konaletsweng."
+      },
+      "when_to_call_vet": {
+        "en": "Consult an agricultural extension officer if more than 20% of your crop is affected, or if you need help identifying the correct insecticide.",
+        "tn": "Bua le mokwaledi wa temo fa go feta 20% ya dibjalo tsa gago di amegile, kgotsa fa o tlhoka thuso go tlhagisa setlhare se se nepileng sa go bolaya dikeledi."
+      }
+    },
+
+    "sorghum cereal grain mold": {
+      "display_name": {
+        "en": "Sorghum Grain Mould",
+        "tn": "Bolwetsi jwa Mooko wa Mabele a Sorghum"
+      },
+      "risk_level": "medium",
+      "affects": {
+        "en": "Sorghum",
+        "tn": "Mabele a sorghum"
+      },
+      "spreads_by": {
+        "en": "Fungal spores carried by wind and rain, insect damage to grain creates entry points",
+        "tn": "Dipora tsa obomela tse di isiswang ke mowa le pula, go gobala ga lebese ke dikeledi go tlhoma mafelo a a tsenang"
+      },
+      "visual_symptoms": {
+        "en": "Pink, red, grey or black discolouration on grain heads. Shrivelled or discoloured individual grain kernels. White or grey fungal growth visible between grain kernels.",
+        "tn": "Go mmina ga mmala wa boshibidu, bohibidu, botlhoki kgotsa boso mo dihlohlong tsa lebese. Lebese le le kgontshitsweng kgotsa le le fetotsegileng mmala. Go gola ga obomela o o tshweu kgotsa o o botlhoki o o bonalang gare ga dikone tsa lebese."
+      },
+      "behavioral_questions": [
+        {
+          "id": "weather",
+          "question": {
+            "en": "What has the weather been like during grain filling and maturity?",
+            "tn": "Bosa bo ne jang nakong ya go tlala le go gola ga lebese?"
+          },
+          "options": {
+            "en": ["Dry and sunny", "Some rain during grain fill", "Frequent rain and high humidity"],
+            "tn": ["Go oma le letsatsi", "Pula e sele nakong ya go tlala ga lebese", "Pula e gantsi le bomolelo jo bogolo"]
+          },
+          "weights": {
+            "Dry and sunny": 0,
+            "Some rain during grain fill": 0.2,
+            "Frequent rain and high humidity": 0.4
+          }
+        },
+        {
+          "id": "mold_coverage",
+          "question": {
+            "en": "How much of the grain head is affected?",
+            "tn": "Kae ga hlogo ya lebese e amegile?"
+          },
+          "options": {
+            "en": ["Less than 25%", "25-50% affected", "More than 50% affected"],
+            "tn": ["Ka fa tlase ga 25%", "25-50% e amegile", "Go feta 50% e amegile"]
+          },
+          "weights": {
+            "Less than 25%": 0.1,
+            "25-50% affected": 0.25,
+            "More than 50% affected": 0.4
+          }
+        },
+        {
+          "id": "harvest_timing",
+          "question": {
+            "en": "Is the crop ready for harvest or past maturity?",
+            "tn": "A dibjalo di sesiwa go kotulwa kgotsa di feta bogolo?"
+          },
+          "options": {
+            "en": ["Still 2-4 weeks from harvest", "Ready to harvest now", "Past optimal harvest time"],
+            "tn": ["Di sale dibeke tse 2-4 go fitlha go kotulo", "Di sesiwa go kotulwa jaanong", "Di feta nako e e siameng ya kotulo"]
+          },
+          "weights": {
+            "Still 2-4 weeks from harvest": 0.1,
+            "Ready to harvest now": 0.2,
+            "Past optimal harvest time": 0.4
+          }
+        }
+      ],
+      "risk_thresholds": {
+        "low": 0.15,
+        "medium": 0.3,
+        "high": 0.5
+      },
+      "recommendations": {
+        "low": {
+          "en": "Early mould signs detected. If close to harvest, harvest early to prevent spread. Ensure good air circulation around grain heads. Apply fungicide if crop is still weeks from harvest and conditions remain wet.",
+          "tn": "Matshwao a ntlha a mooko a bonwe. Fa go le gaufi le kotulo, kotula pele go thibela go anamela. Netefatsa go gololosega ga mowa o o siameng gaufi le dihlohlong tsa lebese. Diriisa setlhare sa obomela fa dibjalo di sale dibeke go fitlha go kotulo mme maemo a ntse a na le metsi."
+        },
+        "medium": {
+          "en": "Moderate grain mould. Harvest as soon as possible — do not wait. Dry harvested grain immediately to below 13% moisture. Separate mouldy grain from healthy grain. Do not feed heavily moulded grain to animals as mycotoxins can be harmful.",
+          "tn": "Mooko wa lebese wa bogare. Kotula ka bonako kamoka — se letele. Omisa lebese le le kotulwang ka bonako go ya ka fa tlase ga 13% ya metsi. Arola lebese le le konaletsweng ke mooko go tswa go lebese le le itekanetse. O se ka wa fepa diphoofolo lebese le le konaletsweng thata ke mooko fa mycotoxins e ka nna ya kotsi."
+        },
+        "high": {
+          "en": "Severe grain mould. Harvest immediately regardless of maturity stage. Heavily moulded grain is not suitable for human consumption or animal feed due to mycotoxins. Contact agricultural extension for grain disposal advice. Source mould-resistant varieties for next season.",
+          "tn": "Mooko o masisi wa lebese. Kotula ka bonako go baakanywa ga seemo sa bogolo. Lebese le le konaletsweng thata ke mooko ga le tshwanela go jewa ke batho kgotsa go fepiwa diphoofolo ka ntlha ya mycotoxins. Ikgolaganya le mokwaledi wa temo go bona kgakololo ya go lahlela lebese. Batlhela mefuta e e ganang mooko go kotulo e e latelang."
+        }
+      },
+      "treatment": {
+        "en": "Once grain mould is established, fungicide has limited effect. Preventive fungicide application during flowering (e.g. propiconazole) is most effective. Harvest early in wet seasons. Store grain at below 13% moisture to prevent post-harvest mould.",
+        "tn": "Fa mooko wa lebese o sena go tlhagela, setlhare sa obomela se na le ditlamorago tse di fokotsegeng. Go diriisa setlhare sa thibelo sa obomela nakong ya go thunya (e.g. propiconazole) ke go nepagala thata. Kotula pele mo dikgweding tse di na le pula. Boloka lebese ka fa tlase ga 13% ya metsi go thibela mooko morago ga kotulo."
+      },
+      "prevention": {
+        "en": "Plant mould-resistant sorghum varieties. Apply fungicide at 50% flowering stage. Harvest promptly at maturity. Avoid late planting which delays harvest into wet season. Ensure proper grain storage conditions.",
+        "tn": "Jala mefuta ya sorghum e e ganang mooko. Diriisa setlhare sa obomela mo seheng sa 50% sa go thunya. Kotula ka bonako fa go boa bogolo. Efoga go jala morago ga nako go go diegelang kotulo go ya mo go kotulo e nang le pula. Netefatsa maemo a a siameng a poloko ya lebese."
+      },
+      "when_to_call_vet": {
+        "en": "Contact your local agricultural extension officer or Ministry of Agriculture if mould affects more than 30% of your crop or if you suspect mycotoxin contamination.",
+        "tn": "Ikgolaganya le mokwaledi wa temo wa gago wa lefelo kgotsa le Lefapha la Temo fa mooko o amega go feta 30% ya dibjalo tsa gago kgotsa fa o belaela tshwaetso ya mycotoxin."
+      }
+    },
+
+    "sorghum covered kernel smut": {
+      "display_name": {
+        "en": "Sorghum Covered Kernel Smut",
+        "tn": "Bolwetsi jwa Smut ya Dikone tse di Aparetsweng tsa Mabele"
+      },
+      "risk_level": "medium",
+      "affects": {
+        "en": "Sorghum",
+        "tn": "Mabele a sorghum"
+      },
+      "spreads_by": {
+        "en": "Soil-borne fungal spores, infected seed, contaminated planting equipment",
+        "tn": "Dipora tsa obomela tse di mo molapon, peo e e konaletsweng, dithulaganyo tsa go jala tse di konaletsweng"
+      },
+      "visual_symptoms": {
+        "en": "Entire grain replaced by dark brown/black masses covered by a thin membrane. Infected heads appear darker than healthy ones. Membrane ruptures at harvest releasing black spore powder.",
+        "tn": "Lebese lotlhe le ntshetsiwa ke dikgwebo tse di fiswa/tse di ntsho tse di aparetsweng ke letlalo le le bonenepi. Dihlohlo tse di konaletsweng di bonala di fifetse go feta tse di itekanetse. Letlalo le a bula fa go kotulwa go ntsholla phofu ya e ntsho ya dipora."
+      },
+      "behavioral_questions": [
+        {
+          "id": "seed_source",
+          "question": {
+            "en": "Where did you get your sorghum seed from?",
+            "tn": "O bone peo ya mabele a gago kwa kae?"
+          },
+          "options": {
+            "en": ["Certified commercial seed", "Own saved seed from last season", "Seed from a neighbour or market"],
+            "tn": ["Peo ya kgwebisano e e netefaditsweng", "Peo e e bolokiwang ya gago go tswa go kotulo e e fetileng", "Peo go tswa go motswala kgotsa lebenkeleng"]
+          },
+          "weights": {
+            "Certified commercial seed": 0,
+            "Own saved seed from last season": 0.3,
+            "Seed from a neighbour or market": 0.35
+          }
+        },
+        {
+          "id": "smut_percentage",
+          "question": {
+            "en": "Roughly what percentage of heads in your field show these dark masses?",
+            "tn": "Mo gare ga dihlohlo mo tshimong ya gago, kelo e e kana kang e bontsha dikgwebo tse di ntsho tse?"
+          },
+          "options": {
+            "en": ["Less than 5%", "5-20%", "More than 20%"],
+            "tn": ["Ka fa tlase ga 5%", "5-20%", "Go feta 20%"]
+          },
+          "weights": {
+            "Less than 5%": 0.1,
+            "5-20%": 0.25,
+            "More than 20%": 0.45
+          }
+        },
+        {
+          "id": "previous_smut",
+          "question": {
+            "en": "Did you have smut problems in this field in previous seasons?",
+            "tn": "A o ne o na le mathata a smut mo tshimong eno mo dikgweding tse di fetileng?"
+          },
+          "options": {
+            "en": ["No, first time", "Yes, occasionally", "Yes, every season"],
+            "tn": ["Nnyaa, nako ya ntlha", "Ee, fa gare ga gare", "Ee, kotulo le kotulo"]
+          },
+          "weights": {
+            "No, first time": 0,
+            "Yes, occasionally": 0.15,
+            "Yes, every season": 0.35
+          }
+        }
+      ],
+      "risk_thresholds": {
+        "low": 0.1,
+        "medium": 0.3,
+        "high": 0.5
+      },
+      "recommendations": {
+        "low": {
+          "en": "Low smut incidence. Remove affected heads carefully before they rupture and release spores. Do not save seed from this crop. Plan to treat seed with fungicide before next planting season.",
+          "tn": "Kelo e nnye ya smut. Tlose dihlohlo tse di amegeng ka kelotlhoko pele di bula mme di ntsholla dipora. O se ka wa boloka peo go tswa mo dibjalo tse. Rerelela go alafa peo ka setlhare sa obomela pele ga kotulo e e latelang ya go jala."
+        },
+        "medium": {
+          "en": "Significant smut infection. Remove and burn smutted heads before rupture. Do not leave infected material in the field. Do not save seed from this crop. For next season: source certified smut-free seed and treat with thiram or carboxin fungicide before planting.",
+          "tn": "Tshwaetso e e kgatlhang ya smut. Tlose mme o tshube dihlohlo tse di nang le smut pele di bula. O se ka wa tshiya dithoto tse di konaletsweng mo tshimong. O se ka wa boloka peo go tswa mo dibjalo tse. Go kotulo e e latelang: batlhela peo e e netefaditsweng e e se nang smut mme o e alafe ka setlhare sa thiram kgotsa carboxin pele ga go jala."
+        },
+        "high": {
+          "en": "Severe smut outbreak — major yield loss expected. Harvest carefully to avoid releasing spores. Burn all crop residue. Do not plant sorghum in this field next season — practice crop rotation. Source resistant varieties and always use certified treated seed going forward.",
+          "tn": "Maaka a masisi a smut — go solofela go latlhegelwa ke pholo e ntsi. Kotula ka kelotlhoko go efoga go ntsholla dipora. Tshuba moretlwa wotlhe wa dibjalo. O se ka wa jala mabele mo tshimong eno ko kotuleng e e latelang — diriisa phuthologo ya dibjalo. Batlhela mefuta e e ganang bolwetsi mme o diriise peo e e netefaditsweng e e alafiwang nako yotlhe go ya pele."
+        }
+      },
+      "treatment": {
+        "en": "No effective in-season treatment. Prevention through seed treatment is critical. Fungicide seed dressings: thiram (3g/kg seed), carboxin+thiram combination, or tebuconazole. These must be applied before planting.",
+        "tn": "Ga go na kalafi e e dirang mo gare ga kotulo. Thibelo ka go alafa peo ke ya botlhokwa. Diteramamente tsa peo tsa setlhare sa obomela: thiram (3g/kg ya peo), kopano ya carboxin+thiram, kgotsa tebuconazole. Tse di tshwanetse go diriiswa pele ga go jala."
+      },
+      "prevention": {
+        "en": "Always use certified disease-free seed. Treat seed with recommended fungicide before planting. Practice 3-year crop rotation — do not plant sorghum in the same field consecutively. Deep plough after harvest to bury spores.",
+        "tn": "Diriisa peo e e netefaditsweng e e se nang bolwetsi nako yotlhe. Alafa peo ka setlhare se se kailweng sa obomela pele ga go jala. Diriisa phuthologo ya dibjalo ya dingwaga tse 3 — o se ka wa jala mabele mo tshimong e e tshwanang go tswelela. Lemela keledi morago ga kotulo go fitlha dipora."
+      },
+      "when_to_call_vet": {
+        "en": "Contact your agricultural extension officer if more than 10% of plants are affected, or for advice on seed treatment options available in your area.",
+        "tn": "Ikgolaganya le mokwaledi wa temo wa gago fa go feta 10% ya dimela di amegile, kgotsa go bona kgakololo ya dikgetho tsa go alafa peo tse di bonalang mo tikologong ya gago."
+      }
+    },
+
+    "potato late blight": {
+      "display_name": {
+        "en": "Potato Late Blight",
+        "tn": "Bolwetsi jwa Blight ya Mabela a Lefatshe"
+      },
+      "risk_level": "high",
+      "affects": {
+        "en": "Potatoes, tomatoes",
+        "tn": "Mabela a lefatshe, dimatamatisi"
+      },
+      "spreads_by": {
+        "en": "Wind-borne spores, water splash, infected tubers/transplants",
+        "tn": "Dipora tse di isiswang ke mowa, go tshilafala ga metsi, dibolo/dipuno tse di konaletsweng"
+      },
+      "visual_symptoms": {
+        "en": "Water-soaked dark brown or black lesions on leaves and stems, starting at leaf edges. White/grey fuzzy fungal growth on underside of infected leaves in humid conditions. Lesions expand rapidly. Tubers show brown rot internally.",
+        "tn": "Dintho tse di tshitlhilweng ke metsi tse di fiswa kgotsa tse di ntsho mo matlharen le matlhobong, go simolola mo makhulong a matlhare. Go gola ga obomela o o tshweu/botlhoki mo tlase ga matlhare a a konaletsweng mo maemong a a na le bomolelo. Dintho di phatlalala ka bonako. Dibolo di bontsha go bola ko go fiswa ko gare."
+      },
+      "behavioral_questions": [
+        {
+          "id": "humidity",
+          "question": {
+            "en": "How have weather conditions been over the past week?",
+            "tn": "Maemo a bosa a ne jang mo dibikeng tse e fetileng?"
+          },
+          "options": {
+            "en": ["Hot and dry", "Cool with some rain or morning dew", "Cool, wet and overcast for several days"],
+            "tn": ["Go tjhesa le go oma", "Go tonya le pula e sele kgotsa majwe a masa", "Go tonya, go na le metsi le go fifala mo malatsi a mmalwa"]
+          },
+          "weights": {
+            "Hot and dry": 0,
+            "Cool with some rain or morning dew": 0.2,
+            "Cool, wet and overcast for several days": 0.45
+          }
+        },
+        {
+          "id": "spread_speed",
+          "question": {
+            "en": "How quickly are the lesions spreading?",
+            "tn": "Dintho di phatlalala ka bonako jang?"
+          },
+          "options": {
+            "en": ["Slowly, over weeks", "Spreading over days", "Very rapid spread within 24-48 hours"],
+            "tn": ["Ka bonenepi, mo dibikeng", "Go phatlalala mo malatsi", "Go phatlalala ka bonako thata mo diureng tse 24-48"]
+          },
+          "weights": {
+            "Slowly, over weeks": 0,
+            "Spreading over days": 0.2,
+            "Very rapid spread within 24-48 hours": 0.45
+          }
+        },
+        {
+          "id": "irrigation",
+          "question": {
+            "en": "How do you irrigate your crop?",
+            "tn": "O nesa dibjalo tsa gago jang?"
+          },
+          "options": {
+            "en": ["Drip irrigation", "Furrow irrigation", "Overhead sprinkler"],
+            "tn": ["Go nesa go mo tseleng", "Go nesa mo digopeng", "Sprinkler e e fa godimo"]
+          },
+          "weights": {
+            "Drip irrigation": 0,
+            "Furrow irrigation": 0.1,
+            "Overhead sprinkler": 0.25
+          }
+        }
+      ],
+      "risk_thresholds": {
+        "low": 0.1,
+        "medium": 0.3,
+        "high": 0.5
+      },
+      "recommendations": {
+        "low": {
+          "en": "Early blight signs. Apply copper-based or mancozeb fungicide immediately to all plants. Remove and destroy visibly infected leaves. Switch to drip irrigation if possible to keep foliage dry. Improve air circulation between plants.",
+          "tn": "Matshwao a ntlha a blight. Diriisa setlhare sa obomela sa go thewa mo kopore kgotsa mancozeb ka bonako mo dimeleng tsotlhe. Tlose mme o senya matlhare a a bonalang a konaletsiwa. Fetogela go nesa go mo tseleng fa go kgonega go boloka matlhare a oma. Tokafatsa go gololosega ga mowa gare ga dimela."
+        },
+        "medium": {
+          "en": "Active late blight. Apply systemic fungicide (e.g. metalaxyl, cymoxanil) immediately — contact fungicides alone are insufficient. Spray every 7 days. Remove all infected material from the field. Check tubers for signs of infection when harvesting.",
+          "tn": "Blight e e tshwereng ya moragonyana. Diriisa setlhare sa obomela sa systemic (e.g. metalaxyl, cymoxanil) ka bonako — disetlhare tse di amang fela ga di lekane. Kofa dikgwedi tse 7 le dikgwedi tse 7. Tlose dithoto tsotlhe tse di konaletsweng go tswa tshimong. Lekola dibolo go bona matshwao a tshwaetso fa go kotulwa."
+        },
+        "high": {
+          "en": "SEVERE: Rapid crop destruction likely. Apply systemic fungicide immediately. Consider emergency harvest of any mature tubers before they rot. Destroy all crop residue — do not compost. Do not plant potatoes or tomatoes in this field for 2 seasons. Report to agricultural extension.",
+          "tn": "GO MASISI: Go senyega ga dibjalo ka bonako go solofela. Diriisa setlhare sa obomela sa systemic ka bonako. Nayang kotulo ya tshoganyetso ya dibolo dipe tse di godileng pele di bola. Senya moretlwa wotlhe wa dibjalo — o se ka wa o bea mo dirakeng. O se ka wa jala mabela a lefatshe kgotsa dimatamatisi mo tshimong eno go ya go dikgwedi tse 2. Begela mokwaledi wa temo."
+        }
+      },
+      "treatment": {
+        "en": "Fungicides: preventive (mancozeb, chlorothalonil) and curative/systemic (metalaxyl, cymoxanil, fenamidone). Rotate fungicide classes to prevent resistance. Apply every 7 days in wet weather, every 10-14 days in dry weather. Always read label instructions.",
+        "tn": "Disetlhare tsa obomela: tsa thibelo (mancozeb, chlorothalonil) le tsa go alafa/systemic (metalaxyl, cymoxanil, fenamidone). Fetola mefuta ya setlhare sa obomela go thibela kgaolo. Diriisa dikgwedi tse 7 le dikgwedi tse 7 mo bossang jo bo na le pula, dikgwedi tse 10-14 mo bossang jo bo omang. Buisa ditaelo tsa lebela ka nako yotlhe."
+      },
+      "prevention": {
+        "en": "Plant certified disease-free seed potatoes. Use blight-resistant varieties. Apply preventive fungicide before rainy weather. Avoid overhead irrigation. Maintain 3-year crop rotation. Remove volunteer potato plants.",
+        "tn": "Jala mabela a lefatshe a peo a a netefaditsweng a a se nang bolwetsi. Diriisa mefuta e e ganang blight. Diriisa setlhare sa thibelo sa obomela pele ga bossa jo bo na le pula. Efoga go nesa go go fa godimo. Boloka phuthologo ya dibjalo ya dingwaga tse 3. Tlose dimela tsa mabela a lefatshe tse di jalong ka tlhago."
+      },
+      "when_to_call_vet": {
+        "en": "Contact an agricultural extension officer immediately if blight is spreading rapidly or affecting more than 10% of your crop. Early intervention is critical — late blight can destroy an entire crop within days.",
+        "tn": "Ikgolaganya le mokwaledi wa temo ka bonako fa blight e phatlalala ka bonako kgotsa e amega go feta 10% ya dibjalo tsa gago. Go tshwaragana ka bonako ke ga botlhokwa — blight ya moragonyana e ka senya dibjalo tsotlhe mo malatsi a sele."
+      }
+    },
+
+    "tomato late blight": {
+      "display_name": {
+        "en": "Tomato Late Blight",
+        "tn": "Bolwetsi jwa Blight ya Dimatamatisi"
+      },
+      "risk_level": "high",
+      "affects": {
+        "en": "Tomatoes, potatoes",
+        "tn": "Dimatamatisi, mabela a lefatshe"
+      },
+      "spreads_by": {
+        "en": "Wind-borne spores, water splash, infected transplants",
+        "tn": "Dipora tse di isiswang ke mowa, go tshilafala ga metsi, dipuno tse di konaletsweng"
+      },
+      "visual_symptoms": {
+        "en": "Greasy dark water-soaked lesions on leaves. White mould on leaf undersides. Dark brown lesions on stems. Fruit shows firm brown rot from outside in. Plants can collapse within days.",
+        "tn": "Dintho tse di botlhole tse di fifetseng tse di tshitlhilweng ke metsi mo matlharen. Obomela o o tshweu mo tlase ga matlhare. Dintho tse di fiswa mo matlhobong. Leungo le bontsha go bola ko go fiswa ko gare go tswa kwa ntle. Dimela di ka we mo malatsi a sele."
+      },
+      "behavioral_questions": [
+        {
+          "id": "humidity",
+          "question": {
+            "en": "How have weather conditions been over the past week?",
+            "tn": "Maemo a bosa a ne jang mo dibikeng tse di fetileng?"
+          },
+          "options": {
+            "en": ["Hot and dry", "Cool with some rain or morning dew", "Cool, wet and overcast for several days"],
+            "tn": ["Go tjhesa le go oma", "Go tonya le pula e sele kgotsa majwe a masa", "Go tonya, go na le metsi le go fifala mo malatsi a mmalwa"]
+          },
+          "weights": {
+            "Hot and dry": 0,
+            "Cool with some rain or morning dew": 0.2,
+            "Cool, wet and overcast for several days": 0.45
+          }
+        },
+        {
+          "id": "spread_speed",
+          "question": {
+            "en": "How quickly are the lesions spreading?",
+            "tn": "Dintho di phatlalala ka bonako jang?"
+          },
+          "options": {
+            "en": ["Slowly, over weeks", "Spreading over days", "Very rapid spread within 24-48 hours"],
+            "tn": ["Ka bonenepi, mo dibikeng", "Go phatlalala mo malatsi", "Go phatlalala ka bonako thata mo diureng tse 24-48"]
+          },
+          "weights": {
+            "Slowly, over weeks": 0,
+            "Spreading over days": 0.2,
+            "Very rapid spread within 24-48 hours": 0.45
+          }
+        },
+        {
+          "id": "fruit_affected",
+          "question": {
+            "en": "Are the fruit also showing signs of rot or lesions?",
+            "tn": "A leungo le bontsha matshwao a go bola kgotsa dintho?"
+          },
+          "options": {
+            "en": ["No fruit affected", "A few fruit with lesions", "Most fruit rotting"],
+            "tn": ["Ga go na leungo le le amegeng", "Leungo le sele le na le dintho", "Leungo le le mantsi le bola"]
+          },
+          "weights": {
+            "No fruit affected": 0,
+            "A few fruit with lesions": 0.2,
+            "Most fruit rotting": 0.4
+          }
+        }
+      ],
+      "risk_thresholds": {
+        "low": 0.1,
+        "medium": 0.3,
+        "high": 0.5
+      },
+      "recommendations": {
+        "low": {
+          "en": "Early blight signs. Apply copper-based fungicide or mancozeb immediately. Remove infected leaves. Improve air circulation. Avoid wetting foliage when watering. Monitor daily.",
+          "tn": "Matshwao a ntlha a blight. Diriisa setlhare sa obomela sa go thewa mo kopore kgotsa mancozeb ka bonako. Tlose matlhare a a konaletsweng. Tokafatsa go gololosega ga mowa. Efoga go kgotsa matlhare fa o nesa. Lebelela letsatsi le letsatsi."
+        },
+        "medium": {
+          "en": "Active late blight on tomatoes. Apply systemic fungicide (metalaxyl or cymoxanil) every 5-7 days. Harvest any ripe fruit immediately before it becomes infected. Remove all infected plant material from the field and destroy it.",
+          "tn": "Blight e e tshwereng ya moragonyana mo dimatamatising. Diriisa setlhare sa obomela sa systemic (metalaxyl kgotsa cymoxanil) dikgwedi tse 5-7 le dikgwedi tse 5-7. Kotula leungo lipe le le butsweng ka bonako pele le konaletsiwa. Tlose dithoto tsotlhe tsa semela tse di konaletsweng go tswa tshimong mme o di senya."
+        },
+        "high": {
+          "en": "SEVERE: Emergency action needed. Apply systemic fungicide immediately. Harvest all marketable fruit now. Remove and burn all crop residue. Do not plant tomatoes or potatoes in this area for at least 2 seasons. Disinfect stakes and equipment.",
+          "tn": "GO MASISI: Go hlokafalela ga tiro ya tshoganyetso. Diriisa setlhare sa obomela sa systemic ka bonako. Kotula leungo lotlhe le le rekisiwang jaanong. Tlose mme o tshube moretlwa wotlhe wa dibjalo. O se ka wa jala dimatamatisi kgotsa mabela a lefatshe mo tikologong eno go ya bonnye go ya go dikgwedi tse 2. Tshidisa dithomero le dithulaganyo."
+        }
+      },
+      "treatment": {
+        "en": "Same fungicides as potato late blight: metalaxyl, cymoxanil, fenamidone for curative action. Mancozeb and chlorothalonil for preventive protection. Always alternate products to prevent fungicide resistance.",
+        "tn": "Disetlhare tse di tshwanang le tsa blight ya moragonyana ya mabela a lefatshe: metalaxyl, cymoxanil, fenamidone go tiro ya go alafa. Mancozeb le chlorothalonil go tshireletso ya thibelo. Fetola dikolo nako yotlhe go thibela kgaolo ya setlhare sa obomela."
+      },
+      "prevention": {
+        "en": "Use blight-resistant tomato varieties. Stake plants to improve air circulation. Use drip irrigation. Apply preventive fungicide before wet weather. 3-year crop rotation with non-solanaceous crops.",
+        "tn": "Diriisa mefuta ya tamati e e ganang blight. Tshomela dimela go tokafatsa go gololosega ga mowa. Diriisa go nesa go mo tseleng. Diriisa setlhare sa thibelo sa obomela pele ga bossa jo bo na le pula. Phuthologo ya dibjalo ya dingwaga tse 3 le dibjalo tse di sa amaneng le solanaceous."
+      },
+      "when_to_call_vet": {
+        "en": "Contact an agricultural extension officer immediately. Tomato late blight can wipe out an entire crop in less than a week in humid conditions — act fast.",
+        "tn": "Ikgolaganya le mokwaledi wa temo ka bonako. Blight ya moragonyana ya tamati e ka senya dibjalo tsotlhe mo dibikeng e ka nna go se kwa go na le bomolelo — dira ka bonako."
+      }
+    },
+
+    "healthy watermelon": {
+      "display_name": {
+        "en": "Healthy Watermelon",
+        "tn": "Legapu le le Itekanetse"
+      },
+      "risk_level": "none",
+      "affects": { "en": "N/A", "tn": "Ga go amege sepe" },
+      "spreads_by": { "en": "N/A", "tn": "Ga go anamele sepe" },
+      "visual_symptoms": {
+        "en": "No disease symptoms. Plant looks healthy with normal leaf colour and growth.",
+        "tn": "Ga go na matshwao a bolwetsi. Semela se bonala se itekanetseng le mmala o tlwaelegang wa matlhare le go gola."
+      },
+      "behavioral_questions": [],
+      "risk_thresholds": { "low": 0, "medium": 0, "high": 1 },
+      "recommendations": {
+        "low": {
+          "en": "Your watermelon crop looks healthy! Continue regular monitoring. Ensure consistent irrigation, balanced fertilisation, and weed control. Scout for pests weekly.",
+          "tn": "Dibjalo tsa gago tsa legapu di bonala di itekanetseng! Tswelela go lebelela ka metlha. Netefatsa go nesa go go tshwanang, go fepa ka kelotlhoko, le taolo ya magora. Batlhela dikeledi dibeke le dibeke."
+        },
+        "medium": { "en": "", "tn": "" },
+        "high": { "en": "", "tn": "" }
+      },
+      "treatment": { "en": "No treatment needed.", "tn": "Ga go hlokafalele kalafi." },
+      "prevention": {
+        "en": "Maintain weed control, monitor for aphids weekly, ensure good drainage, and rotate crops each season.",
+        "tn": "Boloka taolo ya magora, lebelela diaflid dibeke le dibeke, netefatsa go ntsha metsi go go siameng, le go phuthologa ga dibjalo kotulo le kotulo."
+      },
+      "when_to_call_vet": {
+        "en": "Contact an extension officer if you notice yellowing, wilting, unusual spots, or significant pest activity.",
+        "tn": "Ikgolaganya le mokwaledi wa temo fa o lemoga go ntshwa mmala, go fela, dintshi tse di sa tlwaelegang, kgotsa tiro e ntsi ya dikeledi."
+      }
+    },
+
+    "healthy potato": {
+      "display_name": {
+        "en": "Healthy Potato",
+        "tn": "Lefelo la Lefatshe le le Itekanetse"
+      },
+      "risk_level": "none",
+      "affects": { "en": "N/A", "tn": "Ga go amege sepe" },
+      "spreads_by": { "en": "N/A", "tn": "Ga go anamele sepe" },
+      "visual_symptoms": {
+        "en": "No disease symptoms detected. Plant appears healthy.",
+        "tn": "Ga go na matshwao a bolwetsi a bonweng. Semela se bonala se itekanetseng."
+      },
+      "behavioral_questions": [],
+      "risk_thresholds": { "low": 0, "medium": 0, "high": 1 },
+      "recommendations": {
+        "low": {
+          "en": "Your potato crop looks healthy! Monitor weekly for early signs of blight especially during cool wet weather. Ensure good soil drainage and hilling.",
+          "tn": "Dibjalo tsa gago tsa lefelo la lefatshe di bonala di itekanetseng! Lebelela dibeke le dibeke go bona matshwao a ntlha a blight bogolo jang nakong ya bossa jo bo tonya jo bo na le pula. Netefatsa go ntsha metsi ga molapo o o siameng le go roba molapo."
+        },
+        "medium": { "en": "", "tn": "" },
+        "high": { "en": "", "tn": "" }
+      },
+      "treatment": { "en": "No treatment needed.", "tn": "Ga go hlokafalele kalafi." },
+      "prevention": {
+        "en": "Use certified seed potatoes, practice crop rotation, apply preventive fungicide during wet weather, and hill plants regularly.",
+        "tn": "Diriisa mabela a peo a a netefaditsweng a lefatshe, diriisa phuthologo ya dibjalo, diriisa setlhare sa thibelo sa obomela nakong ya bossa jo bo na le pula, le go roba dimela ka metlha."
+      },
+      "when_to_call_vet": {
+        "en": "Contact extension services if you notice dark lesions appearing or spreading rapidly on leaves or stems.",
+        "tn": "Ikgolaganya le ditirelo tsa temo fa o lemoga dintho tse di ntsho di tlhagela kgotsa di phatlalala ka bonako mo matlharen kgotsa matlhobong."
+      }
+    },
+
+    "healthy tomato": {
+      "display_name": {
+        "en": "Healthy Tomato",
+        "tn": "Tamati e e Itekanetse"
+      },
+      "risk_level": "none",
+      "affects": { "en": "N/A", "tn": "Ga go amege sepe" },
+      "spreads_by": { "en": "N/A", "tn": "Ga go anamele sepe" },
+      "visual_symptoms": {
+        "en": "No disease symptoms detected. Plant appears healthy with good foliage and fruit development.",
+        "tn": "Ga go na matshwao a bolwetsi a bonweng. Semela se bonala se itekanetseng le matlhare a a siameng le go gola ga leungo."
+      },
+      "behavioral_questions": [],
+      "risk_thresholds": { "low": 0, "medium": 0, "high": 1 },
+      "recommendations": {
+        "low": {
+          "en": "Your tomato crop looks healthy! Monitor closely during cool humid weather for blight signs. Ensure good staking and air circulation. Apply preventive fungicide if rainy weather is forecast.",
+          "tn": "Dibjalo tsa gago tsa tamati di bonala di itekanetseng! Lebelela ka kelotlhoko nakong ya bossa jo bo tonya jo bo na le bomolelo go bona matshwao a blight. Netefatsa go tshomela go go siameng le go gololosega ga mowa. Diriisa setlhare sa thibelo sa obomela fa bossa jo bo na le pula bo solofeditswe."
+        },
+        "medium": { "en": "", "tn": "" },
+        "high": { "en": "", "tn": "" }
+      },
+      "treatment": { "en": "No treatment needed.", "tn": "Ga go hlokafalele kalafi." },
+      "prevention": {
+        "en": "Use resistant varieties, stake plants, use drip irrigation, apply preventive fungicide, and practice crop rotation.",
+        "tn": "Diriisa mefuta e e ganang bolwetsi, tshomela dimela, diriisa go nesa go mo tseleng, diriisa setlhare sa thibelo sa obomela, le go phuthologa ga dibjalo."
+      },
+      "when_to_call_vet": {
+        "en": "Contact extension if you notice any dark water-soaked lesions on leaves, stems or fruit — late blight moves fast.",
+        "tn": "Ikgolaganya le ditirelo tsa temo fa o lemoga dintho dipe tse di tshitlhilweng ke metsi tse di ntsho mo matlharen, matlhobong kgotsa leungong — blight ya moragonyana e tsamaya ka bonako."
+      }
+    }
+  }
+}
