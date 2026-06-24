@@ -39,9 +39,9 @@ class ProfileScreen extends StatelessWidget {
           final location     = data['location']     ?? '';
           final farmName     = data['farmName']     ?? '';
           final farmType     = data['farmType']     ?? '';
-          final farmSize     = data['farmSize']     ?? '';
+          // final farmSize     = data['farmSize']     ?? '';
           final animalsKept  = data['animalsKept']  ?? '';
-          final animalCount  = data['animalCount']  ?? '';
+          // final animalCount  = data['animalCount']  ?? '';
           final waterSource  = data['waterSource']  ?? '';
           final soilType     = data['soilType']     ?? '';
           final yearsFarming = data['yearsFarming'] ?? '';
@@ -59,7 +59,7 @@ class ProfileScreen extends StatelessWidget {
 
           return CustomScrollView(
             slivers: [
-              // ── Banner ────────────────────────────────────────────
+              // Banner
               SliverToBoxAdapter(
                 child: Container(
                   color: AppColors.greenDark,
@@ -198,7 +198,7 @@ class ProfileScreen extends StatelessWidget {
                 ),
               ),
 
-              // ── User details section ──────────────────────────────
+              // User details section
               _sectionHeader('ACCOUNT DETAILS'),
               SliverToBoxAdapter(
                 child: _card(
@@ -216,7 +216,7 @@ class ProfileScreen extends StatelessWidget {
                 ),
               ),
 
-              // ── Farm details section ──────────────────────────────
+              // Farm details
               _sectionHeader('FARM DETAILS'),
               SliverToBoxAdapter(
                 child: _card(
@@ -227,12 +227,12 @@ class ProfileScreen extends StatelessWidget {
                     _FieldData('Farm name',           farmName,     'farmName'),
                     _FieldData('Farm type',           farmType,     'farmType',
                         hint: 'e.g. Livestock / Crop / Mixed'),
-                    _FieldData('Farm size (ha)',       farmSize,     'farmSize',
-                        isNumeric: true),
+                    // _FieldData('Farm size (ha)',       farmSize,     'farmSize',
+                        // isNumeric: true),
                     _FieldData('Animals kept',        animalsKept,  'animalsKept',
                         hint: 'e.g. Cattle, Goats, Poultry'),
-                    _FieldData('No. of animals',      animalCount,  'animalCount',
-                        isNumeric: true),
+                    // _FieldData('No. of animals',      animalCount,  'animalCount',
+                        // isNumeric: true),
                     _FieldData('Water source',        waterSource,  'waterSource',
                         hint: 'e.g. Borehole, Dam, River'),
                     _FieldData('Soil type',           soilType,     'soilType',
@@ -289,7 +289,7 @@ class ProfileScreen extends StatelessWidget {
     );
   }
 
-  // ── Section header helper ────────────────────────────────────────────────
+  // Section header helper 
   Widget _sectionHeader(String title) => SliverToBoxAdapter(
         child: Padding(
           padding: const EdgeInsets.fromLTRB(16, 20, 16, 8),
@@ -302,7 +302,7 @@ class ProfileScreen extends StatelessWidget {
         ),
       );
 
-  // ── Card builder ─────────────────────────────────────────────────────────
+  // Card builder 
   Widget _card(
     BuildContext context, {
     required Color cardColor,
@@ -352,7 +352,7 @@ class ProfileScreen extends StatelessWidget {
     );
   }
 
-  // ── Photo picker ─────────────────────────────────────────────────────────
+  // Photo picker
   Future<void> _pickPhoto(BuildContext context, String uid) async {
     final picker = ImagePicker();
     final picked = await picker.pickImage(
@@ -380,7 +380,7 @@ class ProfileScreen extends StatelessWidget {
     }
   }
 
-  // ── Edit dialog ──────────────────────────────────────────────────────────
+  // Edit dialog 
   void _editField(
     BuildContext context, {
     required String uid,
@@ -429,7 +429,7 @@ class ProfileScreen extends StatelessWidget {
   }
 }
 
-// ── Data model ────────────────────────────────────────────────────────────────
+// Data model 
 class _FieldData {
   final String label, value, field;
   final String? hint;
@@ -441,7 +441,7 @@ class _FieldData {
   });
 }
 
-// ── Stat box ──────────────────────────────────────────────────────────────────
+// Stat box 
 class _StatBox extends StatelessWidget {
   final String label, value;
   final VoidCallback? onTap;
@@ -486,7 +486,7 @@ class _StatBox extends StatelessWidget {
   }
 }
 
-// ── Profile row ───────────────────────────────────────────────────────────────
+// Profile row
 class _ProfileRow extends StatelessWidget {
   final String label, value;
   final VoidCallback onEdit;

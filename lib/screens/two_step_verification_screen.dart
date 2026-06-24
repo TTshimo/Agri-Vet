@@ -5,8 +5,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import '../../main.dart';
 import 'shell_screen.dart';
 
-/// Called after successful email/password login when 2FA is enabled.
-/// Sends an OTP to the user's phone and verifies it before granting access.
 class TwoStepVerificationScreen extends StatefulWidget {
   final String phoneNumber;
   const TwoStepVerificationScreen({super.key, required this.phoneNumber});

@@ -7,13 +7,13 @@ from datetime import datetime, timezone
 import firebase_admin
 from firebase_admin import credentials, firestore
 
-# ── Firebase init ─────────────────────────────────────────────────────────────
+# Firebase init
 service_account = json.loads(os.environ["FIREBASE_SERVICE_ACCOUNT"])
 cred = credentials.Certificate(service_account)
 firebase_admin.initialize_app(cred)
 db = firestore.client()
 
-# ── RSS feeds by category ─────────────────────────────────────────────────────
+# RSS feeds by category 
 FEEDS = [
     {
         "url": "https://www.fao.org/news/rss-feed/en/",
@@ -42,7 +42,7 @@ FEEDS = [
     },
 ]
 
-# ── Helpers ───────────────────────────────────────────────────────────────────
+# Helpers 
 def strip_html(text: str) -> str:
     """Remove HTML tags and decode common entities."""
     text = re.sub(r"<[^>]+>", "", text)
@@ -63,7 +63,7 @@ def parse_date(entry) -> datetime:
     return datetime.now(timezone.utc)
 
 
-# ── Main ──────────────────────────────────────────────────────────────────────
+# Main
 def scrape():
     batch = db.batch()
     count = 0

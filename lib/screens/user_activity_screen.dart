@@ -90,7 +90,7 @@ class UserActivityScreen extends StatelessWidget {
   }
 }
 
-// ── Post card ─────────────────────────────────────────────────────────────────
+// Post card
 class _PostCard extends StatelessWidget {
   final Map<String, dynamic> data;
   const _PostCard({required this.data});
@@ -183,7 +183,7 @@ class _PostCard extends StatelessWidget {
   }
 }
 
-// ── Diagnosis card ────────────────────────────────────────────────────────────
+// Diagnosis card
 class _DiagnosisCard extends StatelessWidget {
   final Map<String, dynamic> data;
   const _DiagnosisCard({required this.data});

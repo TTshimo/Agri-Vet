@@ -163,8 +163,7 @@ class _LearnScreenState extends State<LearnScreen> {
   }
 }
 
-// ── Disease card ──────────────────────────────────────────────────────────────
-
+// Disease card
 class _DiseaseCard extends StatelessWidget {
   final String diseaseKey;
   final Map<String, dynamic> data;
@@ -271,8 +270,7 @@ class _DiseaseCard extends StatelessWidget {
   }
 }
 
-// ── Disease detail ────────────────────────────────────────────────────────────
-
+// Disease details
 class _DiseaseDetailScreen extends StatelessWidget {
   final String diseaseKey;
   final Map<String, dynamic> data;

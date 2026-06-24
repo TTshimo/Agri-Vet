@@ -2,7 +2,6 @@ import 'package:agrivet/screens/community_screen.dart';
 import 'package:agrivet/screens/home_screen.dart';
 import 'package:agrivet/screens/learn_screen.dart';
 import 'package:agrivet/screens/messaging_screen.dart';
-import 'package:agrivet/screens/news_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -118,9 +117,7 @@ class AgriVetApp extends StatelessWidget {
     );
   }
 
-  // NOTE: This is a placeholder dark theme mirroring the light theme's
-  // structure with darker surfaces. Adjust colors to taste — AppColors
-  // currently only defines a light palette.
+ // Dark mode
   ThemeData _buildDarkTheme() {
     return ThemeData(
       useMaterial3: true,
@@ -185,8 +182,7 @@ class AgriVetApp extends StatelessWidget {
   }
 }
 
-// ── App shell with bottom nav ─────────────────────────────────────────────────
-
+// App shell with bottom nav
 class AppShell extends StatefulWidget {
   const AppShell({super.key});
 
@@ -200,7 +196,6 @@ class _AppShellState extends State<AppShell> {
 
   final _screens = const [
     HomeScreen(),
-    NewsScreen(),
     CommunityScreen(),
     MessagingScreen(),
     LearnScreen(),
@@ -233,7 +228,7 @@ class _AppShellState extends State<AppShell> {
   }
 }
 
-// ── Bottom nav with unread badge on Messages ──────────────────────────────────
+// Bottom nav with unread badge on Messages
 
 class _BottomNav extends StatelessWidget {
   final int currentIndex;
@@ -393,7 +388,7 @@ class _NavItem extends StatelessWidget {
   }
 }
 
-// ── App colors / spacing / radius (unchanged) ─────────────────────────────────
+// App colors / spacing / radius
 
 class AppColors {
   AppColors._();

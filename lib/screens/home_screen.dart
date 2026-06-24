@@ -29,9 +29,9 @@ class _HomeScreenState extends State<HomeScreen> {
 
   String get _greeting {
     final hour = DateTime.now().hour;
-    if (hour < 12) return 'Maduo a masa';
-    if (hour < 17) return 'Dumelang';
-    return 'Maabane';
+    if (hour < 12) return 'Goodmorning';
+    if (hour < 17) return 'Hello';
+    return 'Yesterday';
   }
 
   String get _firstName {
@@ -65,7 +65,7 @@ class _HomeScreenState extends State<HomeScreen> {
       backgroundColor: AppColors.background,
       body: CustomScrollView(
         slivers: [
-          // ── Header: greeting + category chips ──────────────────────────
+          // Header: greeting + category chip
           SliverToBoxAdapter(
             child: Container(
               color: AppColors.greenDark,
@@ -80,7 +80,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 children: [
                   // Greeting
                   Text(
-                    '$_greeting, $_firstName 👋',
+                    '$_greeting, $_firstName',
                     style: const TextStyle(
                       fontSize: 13,
                       color: AppColors.greenHint,
@@ -88,7 +88,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                   const SizedBox(height: 4),
                   const Text(
-                    "What's happening on the farm?",
+                    "Explore what’s new and what’s next",
                     style: TextStyle(
                       fontSize: 22,
                       fontWeight: FontWeight.w600,
@@ -155,7 +155,7 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           ),
 
-          // ── News stream ────────────────────────────────────────────────
+          // News stream
           StreamBuilder<QuerySnapshot>(
             stream: _stream,
             builder: (context, snapshot) {
@@ -226,7 +226,7 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 }
 
-// ── Alert card ────────────────────────────────────────────────────────────────
+// Alert card
 
 class _AlertCard extends StatelessWidget {
   final Map<String, dynamic> data;
@@ -339,7 +339,7 @@ class _AlertCard extends StatelessWidget {
   }
 }
 
-// ── Standard news card ────────────────────────────────────────────────────────
+// Standard news card 
 
 class _NewsCard extends StatelessWidget {
   final Map<String, dynamic> data;
@@ -433,8 +433,7 @@ class _NewsCard extends StatelessWidget {
   }
 }
 
-// ── Source badge ──────────────────────────────────────────────────────────────
-
+// Source badge 
 class _SourceBadge extends StatelessWidget {
   final String source;
   final Color color;
@@ -454,8 +453,7 @@ class _SourceBadge extends StatelessWidget {
   }
 }
 
-// ── Sources footer ────────────────────────────────────────────────────────────
-
+// Sources footer
 class _SourcesFooter extends StatelessWidget {
   const _SourcesFooter();
 
@@ -530,8 +528,7 @@ class _SourcesFooter extends StatelessWidget {
   }
 }
 
-// ── Empty + error states ──────────────────────────────────────────────────────
-
+// Empty + error states 
 class _EmptyView extends StatelessWidget {
   const _EmptyView();
 
@@ -613,8 +610,7 @@ class _ErrorView extends StatelessWidget {
   }
 }
 
-// ── Helpers ───────────────────────────────────────────────────────────────────
-
+// Helpers
 String _timeAgo(dynamic ts) {
   if (ts == null) return '';
   final dt = (ts as Timestamp).toDate();
@@ -673,8 +669,7 @@ _CategoryStyle _categoryStyle(String category) {
   }
 }
 
-// ── Models ────────────────────────────────────────────────────────────────────
-
+// Models
 class _Category {
   final String id;
   final String label;

@@ -94,7 +94,6 @@ class _LoginScreenState extends State<LoginScreen> {
       body: SafeArea(
         child: Column(
           children: [
-            // Top branding section
             Padding(
               padding: const EdgeInsets.fromLTRB(24, 48, 24, 40),
               child: Column(

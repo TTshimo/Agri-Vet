@@ -21,8 +21,7 @@ class ThemeProvider extends ChangeNotifier {
   }
 }
 
-// ── App-wide color tokens ────────────────────────────────────────────────────
-// Call AppTheme.light() / AppTheme.dark() in MaterialApp.
+// App-wide color tokens
 class AppTheme {
   static ThemeData light() => _build(false);
   static ThemeData dark()  => _build(true);

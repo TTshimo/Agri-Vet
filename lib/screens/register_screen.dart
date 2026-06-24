@@ -215,7 +215,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           const SizedBox(height: 20),
                         ],
 
-                        // ── Step 1: Account details ──────────────────────
+                        // Account 
                         if (_step == 1) ...[
                           const _FieldLabel(label: 'Full name'),
                           const SizedBox(height: 6),
@@ -343,7 +343,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           ),
                         ],
 
-                        // ── Step 2: Farm details ─────────────────────────
+                        // Farm details 
                         if (_step == 2) ...[
                           const _FieldLabel(label: 'Farm name'),
                           const SizedBox(height: 6),
@@ -440,7 +440,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
   }
 }
 
-// ── Helper widgets ───────────────────────────────────────────────────────────
+// Helper widgets 
 
 class _FieldLabel extends StatelessWidget {
   final String label;
