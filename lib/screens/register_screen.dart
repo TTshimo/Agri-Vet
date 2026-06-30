@@ -297,7 +297,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           ),
                           const SizedBox(height: 10),
 
-                          // Password strength bar
                           _PasswordStrengthBar(
                               password: _passwordController.text),
                           const SizedBox(height: 18),
@@ -439,8 +438,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
     );
   }
 }
-
-// Helper widgets 
 
 class _FieldLabel extends StatelessWidget {
   final String label;

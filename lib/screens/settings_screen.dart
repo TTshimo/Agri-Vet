@@ -38,7 +38,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
         padding: const EdgeInsets.all(16),
         children: [
 
-          // Appearance
           _header('APPEARANCE'),
           _card(cardColor, borderColor, [
             _ToggleRow(
@@ -49,7 +48,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
             ),
           ]),
 
-          // Language
           _header('LANGUAGE'),
           _card(cardColor, borderColor, [
             _RadioRow(
@@ -69,7 +67,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
             ),
           ]),
 
-          // Notifications
           _header('NOTIFICATIONS'),
           _card(cardColor, borderColor, [
             _ToggleRow(
@@ -94,7 +91,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
             ),
           ]),
 
-          // Account
           _header('ACCOUNT'),
           _card(cardColor, borderColor, [
             _TileRow(
@@ -124,7 +120,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
             ),
           ]),
 
-          // Danger zone
           _header('DANGER ZONE'),
           _card(cardColor, borderColor, [
             _TileRow(
@@ -148,7 +143,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
   }
 
-  // Helpers
   Widget _header(String t) => Padding(
         padding: const EdgeInsets.fromLTRB(2, 20, 2, 8),
         child: Text(t,
@@ -232,7 +226,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
       builder: (_) => AlertDialog(
         title: const Text('Log out?'),
         content: const Text(
-            'You will need to sign in again to use AgriVet.'),
+            'You will need to sign in again to use AgroLens.'),
         actions: [
           TextButton(
               onPressed: () => Navigator.pop(context),
@@ -299,7 +293,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 }
 
-// Reusable row widgets
 class _ToggleRow extends StatelessWidget {
   final IconData icon;
   final String label;

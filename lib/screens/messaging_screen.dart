@@ -352,8 +352,6 @@ class _MessagingScreenState extends State<MessagingScreen> {
   }
 }
 
-// ── New conversation sheet ────────────────────────────────────────────────────
-
 class _NewConversationSheet extends StatefulWidget {
   final String currentUid;
   const _NewConversationSheet({required this.currentUid});

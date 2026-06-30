@@ -42,7 +42,6 @@ class _PalRequestsScreenState extends State<PalRequestsScreen> {
     batch.delete(fs.collection('palRequests').doc(requestId));
     await batch.commit();
 
-    // Notify the original requester that their request was accepted.
     final meDoc = await fs.collection('users').doc(_uid).get();
     final myName = meDoc.data()?['name'] ?? 'Farmer';
     await fs.collection('notifications').doc(fromUid).collection('items').add({
@@ -170,8 +169,6 @@ class _PalRequestsScreenState extends State<PalRequestsScreen> {
   }
 }
 
-// ── Individual request row ───────────────────────────────────────────────────
-
 class _RequestRow extends StatefulWidget {
   final String requestId;
   final String fromUid;
@@ -200,7 +197,6 @@ class _RequestRowState extends State<_RequestRow> {
       widget.onAccept(name);
     } finally {
       // No need to reset _busy — the row disappears once the request
-      // doc is deleted and the stream above rebuilds the list.
     }
   }
 

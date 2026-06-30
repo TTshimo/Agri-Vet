@@ -68,8 +68,6 @@ class _ShellScreenState extends State<ShellScreen> {
   }
 }
 
-// Nav bar
-
 class _AgriVetNavBar extends StatelessWidget {
   final int currentIndex;
   final List<_NavItem> items;

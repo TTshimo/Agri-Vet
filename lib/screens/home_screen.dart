@@ -98,7 +98,6 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                   const SizedBox(height: 16),
 
-                  // Category filter chips
                   SizedBox(
                     height: 34,
                     child: ListView.separated(
@@ -155,7 +154,6 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           ),
 
-          // News stream
           StreamBuilder<QuerySnapshot>(
             stream: _stream,
             builder: (context, snapshot) {
@@ -182,7 +180,6 @@ class _HomeScreenState extends State<HomeScreen> {
                 );
               }
 
-              // Pin alerts to top
               final alerts = docs
                   .where((d) =>
                       (d.data() as Map<String, dynamic>)['category'] ==
@@ -225,8 +222,6 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 }
-
-// Alert card
 
 class _AlertCard extends StatelessWidget {
   final Map<String, dynamic> data;
@@ -339,8 +334,6 @@ class _AlertCard extends StatelessWidget {
   }
 }
 
-// Standard news card 
-
 class _NewsCard extends StatelessWidget {
   final Map<String, dynamic> data;
   const _NewsCard({required this.data});
@@ -433,7 +426,6 @@ class _NewsCard extends StatelessWidget {
   }
 }
 
-// Source badge 
 class _SourceBadge extends StatelessWidget {
   final String source;
   final Color color;
@@ -453,7 +445,6 @@ class _SourceBadge extends StatelessWidget {
   }
 }
 
-// Sources footer
 class _SourcesFooter extends StatelessWidget {
   const _SourcesFooter();
 
@@ -528,7 +519,6 @@ class _SourcesFooter extends StatelessWidget {
   }
 }
 
-// Empty + error states 
 class _EmptyView extends StatelessWidget {
   const _EmptyView();
 
@@ -610,7 +600,6 @@ class _ErrorView extends StatelessWidget {
   }
 }
 
-// Helpers
 String _timeAgo(dynamic ts) {
   if (ts == null) return '';
   final dt = (ts as Timestamp).toDate();
@@ -669,7 +658,6 @@ _CategoryStyle _categoryStyle(String category) {
   }
 }
 
-// Models
 class _Category {
   final String id;
   final String label;

@@ -74,7 +74,6 @@ class _CommunityScreenState extends State<CommunityScreen> {
       backgroundColor: AppColors.background,
       body: CustomScrollView(
         slivers: [
-          // ── Header ──
           SliverToBoxAdapter(
             child: Container(
               color: AppColors.greenDark,
@@ -167,7 +166,6 @@ class _CommunityScreenState extends State<CommunityScreen> {
                   ),
                   const SizedBox(height: 12),
 
-                  // Search bar
                   TextField(
                     controller: _searchController,
                     style: const TextStyle(color: Colors.white, fontSize: 14),
@@ -201,7 +199,6 @@ class _CommunityScreenState extends State<CommunityScreen> {
                   ),
                   const SizedBox(height: 10),
 
-                  // Tag filter chips
                   SingleChildScrollView(
                     scrollDirection: Axis.horizontal,
                     child: Row(
@@ -311,8 +308,6 @@ class _CommunityScreenState extends State<CommunityScreen> {
   }
 }
 
-// ── Filter chip ───────────────────────────────────────────────────────────────
-
 class _FilterChip extends StatelessWidget {
   final String label;
   final bool selected;
@@ -345,8 +340,6 @@ class _FilterChip extends StatelessWidget {
   }
 }
 
-// ── Post card ─────────────────────────────────────────────────────────────────
-
 class _PostCard extends StatefulWidget {
   final String postId;
   final Map<String, dynamic> data;
@@ -374,11 +367,6 @@ class _PostCardState extends State<_PostCard> {
 
   bool get _isOwner => widget.data['uid'] == widget.uid;
 
-  /// Writes a notification into the post author's notifications
-  /// subcollection. No-ops if acting on your own post (no point
-  /// notifying yourself), and swallows errors so a failed notification
-  /// write never blocks the actual like action — the like itself has
-  /// already succeeded by the time this is called.
   Future<void> _notifyAuthor(String type) async {
     final authorUid = widget.data['uid'] ?? '';
     if (authorUid.isEmpty || authorUid == widget.uid) return;
@@ -398,8 +386,6 @@ class _PostCardState extends State<_PostCard> {
         'createdAt': FieldValue.serverTimestamp(),
       });
     } catch (_) {
-      // Best-effort — never let a notification failure surface to the
-      // user over a like that already succeeded.
     }
   }
 
@@ -450,7 +436,6 @@ class _PostCardState extends State<_PostCard> {
         FirebaseFirestore.instance.collection('posts').doc(widget.postId));
     await batch.commit();
 
-    // Decrement user post count
     await FirebaseFirestore.instance
         .collection('users')
         .doc(widget.uid)
@@ -595,7 +580,6 @@ class _PostCardState extends State<_PostCard> {
                         ),
                       ),
 
-                    // Overflow menu (edit/delete for owner)
                     if (_isOwner)
                       PopupMenuButton<String>(
                         icon: const Icon(Icons.more_vert,
@@ -727,8 +711,6 @@ class _PostCardState extends State<_PostCard> {
   }
 }
 
-// ── Comments ──────────────────────────────────────────────────────────────────
-
 class _CommentsSection extends StatefulWidget {
   final String postId;
   final String postAuthorUid;
@@ -751,8 +733,6 @@ class _CommentsSectionState extends State<_CommentsSection> {
   bool _submitting = false;
   String? _editingCommentId;
 
-  // When set, this comment is a reply to a specific existing comment
-  // (so we can notify that commenter, distinct from the post author).
   String? _replyingToCommentId;
   String? _replyingToUid;
 
@@ -762,8 +742,6 @@ class _CommentsSectionState extends State<_CommentsSection> {
     super.dispose();
   }
 
-  /// Mirrors _PostCard._notifyAuthor: best-effort, never blocks the
-  /// underlying action, never notifies yourself.
   Future<void> _notify(String targetUid, String type) async {
     if (targetUid.isEmpty || targetUid == widget.uid) return;
     try {
@@ -792,9 +770,7 @@ class _CommentsSectionState extends State<_CommentsSection> {
 
     try {
       if (_editingCommentId != null) {
-        // Edit existing comment. The comment may have been deleted out
-        // from under the editor (e.g. from another device) — guard
-        // against updating a doc that no longer exists.
+
         final commentRef = FirebaseFirestore.instance
             .collection('posts')
             .doc(widget.postId)
@@ -806,7 +782,6 @@ class _CommentsSectionState extends State<_CommentsSection> {
         }
         setState(() => _editingCommentId = null);
       } else {
-        // New comment
         final batch = FirebaseFirestore.instance.batch();
         final commentRef = FirebaseFirestore.instance
             .collection('posts')
@@ -824,10 +799,6 @@ class _CommentsSectionState extends State<_CommentsSection> {
         batch.update(postRef, {'commentCount': FieldValue.increment(1)});
         await batch.commit();
 
-        // Notify: if this is a reply to a specific comment, notify that
-        // commenter as a 'reply'; otherwise notify the post author as a
-        // 'comment'. Never both — avoids double-notifying the post
-        // author when they're also the one being replied to.
         if (_replyingToCommentId != null && _replyingToUid != null) {
           await _notify(_replyingToUid!, 'reply');
         } else {
@@ -907,12 +878,6 @@ class _CommentsSectionState extends State<_CommentsSection> {
             builder: (context, snap) {
               final docs = snap.data?.docs ?? [];
 
-              // If the comment currently being edited has disappeared
-              // (deleted elsewhere), drop out of edit mode so we don't
-              // try to submit an update to a missing document. Only
-              // check this once we have live data, so a transient
-              // loading/reconnect state doesn't falsely look like a
-              // deletion.
               if (snap.hasData &&
                   _editingCommentId != null &&
                   !docs.any((d) => d.id == _editingCommentId)) {
@@ -950,7 +915,6 @@ class _CommentsSectionState extends State<_CommentsSection> {
             },
           ),
 
-          // Edit/reply mode banner
           if (_editingCommentId != null || _replyingToCommentId != null)
             Container(
               padding:
@@ -1041,8 +1005,6 @@ class _CommentsSectionState extends State<_CommentsSection> {
     );
   }
 }
-
-// ── Comment tile ──────────────────────────────────────────────────────────────
 
 class _CommentTile extends StatelessWidget {
   final String commentId;
@@ -1172,8 +1134,6 @@ class _CommentTile extends StatelessWidget {
   }
 }
 
-// ── Post sheet (create + edit) ────────────────────────────────────────────────
-
 class _PostSheet extends StatefulWidget {
   final String uid;
   final String? existingPostId;
@@ -1302,7 +1262,6 @@ class _PostSheetState extends State<_PostSheet> {
             ),
             const SizedBox(height: 14),
 
-            // Tag selector
             Row(
               children: [
                 const Text('Tag:',

@@ -5,9 +5,6 @@ import 'package:intl/intl.dart';
 import '../main.dart';
 import 'user_profile_screen.dart';
 
-/// Notification types written by other screens into
-/// notifications/{uid}/items. Kept here as the single source of truth
-/// for icon/label/navigation per type.
 enum NotificationType {
   like,
   comment,
@@ -41,10 +38,6 @@ NotificationType _typeFromString(String? raw) {
 }
 
 class NotificationsScreen extends StatefulWidget {
-  /// Called when a like/comment/reply notification is tapped, so the
-  /// caller (typically wrapping CommunityScreen) can navigate to and
-  /// highlight the relevant post. If not provided, taps on those types
-  /// simply mark read and pop back without deep-linking to the post yet.
   final void Function(String postId)? onOpenPost;
 
   const NotificationsScreen({super.key, this.onOpenPost});

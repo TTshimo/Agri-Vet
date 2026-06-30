@@ -357,7 +357,6 @@ class _PalRowState extends State<_PalRow> {
     try {
       final fs = FirebaseFirestore.instance;
 
-      // Avoid duplicate pending conversations between the same pair.
       final existing = await fs
           .collection('conversations')
           .where('participants', arrayContains: widget.currentUid)
@@ -499,7 +498,6 @@ class _PalRowState extends State<_PalRow> {
       );
     }
 
-    // _RowState.none
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [

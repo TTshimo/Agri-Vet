@@ -4,7 +4,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import '../main.dart';
 import 'chat_screen.dart';
 
-/// Relationship state between the current user and the profile being viewed.
 enum _PalState {
   loading,
   none, // strangers
@@ -15,16 +14,9 @@ enum _PalState {
   blockedByThem,
 }
 
-/// Shared profile screen reused by Make a Pal, Pal Requests, and Pals lists.
-///
-/// Shows username, bio, location, and the user's posts, plus contextual
-/// action buttons depending on the relationship between the viewer and
-/// the profile owner.
 class UserProfileScreen extends StatefulWidget {
   final String profileUid;
 
-  /// When opened from the Pal Requests list, this is the request doc id
-  /// so Accept/Delete can act on it directly without re-querying.
   final String? incomingRequestId;
 
   const UserProfileScreen({
@@ -45,8 +37,6 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
   String? _incomingRequestId; // palRequests doc id if they're the sender
   String? _myPalDocId; // pals doc id (mine) if already pals
 
-  // Message-request state (separate from pal state — a non-pal can have
-  // a pending message thread independent of any pal request).
   String? _pendingConversationId;
   bool _pendingConversationIsMine = false; // did I send the first message?
 
@@ -64,7 +54,6 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
   Future<void> _loadRelationship() async {
     final fs = FirebaseFirestore.instance;
 
-    // Blocked checks first — they short-circuit everything else.
     final meDoc = await fs.collection('users').doc(_currentUid).get();
     final themDoc = await fs.collection('users').doc(widget.profileUid).get();
     final myBlocked = List<String>.from(meDoc.data()?['blockedUids'] ?? []);
@@ -86,7 +75,6 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
       return;
     }
 
-    // Already pals?
     final palId = _palDocId(_currentUid, widget.profileUid);
     final palSnap = await fs.collection('pals').doc(palId).get();
     if (palSnap.exists) {
@@ -145,8 +133,6 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
       _loadingRelationship = false;
     });
 
-    // Independently check for a pending message request (non-pals only —
-    // pals message freely with no request step).
     await _loadPendingConversation();
   }
 
@@ -675,7 +661,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
               _InfoBanner(
                 icon: Icons.schedule_rounded,
                 text: _pendingConversationIsMine
-                    ? 'Message request sent — waiting for a reply.'
+                    ? 'Message request sent, waiting for a reply.'
                     : 'This farmer sent you a message request.',
               ),
               const SizedBox(height: 10),
@@ -826,8 +812,6 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
     );
   }
 }
-
-// ── Shared small widgets ───────────────────────────────────────────────────────
 
 class _ActionButton extends StatelessWidget {
   final String label;

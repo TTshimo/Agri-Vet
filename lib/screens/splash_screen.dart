@@ -36,7 +36,6 @@ class _SplashScreenState extends State<SplashScreen>
 
     _controller.forward();
 
-    // Wait for animation then check auth
     Future.delayed(const Duration(milliseconds: 2200), _navigate);
   }
 
@@ -74,7 +73,6 @@ class _SplashScreenState extends State<SplashScreen>
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  // Logo mark
                   Container(
                     width: 96,
                     height: 96,
@@ -90,9 +88,8 @@ class _SplashScreenState extends State<SplashScreen>
                   ),
                   const SizedBox(height: 20),
 
-                  // App name
                   const Text(
-                    'AgriVet',
+                    'AgroLens',
                     style: TextStyle(
                       fontSize: 34,
                       fontWeight: FontWeight.w600,
@@ -102,9 +99,8 @@ class _SplashScreenState extends State<SplashScreen>
                   ),
                   const SizedBox(height: 6),
 
-                  // Tagline
                   const Text(
-                    'Your farm. Your vet. Your phone.',
+                    'The Vet In Your Pocket.',
                     style: TextStyle(
                       fontSize: 14,
                       color: AppColors.greenHint,
@@ -113,7 +109,6 @@ class _SplashScreenState extends State<SplashScreen>
                   ),
                   const SizedBox(height: 48),
 
-                  // Loading indicator
                   const SizedBox(
                     width: 24,
                     height: 24,

@@ -45,18 +45,15 @@ class _LoginScreenState extends State<LoginScreen> {
 
       if (!mounted) return;
 
-      // Check if user has a phone number for 2FA
       final phone = credential.user?.phoneNumber;
 
       if (phone != null && phone.isNotEmpty) {
-        // Route through 2FA
         Navigator.of(context).pushReplacement(
           MaterialPageRoute(
             builder: (_) => TwoStepVerificationScreen(phoneNumber: phone),
           ),
         );
       } else {
-        // No 2FA — go straight to app
         Navigator.of(context).pushReplacement(
           MaterialPageRoute(builder: (_) => const ShellScreen()),
         );
@@ -134,7 +131,6 @@ class _LoginScreenState extends State<LoginScreen> {
               ),
             ),
 
-            // Form section
             Expanded(
               child: Container(
                 decoration: const BoxDecoration(
@@ -150,7 +146,6 @@ class _LoginScreenState extends State<LoginScreen> {
                       children: [
                         const SizedBox(height: 8),
 
-                        // Error message
                         if (_errorMessage != null) ...[
                           Container(
                             padding: const EdgeInsets.all(14),
@@ -181,7 +176,6 @@ class _LoginScreenState extends State<LoginScreen> {
                           const SizedBox(height: 20),
                         ],
 
-                        // Email field
                         const _FieldLabel(label: 'Email address'),
                         const SizedBox(height: 6),
                         TextFormField(
@@ -205,7 +199,6 @@ class _LoginScreenState extends State<LoginScreen> {
                         ),
                         const SizedBox(height: 18),
 
-                        // Password field
                         const _FieldLabel(label: 'Password'),
                         const SizedBox(height: 6),
                         TextFormField(
@@ -255,7 +248,6 @@ class _LoginScreenState extends State<LoginScreen> {
                         ),
                         const SizedBox(height: 28),
 
-                        // Login button
                         SizedBox(
                           width: double.infinity,
                           child: ElevatedButton(
@@ -274,7 +266,6 @@ class _LoginScreenState extends State<LoginScreen> {
                         ),
                         const SizedBox(height: 20),
 
-                        // Register link
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [

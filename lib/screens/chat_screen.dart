@@ -63,7 +63,6 @@ class _ChatScreenState extends State<ChatScreen> {
         'status': 'accepted',
       });
 
-      // Notify the requester their message request was accepted.
       final meDoc =
           await fs.collection('users').doc(widget.currentUid).get();
       final myName = meDoc.data()?['name'] ?? 'Farmer';
@@ -127,7 +126,6 @@ class _ChatScreenState extends State<ChatScreen> {
 
     try {
       if (_editingMessageId != null) {
-        // Edit existing message
         await FirebaseFirestore.instance
             .collection('conversations')
             .doc(widget.conversationId)
@@ -135,8 +133,6 @@ class _ChatScreenState extends State<ChatScreen> {
             .doc(_editingMessageId)
             .update({'text': text, 'edited': true});
 
-        // If this was the most recent message, keep the conversation
-        // list preview in sync with the edited text.
         if (editingIsLastMsg) {
           await FirebaseFirestore.instance
               .collection('conversations')
@@ -152,7 +148,6 @@ class _ChatScreenState extends State<ChatScreen> {
           _replyToSender = null;
         });
       } else {
-        // New message
         final batch = FirebaseFirestore.instance.batch();
 
         final msgRef = FirebaseFirestore.instance
@@ -175,7 +170,6 @@ class _ChatScreenState extends State<ChatScreen> {
 
         batch.set(msgRef, msgData);
 
-        // Update conversation metadata
         batch.update(
           FirebaseFirestore.instance
               .collection('conversations')
@@ -195,7 +189,6 @@ class _ChatScreenState extends State<ChatScreen> {
           _replyToSender = null;
         });
 
-        // Scroll to bottom
         WidgetsBinding.instance.addPostFrameCallback((_) {
           if (_scrollController.hasClients) {
             _scrollController.animateTo(
@@ -326,8 +319,6 @@ class _ChatScreenState extends State<ChatScreen> {
         final status = convData?['status'] as String?;
         final requestedBy = convData?['requestedBy'] as String?;
 
-        // If the conversation doc has vanished (e.g. the other side
-        // unsent/declined), pop back rather than rendering a broken chat.
         if (convSnap.hasData && !convSnap.data!.exists) {
           WidgetsBinding.instance.addPostFrameCallback((_) {
             if (mounted) Navigator.pop(context);
@@ -340,7 +331,6 @@ class _ChatScreenState extends State<ChatScreen> {
 
         final isPending = status == 'pending';
         final iAmRequester = requestedBy == widget.currentUid;
-        // Receiver of a pending request can read but not yet reply.
         final inputLocked = isPending && !iAmRequester;
 
         return Scaffold(
@@ -400,7 +390,6 @@ class _ChatScreenState extends State<ChatScreen> {
                 ),
               ),
 
-              // Pending-request banner (both sides see a variant of this)
               if (isPending)
                 Container(
                   width: double.infinity,
@@ -505,7 +494,6 @@ class _ChatScreenState extends State<ChatScreen> {
                         ),
                 ),
 
-              // Messages
               Expanded(
                 child: StreamBuilder<QuerySnapshot>(
                   stream: FirebaseFirestore.instance
@@ -563,10 +551,6 @@ class _ChatScreenState extends State<ChatScreen> {
                       );
                     }
 
-                    // Mark as read whenever new messages arrive — scheduled
-                    // after the frame so this never runs as a build-time side
-                    // effect, and gated on doc id so it only fires once per
-                    // genuinely new snapshot instead of on every rebuild.
                     final latestDocId = docs.last.id;
                     if (latestDocId != _lastSeenDocId) {
                       _lastSeenDocId = latestDocId;
@@ -575,7 +559,6 @@ class _ChatScreenState extends State<ChatScreen> {
                       });
                     }
 
-                    // Group messages by date
                     String? lastDate;
 
                     return ListView.builder(
@@ -650,7 +633,6 @@ class _ChatScreenState extends State<ChatScreen> {
                 ),
               ),
 
-              // Action banner (edit / reply) — hidden while input is locked
               if (!inputLocked &&
                   (_editingMessageId != null || _replyToId != null))
                 Container(
@@ -692,8 +674,6 @@ class _ChatScreenState extends State<ChatScreen> {
                   ),
                 ),
 
-              // Input bar — replaced with a notice when the receiver of a
-              // pending request hasn't accepted yet.
               if (inputLocked)
                 Container(
                   width: double.infinity,
@@ -792,8 +772,6 @@ class _ChatScreenState extends State<ChatScreen> {
   }
 }
 
-// ── Message bubble ────────────────────────────────────────────────────────────
-
 class _MessageBubble extends StatelessWidget {
   final String messageId;
   final Map<String, dynamic> data;
@@ -876,7 +854,6 @@ class _MessageBubble extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Reply preview
                     if (hasReply && !isDeleted)
                       Container(
                         margin: const EdgeInsets.only(bottom: 6),
@@ -947,7 +924,6 @@ class _MessageBubble extends StatelessWidget {
                 ),
               ),
 
-              // Time + edited
               Padding(
                 padding: const EdgeInsets.only(top: 3, left: 4, right: 4),
                 child: Row(
@@ -979,8 +955,6 @@ class _MessageBubble extends StatelessWidget {
     );
   }
 }
-
-// ── Message actions sheet ─────────────────────────────────────────────────────
 
 class _MessageActionsSheet extends StatelessWidget {
   final VoidCallback? onEdit;

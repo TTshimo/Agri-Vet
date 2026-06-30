@@ -161,7 +161,6 @@ class ProfileScreen extends StatelessWidget {
                 ),
               ),
 
-              // ── Stats (tappable) ──────────────────────────────────
               SliverToBoxAdapter(
                 child: Padding(
                   padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
@@ -199,8 +198,6 @@ class ProfileScreen extends StatelessWidget {
                 ),
               ),
 
-              // ── Social (Notifications / Pal Requests / Pals / Messages /
-              // Blocked / Make a Pal) ──────────────────────────────────
               SliverToBoxAdapter(
                 child: Padding(
                   padding: const EdgeInsets.fromLTRB(0, 16, 0, 0),
@@ -211,7 +208,6 @@ class ProfileScreen extends StatelessWidget {
                 ),
               ),
 
-              // User details section
               _sectionHeader('ACCOUNT DETAILS'),
               SliverToBoxAdapter(
                 child: _card(
@@ -257,7 +253,6 @@ class ProfileScreen extends StatelessWidget {
                 ),
               ),
 
-              // ── Settings button ───────────────────────────────────
               SliverToBoxAdapter(
                 child: Padding(
                   padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
@@ -365,7 +360,6 @@ class ProfileScreen extends StatelessWidget {
     );
   }
 
-  // Photo picker
   Future<void> _pickPhoto(BuildContext context, String uid) async {
     final picker = ImagePicker();
     final picked = await picker.pickImage(
@@ -393,7 +387,6 @@ class ProfileScreen extends StatelessWidget {
     }
   }
 
-  // Edit dialog 
   void _editField(
     BuildContext context, {
     required String uid,

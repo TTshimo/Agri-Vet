@@ -54,7 +54,6 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
       body: SafeArea(
         child: Column(
           children: [
-            // Top
             Padding(
               padding: const EdgeInsets.fromLTRB(24, 32, 24, 32),
               child: Column(
@@ -100,7 +99,6 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
               ),
             ),
 
-            // Form
             Expanded(
               child: Container(
                 decoration: const BoxDecoration(
