@@ -2,6 +2,7 @@ import 'package:agrivet/screens/community_screen.dart';
 import 'package:agrivet/screens/home_screen.dart';
 import 'package:agrivet/screens/learn_screen.dart';
 import 'package:agrivet/screens/messaging_screen.dart';
+import 'package:agrivet/screens/login_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -44,12 +45,16 @@ class AgriVetApp extends StatelessWidget {
     final themeProvider = context.watch<ThemeProvider>();
 
     return MaterialApp(
-      title: 'AgriVet',
+      title: 'AgroLens',
       debugShowCheckedModeBanner: false,
       theme: _buildLightTheme(),
       darkTheme: _buildDarkTheme(),
       themeMode: themeProvider.isDark ? ThemeMode.dark : ThemeMode.light,
       home: const SplashScreen(),
+      routes: {
+        '/login': (context) => const LoginScreen(),
+        '/home': (context) => const AppShell(),
+      },
     );
   }
 
@@ -199,17 +204,6 @@ class _AppShellState extends State<AppShell> {
     CommunityScreen(),
     MessagingScreen(),
     LearnScreen(),
-
-    // ChatScreen(conversationId: conversationId, currentUid: currentUid, otherUid: otherUid, otherName: otherName),
-    // ForgotPasswordScreen(),
-    // DiagnosisScreen(),
-    // LoginScreen(),
-    // MessagingScreen(),
-    // ProfileScreen(),
-    // RegisterScreen(),
-    // SettingsScreen(),
-    // TwoStepVerificationScreen(phoneNumber: phoneNumber),
-
   ];
 
   @override
@@ -275,7 +269,6 @@ class _BottomNav extends StatelessWidget {
                 active: currentIndex == 2,
                 onTap: () => onTap(2),
               ),
-              // Messages tab with live unread badge
               StreamBuilder<QuerySnapshot>(
                 stream: uid.isEmpty
                     ? const Stream.empty()

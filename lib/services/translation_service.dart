@@ -4,8 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-// Supported languages
-
 enum AppLanguage {
   english('en', 'English', '🇬🇧'),
   setswana('tn', 'Setswana', '🇧🇼'),
@@ -24,7 +22,6 @@ enum AppLanguage {
     );
   }
 
-  /// Detect language from device locale
   static AppLanguage fromLocale(Locale locale) {
     final lang = locale.languageCode;
     switch (lang) {
@@ -40,7 +37,6 @@ enum AppLanguage {
   }
 }
 
-// Translation service
 class TranslationService extends ChangeNotifier {
   static final TranslationService _instance = TranslationService._internal();
   factory TranslationService() => _instance;
@@ -53,16 +49,13 @@ class TranslationService extends ChangeNotifier {
   AppLanguage get language => _language;
   bool get isSetswana => _language == AppLanguage.setswana;
 
-  /// Call once at app startup
   Future<void> init() async {
     if (_loaded) return;
 
-    // Load Setswana JSON
     final raw = await rootBundle
         .loadString('assets/translations/setswana.json');
     _setswanaStrings = json.decode(raw) as Map<String, dynamic>;
 
-    // Check saved preference
     final prefs = await SharedPreferences.getInstance();
     final saved = prefs.getString('app_language');
 
@@ -85,11 +78,7 @@ class TranslationService extends ChangeNotifier {
     notifyListeners();
   }
 
-  // ── Getters ────────────────────────────────────────────────────────────────
-
-  /// Get a UI string by dot-notation key e.g. 'nav.home'
-  /// Returns English fallback for Swahili/Portuguese (Flutter l10n handles those)
-  /// Returns Setswana string for 'tn'
+  // Getters
   String get(String key) {
     if (_language != AppLanguage.setswana) return _englishFallback(key);
     return _getSetswana(key) ?? _englishFallback(key);
@@ -109,8 +98,7 @@ class TranslationService extends ChangeNotifier {
     }
   }
 
-  // ── Setswana lookup ────────────────────────────────────────────────────────
-
+  // Setswana lookup 
   String? _getSetswana(String key) {
     final parts = key.split('.');
     dynamic current = _setswanaStrings;
@@ -141,9 +129,7 @@ class TranslationService extends ChangeNotifier {
     };
   }
 
-  // ── Swahili disease info ───────────────────────────────────────────────────
-  // Proof of concept — key disease terms in Swahili
-
+  // Swahili disease info
   Map<String, String> _getSwahiliDiseaseInfo(String diseaseKey) {
     final swahiliDiseases = <String, Map<String, String>>{
       'foot and mouth': {
@@ -187,8 +173,7 @@ class TranslationService extends ChangeNotifier {
         _getEnglishDiseaseInfo(diseaseKey);
   }
 
-  // ── Portuguese disease info ────────────────────────────────────────────────
-
+  // Portuguese disease info
   Map<String, String> _getPortugueseDiseaseInfo(String diseaseKey) {
     final portugueseDiseases = <String, Map<String, String>>{
       'foot and mouth': {
@@ -232,8 +217,6 @@ class TranslationService extends ChangeNotifier {
         _getEnglishDiseaseInfo(diseaseKey);
   }
 
-  // ── English disease info (loaded from disease_info.json) ──────────────────
-
   static Map<String, dynamic> _englishDiseaseData = {};
 
   static Future<void> loadEnglishDiseaseData() async {
@@ -256,8 +239,6 @@ class TranslationService extends ChangeNotifier {
       'risk_level': disease['risk_level']?.toString() ?? 'none',
     };
   }
-
-  // ── English UI string fallbacks ────────────────────────────────────────────
 
   String _englishFallback(String key) {
     const strings = <String, String>{
@@ -344,8 +325,6 @@ class TranslationService extends ChangeNotifier {
     return strings[key] ?? key;
   }
 }
-
-// ── Convenience extension ────────────────────────────────────────────────────
 
 extension TranslationExtension on BuildContext {
   String tr(String key) => TranslationService().get(key);

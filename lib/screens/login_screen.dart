@@ -121,7 +121,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                   const SizedBox(height: 6),
                   const Text(
-                    'Sign in to your AgriVet account',
+                    'Sign in to your AgroLens account',
                     style: TextStyle(
                       fontSize: 15,
                       color: AppColors.greenHint,

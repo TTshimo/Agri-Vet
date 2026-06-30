@@ -166,7 +166,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   const SizedBox(height: 6),
                   Text(
                     _step == 1
-                        ? 'Set up your AgriVet account'
+                        ? 'Set up your AgroLens account'
                         : 'Tell us about your farm (optional)',
                     style: const TextStyle(
                       fontSize: 14,

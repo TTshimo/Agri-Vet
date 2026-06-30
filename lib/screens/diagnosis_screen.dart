@@ -255,7 +255,7 @@ class _DiagnosisScreenState extends State<DiagnosisScreen> {
     String title;
     switch (_step) {
       case _FlowStep.profiling:
-        title = _showSetswana ? 'Dipotso di se mmalwa' : 'A few questions';
+        title = _showSetswana ? 'Dipotso di seng mmalwa' : 'A few questions';
         break;
       case _FlowStep.result:
         title = _showSetswana ? 'Sepelo sa supego' : 'Diagnosis result';

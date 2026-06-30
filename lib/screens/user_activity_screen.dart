@@ -36,7 +36,7 @@ class UserActivityScreen extends StatelessWidget {
       body: StreamBuilder<QuerySnapshot>(
         stream: FirebaseFirestore.instance
             .collection(_collection)
-            .where('userId', isEqualTo: uid)
+            .where('uid', isEqualTo: uid)
             .orderBy('createdAt', descending: true)
             .snapshots(),
         builder: (context, snapshot) {

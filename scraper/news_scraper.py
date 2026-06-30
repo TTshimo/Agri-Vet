@@ -32,7 +32,7 @@ CATEGORY_KEYWORDS = {
     "livestock": [
         "cattle", "livestock", "poultry", "herd", "dairy", "beef", "sheep", "goat",
         "foot and mouth", "fmd", "avian influenza", "bird flu", "vaccination",
-        "veterinary", "abattoir", "disease outbreak", "anthrax", "rabies",
+        "veterinary", "abattoir", "disease outbreak", "anthrax", "rabies", "disease", "insert"
     ],
     "weather": [
         "rainfall", "rain", "drought", "forecast", "flood", "flooding", "climate",
@@ -45,7 +45,7 @@ CATEGORY_KEYWORDS = {
     ],
     "crop": [
         "harvest", "crop", "maize", "sorghum", "wheat", "irrigation", "planting",
-        "seed", "fertilizer", "pest", "locust", "yield",
+        "seed", "fertilizer", "pest", "locust", "yield", "tomato", "potato"
     ],
     "alert": [
         "emergency", "outbreak", "warning", "advisory", "disaster", "famine", "food insecurity",
