@@ -107,7 +107,8 @@ class _LearnScreenState extends State<LearnScreen> {
                   delegate: SliverChildBuilderDelegate(
                     (context, i) {
                       final key = _animalDiseases[i];
-                      final data = _diseaseData[key] ?? {};
+                      final data = Map<String, dynamic>.from(
+                          _diseaseData[key] ?? {});
                       return Padding(
                         padding:
                             const EdgeInsets.fromLTRB(16, 0, 16, 10),
@@ -141,7 +142,8 @@ class _LearnScreenState extends State<LearnScreen> {
                   delegate: SliverChildBuilderDelegate(
                     (context, i) {
                       final key = _cropDiseases[i];
-                      final data = _diseaseData[key] ?? {};
+                      final data = Map<String, dynamic>.from(
+                          _diseaseData[key] ?? {});
                       return Padding(
                         padding:
                             const EdgeInsets.fromLTRB(16, 0, 16, 10),

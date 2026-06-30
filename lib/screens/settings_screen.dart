@@ -243,8 +243,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
             onPressed: () async {
               await FirebaseAuth.instance.signOut();
               if (context.mounted) {
-                Navigator.of(context)
-                    .popUntil((r) => r.isFirst);
+                Navigator.of(context).pushNamedAndRemoveUntil(
+                  '/login',
+                  (route) => false,
+                );
               }
             },
             child: const Text('Log out',
@@ -273,11 +275,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 backgroundColor: const Color(0xFFD32F2F)),
             onPressed: () async {
               try {
-                await FirebaseAuth.instance.currentUser
-                    ?.delete();
+                await FirebaseAuth.instance.currentUser?.delete();
                 if (context.mounted) {
-                  Navigator.of(context)
-                      .popUntil((r) => r.isFirst);
+                  Navigator.of(context).pushNamedAndRemoveUntil(
+                    '/login',
+                    (route) => false,
+                  );
                 }
               } catch (e) {
                 if (context.mounted) {
@@ -318,7 +321,7 @@ class _ToggleRow extends StatelessWidget {
           Switch(
             value: value,
             onChanged: onChanged,
-            activeColor: AppColors.greenDark,
+            activeThumbColor: AppColors.greenDark,
           ),
         ]),
       );

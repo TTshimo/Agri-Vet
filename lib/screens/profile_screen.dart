@@ -7,6 +7,7 @@ import 'dart:io';
 import '../../main.dart';
 import 'settings_screen.dart';
 import 'user_activity_screen.dart';
+import 'profile_social_menu.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
@@ -194,6 +195,18 @@ class ProfileScreen extends StatelessWidget {
                       const SizedBox(width: 10),
                       const _StatBox(label: 'Member', value: 'Active'),
                     ],
+                  ),
+                ),
+              ),
+
+              // ── Social (Notifications / Pal Requests / Pals / Messages /
+              // Blocked / Make a Pal) ──────────────────────────────────
+              SliverToBoxAdapter(
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(0, 16, 0, 0),
+                  child: ProfileSocialMenu(
+                    cardColor: cardColor,
+                    borderColor: borderColor,
                   ),
                 ),
               ),

@@ -1,0 +1,170 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ── Helpers ──────────────────────────────────────────────────────────
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(uid) {
+      return isSignedIn() && request.auth.uid == uid;
+    }
+
+    function isParticipant(participants) {
+      return isSignedIn() && request.auth.uid in participants;
+    }
+
+    // ── users ────────────────────────────────────────────────────────────
+    // Profile docs: name, bio, location, postCount, blockedUids[].
+    // Anyone signed in can read (needed for Make a Pal / profile views /
+    // author name lookups across posts, comments, messages). Only the
+    // owner can write their own doc. blockedUids is owner-only to edit,
+    // which is sufficient since blocking is always a self-action.
+
+    match /users/{uid} {
+      allow read: if isSignedIn();
+      allow create: if isOwner(uid);
+      allow update: if isOwner(uid);
+      allow delete: if false;
+    }
+
+    // ── posts ────────────────────────────────────────────────────────────
+
+    match /posts/{postId} {
+      allow read: if isSignedIn();
+      allow create: if isSignedIn() && request.resource.data.uid == request.auth.uid;
+
+      // Owner can edit content/tag/location/edited fields. Anyone signed
+      // in can update ONLY the likes array and commentCount, so liking
+      // and comment-count bookkeeping doesn't require post ownership.
+      allow update: if isSignedIn() && (
+        request.auth.uid == resource.data.uid ||
+        request.resource.data.diff(resource.data).affectedKeys()
+          .hasOnly(['likes', 'commentCount'])
+      );
+
+      allow delete: if isOwner(resource.data.uid);
+
+      match /comments/{commentId} {
+        allow read: if isSignedIn();
+        allow create: if isSignedIn() && request.resource.data.uid == request.auth.uid;
+        allow update: if isOwner(resource.data.uid);
+        allow delete: if isOwner(resource.data.uid) ||
+          isOwner(get(/databases/$(database)/documents/posts/$(postId)).data.uid);
+      }
+    }
+
+    // ── palRequests ──────────────────────────────────────────────────────
+    // A request doc is only writable by its sender (create) and only
+    // actionable (delete) by either party — sender cancelling or
+    // receiver declining. Accept flow deletes the request doc too
+    // (after the client writes the two pals/ docs), so no separate
+    // "accepted" write path is needed here.
+
+    match /palRequests/{requestId} {
+      allow read: if isSignedIn() && (
+        request.auth.uid == resource.data.fromUid ||
+        request.auth.uid == resource.data.toUid
+      );
+      allow create: if isSignedIn() &&
+        request.resource.data.fromUid == request.auth.uid &&
+        request.resource.data.toUid != request.auth.uid;
+      allow update: if false; // status changes go through delete+pals write
+      allow delete: if isSignedIn() && (
+        request.auth.uid == resource.data.fromUid ||
+        request.auth.uid == resource.data.toUid
+      );
+    }
+
+    // ── pals ─────────────────────────────────────────────────────────────
+    // One doc per direction: pals/{uid}_{otherUid} with fields uid,
+    // otherUid. Only the two people involved can read.
+    //
+    // On accept, the ACCEPTING user's client writes both directional docs
+    // in one batch (pals/{me}_{them} and pals/{them}_{me}). The create
+    // rule allows a write where EITHER uid==me OR otherUid==me, so both
+    // halves of that batch succeed even though only one of them has
+    // uid==request.auth.uid. This is intentionally a bit permissive —
+    // it does mean I could technically write a {uid: them, otherUid: me}
+    // doc without their consent — but since pals/ existence alone confers
+    // no special permissions beyond "messaging is unlocked" and the
+    // request.auth.uid is on one side either way, this is an acceptable
+    // tradeoff for client-side writes without Cloud Functions.
+
+    match /pals/{palId} {
+      allow read: if isSignedIn() && (
+        request.auth.uid == resource.data.uid ||
+        request.auth.uid == resource.data.otherUid
+      );
+      allow create: if isSignedIn() && (
+        request.resource.data.uid == request.auth.uid ||
+        request.resource.data.otherUid == request.auth.uid
+      );
+      allow delete: if isSignedIn() && (
+        resource.data.uid == request.auth.uid ||
+        resource.data.otherUid == request.auth.uid
+      );
+      allow update: if false;
+    }
+
+    // ── conversations ────────────────────────────────────────────────────
+
+    match /conversations/{conversationId} {
+      allow read: if isParticipant(resource.data.participants);
+      allow create: if isSignedIn() &&
+        request.auth.uid in request.resource.data.participants &&
+        request.resource.data.participants.size() == 2;
+
+      // Participants can update; this covers lastMessage/lastMessageAt,
+      // unreadCounts.*, status (accept), archivedBy (arrayUnion/Remove
+      // of their own uid only — enforced loosely here, tightened by the
+      // fact that the client only ever writes its own uid).
+      allow update: if isParticipant(resource.data.participants);
+
+      allow delete: if isSignedIn() &&
+        resource.data.status == 'pending' &&
+        request.auth.uid == resource.data.requestedBy;
+
+      match /messages/{messageId} {
+        allow read: if isParticipant(
+          get(/databases/$(database)/documents/conversations/$(conversationId)).data.participants
+        );
+        allow create: if isSignedIn() &&
+          request.resource.data.senderUid == request.auth.uid &&
+          isParticipant(
+            get(/databases/$(database)/documents/conversations/$(conversationId)).data.participants
+          ) &&
+          (
+            // Either the conversation is already accepted, or — if still
+            // pending — only the original requester may send (the
+            // receiver must Accept first, which flips status before they
+            // can write any message).
+            get(/databases/$(database)/documents/conversations/$(conversationId)).data.status != 'pending' ||
+            get(/databases/$(database)/documents/conversations/$(conversationId)).data.requestedBy == request.auth.uid
+          );
+        allow update: if isOwner(resource.data.senderUid);
+        allow delete: if isOwner(resource.data.senderUid);
+      }
+    }
+
+    // ── notifications ────────────────────────────────────────────────────
+    // notifications/{uid}/items/{itemId}. The owner can read/update
+    // (mark read)/delete their own. ANY signed-in user can create a
+    // notification INTO someone else's subcollection — this is the
+    // deliberate client-side-write tradeoff: actions (like, comment,
+    // pal request, etc.) write directly into the target's notifications.
+    // Locked to create-only so no one can read, edit, or delete another
+    // user's notifications.
+
+    match /notifications/{uid}/items/{itemId} {
+      allow read: if isOwner(uid);
+      allow create: if isSignedIn() && request.resource.data.fromUid == request.auth.uid;
+      allow update: if isOwner(uid) &&
+        request.resource.data.diff(resource.data).affectedKeys().hasOnly(['read']);
+      allow delete: if isOwner(uid);
+    }
+  }
+}

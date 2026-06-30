@@ -29,16 +29,6 @@
     "symptoms": "No disease symptoms detected.",
     "prevention": "Maintain regular vet checkups, vaccination, and clean water and feed."
   },
-  "healthy chicken": {
-    "display_name": "Healthy Chicken",
-    "affects": "N/A",
-    "spreads_by": "N/A",
-    "urgency": "No action needed",
-    "risk_level": "none",
-    "what_to_do": "Your bird appears healthy. Continue regular monitoring and good poultry management practices.",
-    "symptoms": "No disease symptoms detected.",
-    "prevention": "Maintain biosecurity, regular vaccination, clean housing."
-  },
   "healthy goat": {
     "display_name": "Healthy Goat",
     "affects": "N/A",
@@ -58,26 +48,6 @@
     "what_to_do": "Isolate affected animals. Contact a vet for supportive treatment. Vaccinate the rest of the herd. Control insects around the farm.",
     "symptoms": "Raised skin nodules across the body, fever, nasal discharge, reduced milk production, swollen lymph nodes.",
     "prevention": "Annual vaccination, insect control, quarantine new animals."
-  },
-  "salmonella": {
-    "display_name": "Salmonellosis",
-    "affects": "Poultry, cattle, pigs",
-    "spreads_by": "Contaminated feed, water, feces",
-    "urgency": "Treat promptly",
-    "risk_level": "medium",
-    "what_to_do": "Isolate affected birds. Contact a vet for antibiotic treatment. Clean and disinfect housing. Check feed and water sources.",
-    "symptoms": "Diarrhoea, lethargy, reduced egg production, sudden death in young birds.",
-    "prevention": "Clean water and feed, biosecurity, avoid wild birds in poultry areas."
-  },
-  "coccidiosis": {
-    "display_name": "Coccidiosis",
-    "affects": "Poultry, cattle, goats",
-    "spreads_by": "Contaminated feed, water, litter",
-    "urgency": "Treat promptly",
-    "risk_level": "medium",
-    "what_to_do": "Contact a vet for anticoccidial medication. Clean and dry housing. Separate young from older animals.",
-    "symptoms": "Bloody diarrhoea, lethargy, poor growth, ruffled feathers in poultry.",
-    "prevention": "Dry clean housing, avoid overcrowding, use medicated feed for young animals."
   },
   "watermelon mosaic virus": {
     "display_name": "Watermelon Mosaic Virus",
@@ -108,16 +78,6 @@
     "what_to_do": "Harvest early before full maturity in wet seasons. Dry grain quickly after harvest. Use fungicide if caught early.",
     "symptoms": "Pink, red, or black discolouration on grain heads, shrivelled grain.",
     "prevention": "Use mould-resistant varieties, avoid delayed harvest, improve field drainage."
-  },
-  "sorghum covered kernel smut": {
-    "display_name": "Sorghum Covered Kernel Smut",
-    "affects": "Sorghum",
-    "spreads_by": "Soil-borne fungal spores, infected seed",
-    "urgency": "Treat seed before planting",
-    "risk_level": "medium",
-    "what_to_do": "Do not plant infected seed. Treat seed with fungicide before planting. Practice crop rotation.",
-    "symptoms": "Grain replaced by dark fungal masses covered by a membrane, reduced yield.",
-    "prevention": "Use certified clean seed, seed treatment fungicides, crop rotation."
   },
   "potato late blight": {
     "display_name": "Potato Late Blight",

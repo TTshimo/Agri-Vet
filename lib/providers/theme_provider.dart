@@ -29,8 +29,8 @@ class AppTheme {
   static ThemeData _build(bool dark) {
     const seed = Color(0xFF2E7D32); // greenDark
     final scheme = dark
-        ? ColorScheme.dark(primary: seed, secondary: const Color(0xFFFFA000))
-        : ColorScheme.light(primary: seed, secondary: const Color(0xFFFFA000));
+        ? const ColorScheme.dark(primary: seed, secondary: Color(0xFFFFA000))
+        : const ColorScheme.light(primary: seed, secondary: Color(0xFFFFA000));
     return ThemeData(
       colorScheme: scheme,
       useMaterial3: true,

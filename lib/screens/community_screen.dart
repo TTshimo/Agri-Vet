@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:intl/intl.dart';
 import '../main.dart';
+import 'make_pal_screen.dart';
 
 class CommunityScreen extends StatefulWidget {
   const CommunityScreen({super.key});
@@ -39,6 +40,13 @@ class _CommunityScreenState extends State<CommunityScreen> {
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
       builder: (_) => _PostSheet(uid: _uid),
+    );
+  }
+
+  void _openMakePal() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (_) => const MakePalScreen()),
     );
   }
 
@@ -101,6 +109,33 @@ class _CommunityScreenState extends State<CommunityScreen> {
                               ),
                             ),
                           ],
+                        ),
+                      ),
+                      GestureDetector(
+                        onTap: _openMakePal,
+                        child: Container(
+                          margin: const EdgeInsets.only(right: 8),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 14, vertical: 8),
+                          decoration: BoxDecoration(
+                            color: Colors.white.withOpacity(0.15),
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                          child: const Row(
+                            children: [
+                              Icon(Icons.group_add_rounded,
+                                  color: Colors.white, size: 16),
+                              SizedBox(width: 4),
+                              Text(
+                                'Make a Pal',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
                       ),
                       GestureDetector(
@@ -339,6 +374,35 @@ class _PostCardState extends State<_PostCard> {
 
   bool get _isOwner => widget.data['uid'] == widget.uid;
 
+  /// Writes a notification into the post author's notifications
+  /// subcollection. No-ops if acting on your own post (no point
+  /// notifying yourself), and swallows errors so a failed notification
+  /// write never blocks the actual like action — the like itself has
+  /// already succeeded by the time this is called.
+  Future<void> _notifyAuthor(String type) async {
+    final authorUid = widget.data['uid'] ?? '';
+    if (authorUid.isEmpty || authorUid == widget.uid) return;
+
+    try {
+      final myName = await widget.getName(widget.uid);
+      await FirebaseFirestore.instance
+          .collection('notifications')
+          .doc(authorUid)
+          .collection('items')
+          .add({
+        'type': type,
+        'fromUid': widget.uid,
+        'fromName': myName,
+        'postId': widget.postId,
+        'read': false,
+        'createdAt': FieldValue.serverTimestamp(),
+      });
+    } catch (_) {
+      // Best-effort — never let a notification failure surface to the
+      // user over a like that already succeeded.
+    }
+  }
+
   Future<void> _toggleLike() async {
     final ref =
         FirebaseFirestore.instance.collection('posts').doc(widget.postId);
@@ -346,6 +410,7 @@ class _PostCardState extends State<_PostCard> {
       await ref.update({'likes': FieldValue.arrayRemove([widget.uid])});
     } else {
       await ref.update({'likes': FieldValue.arrayUnion([widget.uid])});
+      await _notifyAuthor('like');
     }
   }
 
@@ -652,6 +717,7 @@ class _PostCardState extends State<_PostCard> {
           if (_showComments)
             _CommentsSection(
               postId: widget.postId,
+              postAuthorUid: authorUid,
               uid: widget.uid,
               getName: widget.getName,
             ),
@@ -665,11 +731,13 @@ class _PostCardState extends State<_PostCard> {
 
 class _CommentsSection extends StatefulWidget {
   final String postId;
+  final String postAuthorUid;
   final String uid;
   final Future<String> Function(String) getName;
 
   const _CommentsSection({
     required this.postId,
+    required this.postAuthorUid,
     required this.uid,
     required this.getName,
   });
@@ -683,10 +751,38 @@ class _CommentsSectionState extends State<_CommentsSection> {
   bool _submitting = false;
   String? _editingCommentId;
 
+  // When set, this comment is a reply to a specific existing comment
+  // (so we can notify that commenter, distinct from the post author).
+  String? _replyingToCommentId;
+  String? _replyingToUid;
+
   @override
   void dispose() {
     _controller.dispose();
     super.dispose();
+  }
+
+  /// Mirrors _PostCard._notifyAuthor: best-effort, never blocks the
+  /// underlying action, never notifies yourself.
+  Future<void> _notify(String targetUid, String type) async {
+    if (targetUid.isEmpty || targetUid == widget.uid) return;
+    try {
+      final myName = await widget.getName(widget.uid);
+      await FirebaseFirestore.instance
+          .collection('notifications')
+          .doc(targetUid)
+          .collection('items')
+          .add({
+        'type': type,
+        'fromUid': widget.uid,
+        'fromName': myName,
+        'postId': widget.postId,
+        'read': false,
+        'createdAt': FieldValue.serverTimestamp(),
+      });
+    } catch (_) {
+      // Best-effort only.
+    }
   }
 
   Future<void> _submitComment() async {
@@ -727,6 +823,21 @@ class _CommentsSectionState extends State<_CommentsSection> {
             .doc(widget.postId);
         batch.update(postRef, {'commentCount': FieldValue.increment(1)});
         await batch.commit();
+
+        // Notify: if this is a reply to a specific comment, notify that
+        // commenter as a 'reply'; otherwise notify the post author as a
+        // 'comment'. Never both — avoids double-notifying the post
+        // author when they're also the one being replied to.
+        if (_replyingToCommentId != null && _replyingToUid != null) {
+          await _notify(_replyingToUid!, 'reply');
+        } else {
+          await _notify(widget.postAuthorUid, 'comment');
+        }
+
+        setState(() {
+          _replyingToCommentId = null;
+          _replyingToUid = null;
+        });
       }
       _controller.clear();
     } finally {
@@ -749,12 +860,29 @@ class _CommentsSectionState extends State<_CommentsSection> {
   }
 
   void _startEdit(String commentId, String currentContent) {
-    setState(() => _editingCommentId = commentId);
+    setState(() {
+      _editingCommentId = commentId;
+      _replyingToCommentId = null;
+      _replyingToUid = null;
+    });
     _controller.text = currentContent;
   }
 
+  void _startReply(String commentId, String commenterUid) {
+    setState(() {
+      _replyingToCommentId = commentId;
+      _replyingToUid = commenterUid;
+      _editingCommentId = null;
+    });
+    _controller.text = '';
+  }
+
   void _cancelEdit() {
-    setState(() => _editingCommentId = null);
+    setState(() {
+      _editingCommentId = null;
+      _replyingToCommentId = null;
+      _replyingToUid = null;
+    });
     _controller.clear();
   }
 
@@ -812,28 +940,38 @@ class _CommentsSectionState extends State<_CommentsSection> {
                     getName: widget.getName,
                     isOwner: isOwner,
                     isEditing: _editingCommentId == doc.id,
+                    isReplyTarget: _replyingToCommentId == doc.id,
                     onEdit: () => _startEdit(doc.id, data['content'] ?? ''),
                     onDelete: () => _deleteComment(doc.id),
+                    onReply: () => _startReply(doc.id, data['uid'] ?? ''),
                   );
                 }).toList(),
               );
             },
           ),
 
-          // Edit mode banner
-          if (_editingCommentId != null)
+          // Edit/reply mode banner
+          if (_editingCommentId != null || _replyingToCommentId != null)
             Container(
               padding:
                   const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
               color: AppColors.amberLight,
               child: Row(
                 children: [
-                  const Icon(Icons.edit, size: 14, color: AppColors.amberText),
+                  Icon(
+                    _editingCommentId != null
+                        ? Icons.edit
+                        : Icons.reply_rounded,
+                    size: 14,
+                    color: AppColors.amberText,
+                  ),
                   const SizedBox(width: 6),
-                  const Expanded(
+                  Expanded(
                     child: Text(
-                      'Editing reply',
-                      style: TextStyle(
+                      _editingCommentId != null
+                          ? 'Editing reply'
+                          : 'Replying to comment',
+                      style: const TextStyle(
                           fontSize: 12, color: AppColors.amberText),
                     ),
                   ),
@@ -912,8 +1050,10 @@ class _CommentTile extends StatelessWidget {
   final Future<String> Function(String) getName;
   final bool isOwner;
   final bool isEditing;
+  final bool isReplyTarget;
   final VoidCallback onEdit;
   final VoidCallback onDelete;
+  final VoidCallback onReply;
 
   const _CommentTile({
     required this.commentId,
@@ -923,12 +1063,16 @@ class _CommentTile extends StatelessWidget {
     required this.isEditing,
     required this.onEdit,
     required this.onDelete,
+    required this.onReply,
+    this.isReplyTarget = false,
   });
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      color: isEditing ? AppColors.amberLight.withOpacity(0.3) : null,
+      color: (isEditing || isReplyTarget)
+          ? AppColors.amberLight.withOpacity(0.3)
+          : null,
       padding: const EdgeInsets.fromLTRB(14, 10, 14, 0),
       child: FutureBuilder<String>(
         future: getName(data['uid'] ?? ''),
@@ -975,19 +1119,33 @@ class _CommentTile extends StatelessWidget {
                             ),
                           ),
                         const Spacer(),
+                        GestureDetector(
+                          onTap: onReply,
+                          child: const Padding(
+                            padding: EdgeInsets.only(left: 10),
+                            child: Icon(Icons.reply_rounded,
+                                size: 14, color: AppColors.textSecondary),
+                          ),
+                        ),
                         if (isOwner)
                           Row(
                             children: [
                               GestureDetector(
                                 onTap: onEdit,
-                                child: const Icon(Icons.edit_outlined,
-                                    size: 14, color: AppColors.textSecondary),
+                                child: const Padding(
+                                  padding: EdgeInsets.only(left: 10),
+                                  child: Icon(Icons.edit_outlined,
+                                      size: 14,
+                                      color: AppColors.textSecondary),
+                                ),
                               ),
-                              const SizedBox(width: 10),
                               GestureDetector(
                                 onTap: onDelete,
-                                child: const Icon(Icons.delete_outline,
-                                    size: 14, color: AppColors.red),
+                                child: const Padding(
+                                  padding: EdgeInsets.only(left: 10),
+                                  child: Icon(Icons.delete_outline,
+                                      size: 14, color: AppColors.red),
+                                ),
                               ),
                             ],
                           ),

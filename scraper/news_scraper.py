@@ -7,42 +7,52 @@ from datetime import datetime, timezone
 import firebase_admin
 from firebase_admin import credentials, firestore
 
-# Firebase init
-service_account = json.loads(os.environ["FIREBASE_SERVICE_ACCOUNT"])
-cred = credentials.Certificate(service_account)
-firebase_admin.initialize_app(cred)
-db = firestore.client()
+import sys
 
-# RSS feeds by category 
+TEST_MODE = "--test" in sys.argv
+
+if not TEST_MODE:
+    service_account = json.loads(os.environ["FIREBASE_SERVICE_ACCOUNT"])
+    cred = credentials.Certificate(service_account)
+    firebase_admin.initialize_app(cred)
+    db = firestore.client()
+
 FEEDS = [
-    {
-        "url": "https://www.fao.org/news/rss-feed/en/",
-        "source": "FAO",
-        "category": "livestock",
-    },
-    {
-        "url": "https://reliefweb.int/updates/rss.xml?primary_country=72&source=0&theme=0",
-        "source": "ReliefWeb",
-        "category": "alert",
-    },
-    {
-        "url": "https://allafrica.com/tools/headlines/rdf/botswana/headlines.rdf",
-        "source": "AllAfrica",
-        "category": "crop",
-    },
-    {
-        "url": "https://www.farmer.co.zw/feed/",
-        "source": "Farmer's Weekly",
-        "category": "livestock",
-    },
-    {
-        "url": "https://www.agriculture.gov.bw/rss",
-        "source": "Botswana Agriculture",
-        "category": "policy",
-    },
+    {"url": "https://www.fao.org/news/rss-feed/en/", "source": "FAO"},
+    {"url": "https://reliefweb.int/updates/rss.xml?primary_country=72&source=0&theme=0", "source": "ReliefWeb"},
+    {"url": "https://allafrica.com/tools/headlines/rdf/botswana/headlines.rdf", "source": "AllAfrica"},
+    {"url": "https://www.farmer.co.zw/feed/", "source": "Farmer's Weekly"},
+    {"url": "https://www.agriculture.gov.bw/rss", "source": "Botswana Agriculture"},
+    {"url": "https://www.woah.org/en/news/feed/", "source": "WOAH"},
+    {"url": "https://www.sabcnews.com/sabcnews/feed/", "source": "SABC News"},
+    {"url": "https://www.dailynews.gov.bw/feed", "source": "Botswana Daily News"},
 ]
 
-# Helpers 
+CATEGORY_KEYWORDS = {
+    "livestock": [
+        "cattle", "livestock", "poultry", "herd", "dairy", "beef", "sheep", "goat",
+        "foot and mouth", "fmd", "avian influenza", "bird flu", "vaccination",
+        "veterinary", "abattoir", "disease outbreak", "anthrax", "rabies",
+    ],
+    "weather": [
+        "rainfall", "rain", "drought", "forecast", "flood", "flooding", "climate",
+        "temperature", "heatwave", "cyclone", "storm", "el nino", "la nina", "monsoon",
+    ],
+    "policy": [
+        "subsidy", "subsidies", "regulation", "ministry", "policy", "tariff",
+        "trade agreement", "extension services", "bill", "legislation", "budget",
+        "import ban", "export ban", "quota",
+    ],
+    "crop": [
+        "harvest", "crop", "maize", "sorghum", "wheat", "irrigation", "planting",
+        "seed", "fertilizer", "pest", "locust", "yield",
+    ],
+    "alert": [
+        "emergency", "outbreak", "warning", "advisory", "disaster", "famine", "food insecurity",
+    ],
+}
+
+
 def strip_html(text: str) -> str:
     """Remove HTML tags and decode common entities."""
     text = re.sub(r"<[^>]+>", "", text)
@@ -60,32 +70,67 @@ def parse_date(entry) -> datetime:
     """Try to extract a published date, fall back to now."""
     if hasattr(entry, "published_parsed") and entry.published_parsed:
         return datetime(*entry.published_parsed[:6], tzinfo=timezone.utc)
+    if hasattr(entry, "updated_parsed") and entry.updated_parsed:
+        return datetime(*entry.updated_parsed[:6], tzinfo=timezone.utc)
     return datetime.now(timezone.utc)
 
 
-# Main
+def classify(title: str, summary: str) -> list:
+    """Return all matching categories based on keyword hits in title+summary."""
+    text = f"{title} {summary}".lower()
+    matches = [cat for cat, keywords in CATEGORY_KEYWORDS.items() if any(kw in text for kw in keywords)]
+    return matches if matches else ["general"]
+
+
+def test_feeds():
+    """Check each feed URL without touching Firestore. Run this first if scrapes are coming up empty."""
+    for feed_config in FEEDS:
+        source = feed_config["source"]
+        url = feed_config["url"]
+        feed = feedparser.parse(url)
+        status = getattr(feed, "status", "N/A")
+        print(f"{source:25s} | entries: {len(feed.entries):3d} | bozo: {feed.bozo} | status: {status}")
+        if feed.bozo:
+            print(f"    bozo_exception: {feed.bozo_exception}")
+        if feed.entries:
+            print(f"    sample title: {feed.entries[0].get('title', '')[:80]}")
+
 def scrape():
     batch = db.batch()
     count = 0
 
     for feed_config in FEEDS:
-        print(f"Fetching {feed_config['source']} ...")
+        source = feed_config["source"]
+        print(f"Fetching {source} ...")
         try:
             feed = feedparser.parse(feed_config["url"])
-            for entry in feed.entries[:10]:  # max 10 per source
+
+            if feed.bozo:
+                print(f"  WARNING: {source} feed may be malformed or unreachable: {feed.bozo_exception}")
+
+            if not feed.entries:
+                print(f"  No entries found for {source} — feed URL may be wrong or empty.")
+                continue
+
+            for entry in feed.entries[:20]: 
                 url = entry.get("link", "")
                 if not url:
                     continue
+
+                title = strip_html(entry.get("title", ""))
+                summary = strip_html(entry.get("summary", ""))[:300]
+                categories = classify(title, summary)
 
                 doc_id = make_id(url)
                 ref = db.collection("news").document(doc_id)
 
                 data = {
-                    "title": strip_html(entry.get("title", "")),
-                    "summary": strip_html(entry.get("summary", ""))[:300],
+                    "title": title,
+                    "summary": summary,
                     "url": url,
-                    "source": feed_config["source"],
-                    "category": feed_config["category"],
+                    "source": source,
+                    "categories": categories,       
+                    "category": categories[0],       
                     "publishedAt": parse_date(entry),
                 }
 
@@ -93,11 +138,14 @@ def scrape():
                 count += 1
 
         except Exception as e:
-            print(f"Error fetching {feed_config['source']}: {e}")
+            print(f"Error fetching {source}: {e}")
 
     batch.commit()
     print(f"Written {count} articles to Firestore.")
 
 
 if __name__ == "__main__":
-    scrape()
+    if TEST_MODE:
+        test_feeds()
+    else:
+        scrape()

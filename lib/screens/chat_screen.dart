@@ -33,6 +33,8 @@ class _ChatScreenState extends State<ChatScreen> {
   String? _lastSeenDocId;
   bool _editingIsLastMsg = false;
 
+  bool _decidingRequest = false;
+
   @override
   void initState() {
     super.initState();
@@ -53,7 +55,72 @@ class _ChatScreenState extends State<ChatScreen> {
         .update({'unreadCounts.${widget.currentUid}': 0});
   }
 
-  Future<void> _sendMessage({bool editingIsLastMsg = false}) async {
+  Future<void> _acceptRequest() async {
+    setState(() => _decidingRequest = true);
+    try {
+      final fs = FirebaseFirestore.instance;
+      await fs.collection('conversations').doc(widget.conversationId).update({
+        'status': 'accepted',
+      });
+
+      // Notify the requester their message request was accepted.
+      final meDoc =
+          await fs.collection('users').doc(widget.currentUid).get();
+      final myName = meDoc.data()?['name'] ?? 'Farmer';
+      await fs
+          .collection('notifications')
+          .doc(widget.otherUid)
+          .collection('items')
+          .add({
+        'type': 'msg_accept',
+        'fromUid': widget.currentUid,
+        'fromName': myName,
+        'conversationId': widget.conversationId,
+        'read': false,
+        'createdAt': FieldValue.serverTimestamp(),
+      });
+    } finally {
+      if (mounted) setState(() => _decidingRequest = false);
+    }
+  }
+
+  Future<void> _declineRequest() async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: const Text('Decline message request?'),
+        content: Text(
+            'This will delete the conversation. ${widget.otherName} won\'t '
+            'be notified.'),
+        actions: [
+          TextButton(
+              onPressed: () => Navigator.pop(context, false),
+              child: const Text('Cancel')),
+          TextButton(
+            onPressed: () => Navigator.pop(context, true),
+            style: TextButton.styleFrom(foregroundColor: AppColors.red),
+            child: const Text('Decline'),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true) return;
+
+    setState(() => _decidingRequest = true);
+    try {
+      await FirebaseFirestore.instance
+          .collection('conversations')
+          .doc(widget.conversationId)
+          .delete();
+      if (mounted) Navigator.pop(context);
+    } finally {
+      if (mounted) setState(() => _decidingRequest = false);
+    }
+  }
+
+  Future<void> _sendMessage(
+      {bool editingIsLastMsg = false, bool inputLocked = false}) async {
+    if (inputLocked) return;
     final text = _controller.text.trim();
     if (text.isEmpty) return;
     setState(() => _submitting = true);
@@ -249,312 +316,478 @@ class _ChatScreenState extends State<ChatScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppColors.background,
-      body: Column(
-        children: [
-          // Header
-          Container(
-            color: AppColors.greenDark,
-            padding: EdgeInsets.fromLTRB(
-              0,
-              MediaQuery.of(context).padding.top + 8,
-              16,
-              12,
-            ),
-            child: Row(
-              children: [
-                IconButton(
-                  icon: const Icon(Icons.arrow_back_ios_new_rounded,
-                      color: Colors.white, size: 20),
-                  onPressed: () => Navigator.pop(context),
+    return StreamBuilder<DocumentSnapshot>(
+      stream: FirebaseFirestore.instance
+          .collection('conversations')
+          .doc(widget.conversationId)
+          .snapshots(),
+      builder: (context, convSnap) {
+        final convData = convSnap.data?.data() as Map<String, dynamic>?;
+        final status = convData?['status'] as String?;
+        final requestedBy = convData?['requestedBy'] as String?;
+
+        // If the conversation doc has vanished (e.g. the other side
+        // unsent/declined), pop back rather than rendering a broken chat.
+        if (convSnap.hasData && !convSnap.data!.exists) {
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            if (mounted) Navigator.pop(context);
+          });
+          return const Scaffold(
+            backgroundColor: AppColors.background,
+            body: SizedBox.shrink(),
+          );
+        }
+
+        final isPending = status == 'pending';
+        final iAmRequester = requestedBy == widget.currentUid;
+        // Receiver of a pending request can read but not yet reply.
+        final inputLocked = isPending && !iAmRequester;
+
+        return Scaffold(
+          backgroundColor: AppColors.background,
+          body: Column(
+            children: [
+              // Header
+              Container(
+                color: AppColors.greenDark,
+                padding: EdgeInsets.fromLTRB(
+                  0,
+                  MediaQuery.of(context).padding.top + 8,
+                  16,
+                  12,
                 ),
-                CircleAvatar(
-                  radius: 18,
-                  backgroundColor: AppColors.greenMid,
-                  child: Text(
-                    _initials(widget.otherName),
-                    style: const TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w600,
-                      color: Colors.white,
+                child: Row(
+                  children: [
+                    IconButton(
+                      icon: const Icon(Icons.arrow_back_ios_new_rounded,
+                          color: Colors.white, size: 20),
+                      onPressed: () => Navigator.pop(context),
                     ),
-                  ),
-                ),
-                const SizedBox(width: 10),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        widget.otherName,
+                    CircleAvatar(
+                      radius: 18,
+                      backgroundColor: AppColors.greenMid,
+                      child: Text(
+                        _initials(widget.otherName),
                         style: const TextStyle(
-                          fontSize: 16,
+                          fontSize: 12,
                           fontWeight: FontWeight.w600,
                           color: Colors.white,
                         ),
                       ),
-                      const Text(
-                        'Farmer',
-                        style:
-                            TextStyle(fontSize: 12, color: AppColors.greenHint),
+                    ),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            widget.otherName,
+                            style: const TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.white,
+                            ),
+                          ),
+                          Text(
+                            isPending ? 'Message request' : 'Farmer',
+                            style: TextStyle(
+                                fontSize: 12, color: AppColors.greenHint),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
+              // Pending-request banner (both sides see a variant of this)
+              if (isPending)
+                Container(
+                  width: double.infinity,
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                  color: AppColors.amberLight,
+                  child: iAmRequester
+                      ? Row(
+                          children: [
+                            const Icon(Icons.schedule_rounded,
+                                size: 16, color: AppColors.amberText),
+                            const SizedBox(width: 8),
+                            Expanded(
+                              child: Text(
+                                'Message request sent — waiting for '
+                                '${widget.otherName} to accept.',
+                                style: const TextStyle(
+                                    fontSize: 12.5,
+                                    color: AppColors.amberText),
+                              ),
+                            ),
+                          ],
+                        )
+                      : Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              children: [
+                                const Icon(Icons.mark_email_unread_rounded,
+                                    size: 16, color: AppColors.amberText),
+                                const SizedBox(width: 8),
+                                Expanded(
+                                  child: Text(
+                                    '${widget.otherName} wants to message you.',
+                                    style: const TextStyle(
+                                        fontSize: 12.5,
+                                        fontWeight: FontWeight.w500,
+                                        color: AppColors.amberText),
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 10),
+                            Row(
+                              children: [
+                                Expanded(
+                                  child: SizedBox(
+                                    height: 36,
+                                    child: ElevatedButton(
+                                      onPressed: _decidingRequest
+                                          ? null
+                                          : _acceptRequest,
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor: AppColors.greenDark,
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(
+                                                  AppRadius.button),
+                                        ),
+                                      ),
+                                      child: _decidingRequest
+                                          ? const SizedBox(
+                                              height: 16,
+                                              width: 16,
+                                              child:
+                                                  CircularProgressIndicator(
+                                                strokeWidth: 2,
+                                                color: Colors.white,
+                                              ),
+                                            )
+                                          : const Text('Accept',
+                                              style: TextStyle(fontSize: 13)),
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(width: 10),
+                                Expanded(
+                                  child: SizedBox(
+                                    height: 36,
+                                    child: OutlinedButton(
+                                      onPressed: _decidingRequest
+                                          ? null
+                                          : _declineRequest,
+                                      style: OutlinedButton.styleFrom(
+                                        foregroundColor: AppColors.red,
+                                        side: const BorderSide(
+                                            color: AppColors.red),
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(
+                                                  AppRadius.button),
+                                        ),
+                                      ),
+                                      child: const Text('Decline',
+                                          style: TextStyle(fontSize: 13)),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                ),
+
+              // Messages
+              Expanded(
+                child: StreamBuilder<QuerySnapshot>(
+                  stream: FirebaseFirestore.instance
+                      .collection('conversations')
+                      .doc(widget.conversationId)
+                      .collection('messages')
+                      .orderBy('createdAt')
+                      .snapshots(),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return const Center(
+                        child: CircularProgressIndicator(
+                            color: AppColors.greenDark),
+                      );
+                    }
+
+                    final docs = snapshot.data?.docs ?? [];
+
+                    if (docs.isEmpty) {
+                      return Center(
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            CircleAvatar(
+                              radius: 32,
+                              backgroundColor: AppColors.greenLight,
+                              child: Text(
+                                _initials(widget.otherName),
+                                style: const TextStyle(
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.w600,
+                                  color: AppColors.greenDeep,
+                                ),
+                              ),
+                            ),
+                            const SizedBox(height: 12),
+                            Text(
+                              widget.otherName,
+                              style: const TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                                color: AppColors.textPrimary,
+                              ),
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              isPending && iAmRequester
+                                  ? 'Say hello to start the conversation.'
+                                  : 'Send a message to start the conversation.',
+                              style: const TextStyle(
+                                  fontSize: 13, color: AppColors.textSecondary),
+                            ),
+                          ],
+                        ),
+                      );
+                    }
+
+                    // Mark as read whenever new messages arrive — scheduled
+                    // after the frame so this never runs as a build-time side
+                    // effect, and gated on doc id so it only fires once per
+                    // genuinely new snapshot instead of on every rebuild.
+                    final latestDocId = docs.last.id;
+                    if (latestDocId != _lastSeenDocId) {
+                      _lastSeenDocId = latestDocId;
+                      WidgetsBinding.instance.addPostFrameCallback((_) {
+                        if (mounted) _markAsRead();
+                      });
+                    }
+
+                    // Group messages by date
+                    String? lastDate;
+
+                    return ListView.builder(
+                      controller: _scrollController,
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 12, vertical: 16),
+                      itemCount: docs.length,
+                      itemBuilder: (context, i) {
+                        final doc = docs[i];
+                        final data = doc.data() as Map<String, dynamic>;
+                        final isMe = data['senderUid'] == widget.currentUid;
+                        final ts = data['createdAt'] as Timestamp?;
+                        final dateLabel = _formatDate(ts);
+                        final showDate = dateLabel != lastDate;
+                        lastDate = dateLabel;
+                        final isLastMsg = i == docs.length - 1;
+
+                        return Column(
+                          children: [
+                            if (showDate)
+                              Padding(
+                                padding:
+                                    const EdgeInsets.symmetric(vertical: 12),
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 12, vertical: 4),
+                                  decoration: BoxDecoration(
+                                    color: AppColors.border,
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                  child: Text(
+                                    dateLabel,
+                                    style: const TextStyle(
+                                      fontSize: 11,
+                                      color: AppColors.textSecondary,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            _MessageBubble(
+                              messageId: doc.id,
+                              data: data,
+                              isMe: isMe,
+                              isLastMsg: isLastMsg,
+                              time: _formatTime(ts),
+                              currentName: 'You',
+                              otherName: widget.otherName,
+                              onEdit: isMe &&
+                                      data['deleted'] != true &&
+                                      !inputLocked
+                                  ? () => _startEdit(
+                                      doc.id, data['text'] ?? '', isLastMsg)
+                                  : null,
+                              onDelete: isMe &&
+                                      data['deleted'] != true &&
+                                      !inputLocked
+                                  ? () => _deleteMessage(doc.id, isLastMsg)
+                                  : null,
+                              onReply: data['deleted'] != true && !inputLocked
+                                  ? () => _startReply(
+                                        doc.id,
+                                        data['text'] ?? '',
+                                        isMe ? 'You' : widget.otherName,
+                                      )
+                                  : null,
+                            ),
+                          ],
+                        );
+                      },
+                    );
+                  },
+                ),
+              ),
+
+              // Action banner (edit / reply) — hidden while input is locked
+              if (!inputLocked &&
+                  (_editingMessageId != null || _replyToId != null))
+                Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                  color: AppColors.amberLight,
+                  child: Row(
+                    children: [
+                      Icon(
+                        _editingMessageId != null
+                            ? Icons.edit
+                            : Icons.reply_rounded,
+                        size: 14,
+                        color: AppColors.amberText,
+                      ),
+                      const SizedBox(width: 6),
+                      Expanded(
+                        child: Text(
+                          _editingMessageId != null
+                              ? 'Editing message'
+                              : 'Replying to $_replyToSender: "${_replyToText ?? ''}"',
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(
+                              fontSize: 12, color: AppColors.amberText),
+                        ),
+                      ),
+                      GestureDetector(
+                        onTap: _cancelAction,
+                        child: const Text(
+                          'Cancel',
+                          style: TextStyle(
+                              fontSize: 12,
+                              color: AppColors.amberText,
+                              fontWeight: FontWeight.w600),
+                        ),
                       ),
                     ],
                   ),
                 ),
-              ],
-            ),
-          ),
 
-          // Messages
-          Expanded(
-            child: StreamBuilder<QuerySnapshot>(
-              stream: FirebaseFirestore.instance
-                  .collection('conversations')
-                  .doc(widget.conversationId)
-                  .collection('messages')
-                  .orderBy('createdAt')
-                  .snapshots(),
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const Center(
-                    child: CircularProgressIndicator(color: AppColors.greenDark),
-                  );
-                }
-
-                final docs = snapshot.data?.docs ?? [];
-
-                if (docs.isEmpty) {
-                  return Center(
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        CircleAvatar(
-                          radius: 32,
-                          backgroundColor: AppColors.greenLight,
-                          child: Text(
-                            _initials(widget.otherName),
-                            style: const TextStyle(
-                              fontSize: 20,
-                              fontWeight: FontWeight.w600,
-                              color: AppColors.greenDeep,
+              // Input bar — replaced with a notice when the receiver of a
+              // pending request hasn't accepted yet.
+              if (inputLocked)
+                Container(
+                  width: double.infinity,
+                  padding: EdgeInsets.fromLTRB(
+                    16,
+                    10,
+                    16,
+                    MediaQuery.of(context).padding.bottom + 10,
+                  ),
+                  decoration: const BoxDecoration(
+                    color: Colors.white,
+                    border: Border(top: BorderSide(color: AppColors.border)),
+                  ),
+                  child: Text(
+                    'Accept the request above to reply.',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: 12.5,
+                      color: AppColors.textSecondary,
+                    ),
+                  ),
+                )
+              else
+                Container(
+                  padding: EdgeInsets.fromLTRB(
+                    12,
+                    8,
+                    12,
+                    MediaQuery.of(context).padding.bottom + 8,
+                  ),
+                  decoration: const BoxDecoration(
+                    color: Colors.white,
+                    border: Border(top: BorderSide(color: AppColors.border)),
+                  ),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: TextField(
+                          controller: _controller,
+                          maxLines: 4,
+                          minLines: 1,
+                          decoration: InputDecoration(
+                            hintText: _editingMessageId != null
+                                ? 'Edit message...'
+                                : 'Message ${widget.otherName}...',
+                            hintStyle: const TextStyle(fontSize: 14),
+                            contentPadding: const EdgeInsets.symmetric(
+                                horizontal: 14, vertical: 10),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(20),
+                              borderSide:
+                                  const BorderSide(color: AppColors.border),
                             ),
                           ),
+                          style: const TextStyle(fontSize: 14),
+                          textCapitalization: TextCapitalization.sentences,
                         ),
-                        const SizedBox(height: 12),
-                        Text(
-                          widget.otherName,
-                          style: const TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600,
-                            color: AppColors.textPrimary,
-                          ),
-                        ),
-                        const SizedBox(height: 4),
-                        const Text(
-                          'Send a message to start the conversation.',
-                          style: TextStyle(
-                              fontSize: 13, color: AppColors.textSecondary),
-                        ),
-                      ],
-                    ),
-                  );
-                }
-
-                // Mark as read whenever new messages arrive — scheduled
-                // after the frame so this never runs as a build-time side
-                // effect, and gated on doc id so it only fires once per
-                // genuinely new snapshot instead of on every rebuild.
-                final latestDocId = docs.last.id;
-                if (latestDocId != _lastSeenDocId) {
-                  _lastSeenDocId = latestDocId;
-                  WidgetsBinding.instance.addPostFrameCallback((_) {
-                    if (mounted) _markAsRead();
-                  });
-                }
-
-                // Group messages by date
-                String? lastDate;
-
-                return ListView.builder(
-                  controller: _scrollController,
-                  padding: const EdgeInsets.symmetric(
-                      horizontal: 12, vertical: 16),
-                  itemCount: docs.length,
-                  itemBuilder: (context, i) {
-                    final doc = docs[i];
-                    final data = doc.data() as Map<String, dynamic>;
-                    final isMe = data['senderUid'] == widget.currentUid;
-                    final ts = data['createdAt'] as Timestamp?;
-                    final dateLabel = _formatDate(ts);
-                    final showDate = dateLabel != lastDate;
-                    lastDate = dateLabel;
-                    final isLastMsg = i == docs.length - 1;
-
-                    return Column(
-                      children: [
-                        if (showDate)
-                          Padding(
-                            padding:
-                                const EdgeInsets.symmetric(vertical: 12),
-                            child: Container(
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 12, vertical: 4),
-                              decoration: BoxDecoration(
-                                color: AppColors.border,
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                              child: Text(
-                                dateLabel,
-                                style: const TextStyle(
-                                  fontSize: 11,
-                                  color: AppColors.textSecondary,
-                                ),
-                              ),
-                            ),
-                          ),
-                        _MessageBubble(
-                          messageId: doc.id,
-                          data: data,
-                          isMe: isMe,
-                          isLastMsg: isLastMsg,
-                          time: _formatTime(ts),
-                          currentName:
-                              'You', // passed as "You" for reply labels
-                          otherName: widget.otherName,
-                          onEdit: isMe && data['deleted'] != true
-                              ? () => _startEdit(
-                                  doc.id, data['text'] ?? '', isLastMsg)
-                              : null,
-                          onDelete: isMe && data['deleted'] != true
-                              ? () => _deleteMessage(doc.id, isLastMsg)
-                              : null,
-                          onReply: data['deleted'] != true
-                              ? () => _startReply(
-                                    doc.id,
-                                    data['text'] ?? '',
-                                    isMe ? 'You' : widget.otherName,
-                                  )
-                              : null,
-                        ),
-                      ],
-                    );
-                  },
-                );
-              },
-            ),
-          ),
-
-          // Action banner (edit / reply)
-          if (_editingMessageId != null || _replyToId != null)
-            Container(
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-              color: AppColors.amberLight,
-              child: Row(
-                children: [
-                  Icon(
-                    _editingMessageId != null
-                        ? Icons.edit
-                        : Icons.reply_rounded,
-                    size: 14,
-                    color: AppColors.amberText,
-                  ),
-                  const SizedBox(width: 6),
-                  Expanded(
-                    child: Text(
-                      _editingMessageId != null
-                          ? 'Editing message'
-                          : 'Replying to $_replyToSender: "${_replyToText ?? ''}"',
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
-                          fontSize: 12, color: AppColors.amberText),
-                    ),
-                  ),
-                  GestureDetector(
-                    onTap: _cancelAction,
-                    child: const Text(
-                      'Cancel',
-                      style: TextStyle(
-                          fontSize: 12,
-                          color: AppColors.amberText,
-                          fontWeight: FontWeight.w600),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-
-          // Input bar
-          Container(
-            padding: EdgeInsets.fromLTRB(
-              12,
-              8,
-              12,
-              MediaQuery.of(context).padding.bottom + 8,
-            ),
-            decoration: const BoxDecoration(
-              color: Colors.white,
-              border: Border(top: BorderSide(color: AppColors.border)),
-            ),
-            child: Row(
-              children: [
-                Expanded(
-                  child: TextField(
-                    controller: _controller,
-                    maxLines: 4,
-                    minLines: 1,
-                    decoration: InputDecoration(
-                      hintText: _editingMessageId != null
-                          ? 'Edit message...'
-                          : 'Message ${widget.otherName}...',
-                      hintStyle: const TextStyle(fontSize: 14),
-                      contentPadding: const EdgeInsets.symmetric(
-                          horizontal: 14, vertical: 10),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(20),
-                        borderSide:
-                            const BorderSide(color: AppColors.border),
                       ),
-                    ),
-                    style: const TextStyle(fontSize: 14),
-                    textCapitalization: TextCapitalization.sentences,
-                  ),
-                ),
-                const SizedBox(width: 8),
-                GestureDetector(
-                  onTap: _submitting
-                      ? null
-                      : () => _sendMessage(
-                          editingIsLastMsg: _editingIsLastMsg),
-                  child: Container(
-                    width: 42,
-                    height: 42,
-                    decoration: BoxDecoration(
-                      color: AppColors.greenDark,
-                      borderRadius: BorderRadius.circular(21),
-                    ),
-                    child: _submitting
-                        ? const Padding(
-                            padding: EdgeInsets.all(10),
-                            child: CircularProgressIndicator(
-                                strokeWidth: 2, color: Colors.white),
-                          )
-                        : Icon(
-                            _editingMessageId != null
-                                ? Icons.check_rounded
-                                : Icons.send_rounded,
-                            color: Colors.white,
-                            size: 20,
+                      const SizedBox(width: 8),
+                      GestureDetector(
+                        onTap: _submitting
+                            ? null
+                            : () => _sendMessage(
+                                editingIsLastMsg: _editingIsLastMsg,
+                                inputLocked: inputLocked),
+                        child: Container(
+                          width: 42,
+                          height: 42,
+                          decoration: BoxDecoration(
+                            color: AppColors.greenDark,
+                            borderRadius: BorderRadius.circular(21),
                           ),
+                          child: _submitting
+                              ? const Padding(
+                                  padding: EdgeInsets.all(10),
+                                  child: CircularProgressIndicator(
+                                      strokeWidth: 2, color: Colors.white),
+                                )
+                              : Icon(
+                                  _editingMessageId != null
+                                      ? Icons.check_rounded
+                                      : Icons.send_rounded,
+                                  color: Colors.white,
+                                  size: 20,
+                                ),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
-              ],
-            ),
+            ],
           ),
-        ],
-      ),
+        );
+      },
     );
   }
 }
@@ -599,6 +832,9 @@ class _MessageBubble extends StatelessWidget {
         onLongPress: isDeleted
             ? null
             : () {
+                if (onEdit == null && onDelete == null && onReply == null) {
+                  return;
+                }
                 showModalBottomSheet(
                   context: context,
                   backgroundColor: Colors.transparent,

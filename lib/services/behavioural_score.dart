@@ -1,72 +1,91 @@
-/// Pure logic for scoring behavioral profiling answers against a disease's
-/// risk thresholds. Extracted from DiagnosisScreen so it can be unit tested
-/// without spinning up widgets, Firebase, or TFLite.
 class BehavioralScorer {
-  /// Calculates the total behavioral score from a set of answers.
-  ///
-  /// [questions] is the raw `behavioral_questions` list from the knowledge
-  /// base JSON for a given disease. Each question map must contain an `id`
-  /// and a `weights` map of answer -> numeric weight.
-  ///
-  /// [answers] maps question id -> the answer string the user selected.
-  ///
-  /// Unanswered questions contribute 0. Unknown answer strings contribute 0
-  /// rather than throwing, since user input should never crash scoring.
+  BehavioralScorer._();
+
   static double calculateScore(
     List<Map<String, dynamic>> questions,
     Map<String, String> answers,
   ) {
-    double total = 0;
-    for (final q in questions) {
-      final id = q['id'] as String?;
-      if (id == null) continue;
+    double total = 0.0;
 
+    for (final question in questions) {
+      final id = question['id'] as String? ?? '';
       final answer = answers[id];
-      if (answer == null) continue;
+      if (answer == null) continue; // question was skipped
 
-      final weights = q['weights'] as Map<String, dynamic>? ?? {};
+      final weights = question['weights'] as Map<String, dynamic>?;
+      if (weights == null) continue;
+
       final weight = weights[answer];
-      if (weight is num) {
-        total += weight.toDouble();
+      if (weight != null) {
+        total += (weight as num).toDouble();
       }
     }
+
     return total;
   }
 
-  /// Determines the final risk level given a behavioral score and a
-  /// disease's risk_thresholds map (`{low, medium, high}`).
-  ///
-  /// Diseases with risk_level == 'none' (healthy classes) always return
-  /// 'none' regardless of score, since there are no behavioral questions
-  /// to ask about a healthy animal/plant.
   static String determineRiskLevel({
     required double score,
     required Map<String, dynamic> thresholds,
     required String baseRiskLevel,
   }) {
-    if (baseRiskLevel == 'none') return 'none';
+    final low = (thresholds['low'] as num?)?.toDouble() ?? 0.1;
+    final medium = (thresholds['medium'] as num?)?.toDouble() ?? 0.3;
+    final high = (thresholds['high'] as num?)?.toDouble() ?? 0.5;
 
-    final highThresh = (thresholds['high'] as num? ?? 0.5).toDouble();
-    final medThresh = (thresholds['medium'] as num? ?? 0.3).toDouble();
+    String behaviouralLevel;
+    if (score < low) {
+      behaviouralLevel = 'none';
+    } else if (score < medium) {
+      behaviouralLevel = 'low';
+    } else if (score < high) {
+      behaviouralLevel = 'medium';
+    } else {
+      behaviouralLevel = 'high';
+    }
 
-    if (score >= highThresh) return 'high';
-    if (score >= medThresh) return 'medium';
-    return 'low';
+    return _applyBaseFloor(behaviouralLevel, baseRiskLevel);
   }
 
-  /// Convenience combined call: score the answers and resolve the risk
-  /// level in one step.
-  static String scoreAndClassify({
-    required List<Map<String, dynamic>> questions,
-    required Map<String, String> answers,
-    required Map<String, dynamic> thresholds,
-    required String baseRiskLevel,
-  }) {
-    final score = calculateScore(questions, answers);
-    return determineRiskLevel(
-      score: score,
-      thresholds: thresholds,
-      baseRiskLevel: baseRiskLevel,
-    );
+  static const _levelOrder = ['none', 'low', 'medium', 'high'];
+
+  static String _applyBaseFloor(
+      String behaviouralLevel, String baseRiskLevel) {
+    final floor = _floorForBase(baseRiskLevel);
+    final bIdx = _levelOrder.indexOf(behaviouralLevel);
+    final fIdx = _levelOrder.indexOf(floor);
+    return bIdx >= fIdx ? behaviouralLevel : floor;
+  }
+
+  static String _floorForBase(String baseRiskLevel) {
+    switch (baseRiskLevel) {
+      case 'high':
+        return 'medium';
+      case 'medium':
+        return 'low';
+      default:
+        return 'none';
+    }
+  }
+
+  static List<Map<String, dynamic>> debugBreakdown(
+    List<Map<String, dynamic>> questions,
+    Map<String, String> answers,
+  ) {
+    final rows = <Map<String, dynamic>>[];
+    for (final question in questions) {
+      final id = question['id'] as String? ?? '';
+      final answer = answers[id];
+      final weights = question['weights'] as Map<String, dynamic>?;
+      final weight =
+          (answer != null && weights != null) ? weights[answer] : null;
+
+      rows.add({
+        'id': id,
+        'answered': answer ?? '(skipped)',
+        'weight': weight ?? 0.0,
+      });
+    }
+    return rows;
   }
 }

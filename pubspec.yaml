@@ -40,6 +40,8 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^3.0.0
+  flutter_launcher_icons: ^0.13.1
+
 
 flutter:
   uses-material-design: true
@@ -52,3 +54,11 @@ flutter:
     - assets/data/disease_info.json
     - assets/data/disease_knowledge_base.json
     - assets/translation/setswana.json
+
+flutter_launcher_icons:
+  android: true
+  ios: true
+  image_path: "assets/icon/app_icon.png"
+  min_sdk_android: 21
+  adaptive_icon_background: "#1B5E3A"
+  adaptive_icon_foreground: "assets/icon/app_icon.png"
