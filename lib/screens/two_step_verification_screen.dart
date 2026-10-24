@@ -225,7 +225,7 @@ class _TwoStepVerificationScreenState
                           width: 40,
                           height: 40,
                           decoration: BoxDecoration(
-                            color: Bg.surface.withOpacity(0.1),
+                            color: Colors.white.withOpacity(0.1),
                             borderRadius: BorderRadius.circular(12),
                           ),
                           child: Icon(

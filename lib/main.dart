@@ -27,11 +27,14 @@ void main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
 
+  final language = LanguageProvider();
+  await language.ready;
+
   runApp(
     MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => ThemeProvider()),
-        ChangeNotifierProvider(create: (_) => LanguageProvider()),
+        ChangeNotifierProvider.value(value: language),
       ],
       child: const AgriVetApp(),
     ),

@@ -127,7 +127,7 @@ class _MakePalScreenState extends State<MakePalScreen> {
                               )
                             : null,
                         filled: true,
-                        fillColor: Bg.surface.withOpacity(0.12),
+                        fillColor: Colors.white.withOpacity(0.12),
                         contentPadding: const EdgeInsets.symmetric(
                             horizontal: 14, vertical: 10),
                         border: OutlineInputBorder(

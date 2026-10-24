@@ -163,7 +163,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                         style: TextStyle(color: Fg.almond, fontSize: 14),
                         decoration: InputDecoration(
                           hintText: 'Email address',
-                          hintStyle: TextStyle(color: Fg.almondMuted.withOpacity(0.8), fontSize: 13.5),
+                          hintStyle: TextStyle(color: Fg.almondSoft, fontSize: 13.5),
                           prefixIcon: Icon(Icons.mail_outline, size: 18, color: Fg.almondSoft),
                           border: InputBorder.none,
                           contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
@@ -181,7 +181,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                         onPressed: _loading ? null : _sendResetLink,
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Bg.rust,
-                          foregroundColor: Fg.ink,
+                          foregroundColor: Fg.almond,
                           padding: const EdgeInsets.symmetric(vertical: 14),
                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                         ),
@@ -189,7 +189,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                             ? SizedBox(
                                 height: 18,
                                 width: 18,
-                                child: CircularProgressIndicator(strokeWidth: 2, color: Fg.ink),
+                                child: CircularProgressIndicator(strokeWidth: 2, color: Fg.almond),
                               )
                             : const Text('Send reset link', style: TextStyle(fontWeight: FontWeight.w600)),
                       ),

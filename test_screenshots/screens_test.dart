@@ -71,6 +71,17 @@ final _shots = <_Shot>[
   _Shot('diagnose_plant_shona',
       () => const DiagnosisScreen(initialType: DiagnosisType.plant),
       language: 'sn'),
+  _Shot('result_animal',
+      () => const DiagnosisScreen(
+          initialType: DiagnosisType.animal, previewDisease: 'foot and mouth')),
+  _Shot('result_animal_shona',
+      () => const DiagnosisScreen(
+          initialType: DiagnosisType.animal, previewDisease: 'foot and mouth'),
+      language: 'sn'),
+  _Shot('result_plant_spanish',
+      () => const DiagnosisScreen(
+          initialType: DiagnosisType.plant, previewDisease: 'tomato late blight'),
+      language: 'es'),
   _Shot('community', () => const CommunityScreen()),
   _Shot('learn', () => const LearnScreen()),
   _Shot('messaging', () => const MessagingScreen()),
@@ -98,14 +109,17 @@ void main() {
         tester.view.devicePixelRatio = 2;
         addTearDown(tester.view.reset);
 
-        final lang = LanguageProvider();
-        await tester.runAsync(() => Future<void>.delayed(const Duration(milliseconds: 300)));
+        final lang = await tester.runAsync(() async {
+          final l = LanguageProvider();
+          await l.ready;
+          return l;
+        });
 
         await tester.pumpWidget(
           MultiProvider(
             providers: [
               ChangeNotifierProvider(create: (_) => ThemeProvider()),
-              ChangeNotifierProvider.value(value: lang),
+              ChangeNotifierProvider.value(value: lang!),
             ],
             child: MaterialApp(
               debugShowCheckedModeBanner: false,

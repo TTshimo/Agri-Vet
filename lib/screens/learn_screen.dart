@@ -44,6 +44,13 @@ class _LearnScreenState extends State<LearnScreen> {
     'sorghum anthracnose',
   ];
 
+  // Only list diseases that have an entry in disease_info.json; the rest
+  // (e.g. salmonella, coccidiosis) appear as soon as their info is added.
+  List<String> get _animalsWithInfo =>
+      _animalDiseases.where(_diseaseData.containsKey).toList();
+  List<String> get _cropsWithInfo =>
+      _cropDiseases.where(_diseaseData.containsKey).toList();
+
   @override
   void initState() {
     super.initState();
@@ -124,7 +131,7 @@ class _LearnScreenState extends State<LearnScreen> {
                     SliverList(
                       delegate: SliverChildBuilderDelegate(
                         (context, i) {
-                          final key = _animalDiseases[i];
+                          final key = _animalsWithInfo[i];
                           final data =
                               Map<String, dynamic>.from(_diseaseData[key] ?? {});
                           return Padding(
@@ -136,7 +143,7 @@ class _LearnScreenState extends State<LearnScreen> {
                             ),
                           );
                         },
-                        childCount: _animalDiseases.length,
+                        childCount: _animalsWithInfo.length,
                       ),
                     ),
                     SliverPadding(
@@ -156,7 +163,7 @@ class _LearnScreenState extends State<LearnScreen> {
                     SliverList(
                       delegate: SliverChildBuilderDelegate(
                         (context, i) {
-                          final key = _cropDiseases[i];
+                          final key = _cropsWithInfo[i];
                           final data =
                               Map<String, dynamic>.from(_diseaseData[key] ?? {});
                           return Padding(
@@ -168,7 +175,7 @@ class _LearnScreenState extends State<LearnScreen> {
                             ),
                           );
                         },
-                        childCount: _cropDiseases.length,
+                        childCount: _cropsWithInfo.length,
                       ),
                     ),
                     const SliverToBoxAdapter(child: SizedBox(height: 24)),

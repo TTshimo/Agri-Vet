@@ -129,7 +129,7 @@ class _AuthField extends StatelessWidget {
         style: TextStyle(color: Fg.almond, fontSize: 14),
         decoration: InputDecoration(
           hintText: hint,
-          hintStyle: TextStyle(color: Fg.almondMuted.withOpacity(0.8), fontSize: 13.5),
+          hintStyle: TextStyle(color: Fg.almondSoft, fontSize: 13.5),
           prefixIcon: icon == null ? null : Icon(icon, size: 18, color: Fg.almondSoft),
           suffixIcon: suffix,
           border: InputBorder.none,
@@ -610,7 +610,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
             onPressed: _goToStep2,
             style: ElevatedButton.styleFrom(
               backgroundColor: Bg.rust,
-              foregroundColor: Fg.ink,
+              foregroundColor: Fg.almond,
               padding: const EdgeInsets.symmetric(vertical: 14),
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
             ),
@@ -687,14 +687,14 @@ class _RegisterScreenState extends State<RegisterScreen> {
             onPressed: _loading ? null : () => _completeRegistration(),
             style: ElevatedButton.styleFrom(
               backgroundColor: Bg.rust,
-              foregroundColor: Fg.ink,
+              foregroundColor: Fg.almond,
               padding: const EdgeInsets.symmetric(vertical: 14),
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
             ),
             child: _loading
                 ? SizedBox(
                     height: 18, width: 18,
-                    child: CircularProgressIndicator(strokeWidth: 2, color: Fg.ink),
+                    child: CircularProgressIndicator(strokeWidth: 2, color: Fg.almond),
                   )
                 : const Text('Finish setting up', style: TextStyle(fontWeight: FontWeight.w600)),
           ),

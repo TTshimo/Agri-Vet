@@ -45,8 +45,12 @@ class LanguageProvider extends ChangeNotifier {
   String get code => _language.code;
 
   LanguageProvider() {
-    _load();
+    ready = _load();
   }
+
+  /// Completes once the language files are read. main() waits for it before
+  /// the first frame, so screens never show raw keys like 'ui.diag.title'.
+  late final Future<void> ready;
 
   Future<void> _load() async {
     try {

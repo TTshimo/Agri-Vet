@@ -921,7 +921,7 @@ class _MessageBubble extends StatelessWidget {
                         padding: const EdgeInsets.all(8),
                         decoration: BoxDecoration(
                           color: isMe
-                              ? Bg.surface.withOpacity(0.15)
+                              ? Colors.white.withOpacity(0.15)
                               : Bg.almond,
                           borderRadius: BorderRadius.circular(8),
                           border: Border(

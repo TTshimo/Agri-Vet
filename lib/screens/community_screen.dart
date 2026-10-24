@@ -288,7 +288,7 @@ class _CommunityScreenState extends State<CommunityScreen> {
                   size: 56,
                   background: Bg.rust,
                   icon: Icons.add_rounded,
-                  iconColor: Fg.rustBg,
+                  iconColor: Fg.almond,
                   iconSize: 24,
                   onTap: _showNewPost,
                 ),
@@ -952,7 +952,7 @@ class _CommentsSectionState extends State<_CommentsSection> {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: Bg.surface.withOpacity(0.25),
+        color: Colors.white.withOpacity(0.25),
         border: Border(top: BorderSide(color: Bg.surface.withOpacity(0.7))),
       ),
       child: Column(
@@ -1065,9 +1065,9 @@ class _CommentsSectionState extends State<_CommentsSection> {
                     child: _submitting
                         ? Padding(
                             padding: const EdgeInsets.all(10),
-                            child: CircularProgressIndicator(strokeWidth: 2, color: Fg.rustBg),
+                            child: CircularProgressIndicator(strokeWidth: 2, color: Fg.almond),
                           )
-                        : Icon(Icons.send_rounded, color: Fg.rustBg, size: 18),
+                        : Icon(Icons.send_rounded, color: Fg.almond, size: 18),
                   ),
                 ),
               ],
@@ -1393,7 +1393,7 @@ class _PostSheetState extends State<_PostSheet> {
                 onPressed: _submitting ? null : _submit,
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Bg.rust,
-                  foregroundColor: Fg.rustBg,
+                  foregroundColor: Fg.almond,
                   padding: const EdgeInsets.symmetric(vertical: 14),
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
                   elevation: 0,
@@ -1402,7 +1402,7 @@ class _PostSheetState extends State<_PostSheet> {
                     ? SizedBox(
                         height: 20,
                         width: 20,
-                        child: CircularProgressIndicator(strokeWidth: 2, color: Fg.rustBg),
+                        child: CircularProgressIndicator(strokeWidth: 2, color: Fg.almond),
                       )
                     : Text(
                         _isEdit ? 'Save changes' : 'Post',

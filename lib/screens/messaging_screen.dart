@@ -89,7 +89,7 @@ class _MessagingScreenState extends State<MessagingScreen> {
                           Text(
                             'Messages',
                             style: TextStyle(
-                              fontSize: 20,
+                              fontSize: 22,
                               fontWeight: FontWeight.w600,
                               color: Fg.almond,
                             ),

@@ -34,7 +34,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   String get _greeting {
     final hour = DateTime.now().hour;
-    if (hour < 12) return 'Goodmorning';
+    if (hour < 12) return 'Good morning';
     if (hour < 17) return 'Hello';
     return 'Yesterday';
   }
@@ -128,15 +128,17 @@ class _HomeScreenState extends State<HomeScreen> {
                                 padding: const EdgeInsets.symmetric(
                                     horizontal: 14, vertical: 8),
                                 decoration: BoxDecoration(
+                                  // Header chips: light pill when selected,
+                                  // frosted when not, in both light and dark mode.
                                   color: selected
-                                      ? Bg.almond
-                                      : Bg.surface.withOpacity(0.14),
+                                      ? Fg.almond
+                                      : Colors.white.withOpacity(0.14),
                                   borderRadius: BorderRadius.circular(999),
                                   border: selected
                                       ? null
                                       : Border.all(
                                           color:
-                                              Bg.surface.withOpacity(0.35),
+                                              Colors.white.withOpacity(0.35),
                                           width: 0.7,
                                         ),
                                 ),
@@ -146,7 +148,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                       cat.icon,
                                       size: 14,
                                       color: selected
-                                          ? Fg.matchaDark
+                                          ? Bg.matchaDark
                                           : Fg.almond,
                                     ),
                                     const SizedBox(width: 6),
@@ -156,7 +158,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                         fontSize: 12,
                                         fontWeight: FontWeight.w500,
                                         color: selected
-                                            ? Fg.matchaDark
+                                            ? Bg.matchaDark
                                             : Fg.almond,
                                       ),
                                     ),
