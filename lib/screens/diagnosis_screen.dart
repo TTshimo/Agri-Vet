@@ -343,6 +343,43 @@ class _DiagnosisScreenState extends State<DiagnosisScreen> {
 
     final showBack = widget.initialType != null || _step != _FlowStep.upload;
 
+    // Main tab: title + subtitle like Community and Learn.
+    if (!showBack) {
+      return _WavyHeader(
+        height: MediaQuery.of(context).padding.top + 96,
+        child: Padding(
+          padding: EdgeInsets.fromLTRB(
+            20,
+            MediaQuery.of(context).padding.top + 20,
+            20,
+            0,
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                title,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(
+                  fontSize: 22,
+                  fontWeight: FontWeight.w600,
+                  color: Fg.almond,
+                ),
+              ),
+              const SizedBox(height: 2),
+              Text(
+                _t('ui.diag.subtitle'),
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(fontSize: 12.5, color: Fg.matchaLight),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
     return _WavyHeader(
       height: MediaQuery.of(context).padding.top + 100,
       child: Padding(
@@ -353,6 +390,7 @@ class _DiagnosisScreenState extends State<DiagnosisScreen> {
           0,
         ),
         child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             if (showBack)
               GestureDetector(
@@ -384,9 +422,8 @@ class _DiagnosisScreenState extends State<DiagnosisScreen> {
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
                 style: TextStyle(
-                  // Same scale as the other pages: 22 for a main tab,
-                  // 17 for a page opened with a back arrow.
-                  fontSize: showBack ? 17 : 22,
+                  // Same size as other pages opened with a back arrow.
+                  fontSize: 17,
                   fontWeight: FontWeight.w600,
                   color: Fg.almond,
                   height: 1.2,

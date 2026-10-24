@@ -212,8 +212,8 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                   Center(
                     child: GestureDetector(
                       onTap: () => Navigator.of(context).pop(),
-                      child: RichText(
-                        text: TextSpan(
+                      child: Text.rich(
+                        TextSpan(
                           style: TextStyle(color: Fg.almondSoft, fontSize: 12.5),
                           children: [
                             const TextSpan(text: 'Remembered the password? '),

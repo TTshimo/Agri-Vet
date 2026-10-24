@@ -75,8 +75,13 @@ class _FieldLabel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Text(text,
-        style: TextStyle(color: Fg.almond, fontSize: 12.5, fontWeight: FontWeight.w600));
+    // Same gap above every label, so each label clearly belongs to the
+    // field below it rather than the one above.
+    return Padding(
+      padding: const EdgeInsets.only(top: 14, bottom: 6),
+      child: Text(text,
+          style: TextStyle(color: Fg.almond, fontSize: 12.5, fontWeight: FontWeight.w600)),
+    );
   }
 }
 
@@ -87,7 +92,7 @@ class _HelperText extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.only(top: 4, bottom: 14),
+      padding: const EdgeInsets.only(top: 4),
       child: Text(text, style: TextStyle(color: Fg.almondMuted, fontSize: 11, height: 1.4)),
     );
   }
@@ -452,8 +457,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     Center(
                       child: GestureDetector(
                         onTap: () => Navigator.of(context).pop(),
-                        child: RichText(
-                          text: TextSpan(
+                        child: Text.rich(
+                          TextSpan(
                             style: TextStyle(color: Fg.almondSoft, fontSize: 12.5),
                             children: [
                               const TextSpan(text: 'Already have an account? '),
@@ -542,10 +547,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
         const _FieldLabel('Confirm password'),
         _AuthField(controller: _confirmCtrl, hint: 'Repeat your password', icon: Icons.lock_outline, obscure: true),
-        const SizedBox(height: 14),
-
         const _FieldLabel('I farm'),
-        const SizedBox(height: 8),
+        const SizedBox(height: 2),
         Row(
           children: [
             Expanded(
@@ -635,7 +638,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
         const _HelperText('Matches you to nearby outbreak alerts and farmers.'),
 
         const _FieldLabel('Animals kept'),
-        const SizedBox(height: 8),
+        const SizedBox(height: 2),
         Wrap(
           spacing: 8,
           runSpacing: 8,

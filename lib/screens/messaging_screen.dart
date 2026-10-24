@@ -74,35 +74,32 @@ class _MessagingScreenState extends State<MessagingScreen> {
               clipper: _HeaderWaveClipper(),
               child: Container(
                 color: Bg.matchaDark,
+                // Same header as the other pages opened from Profile
+                // (Settings, Notifications, Pals): back arrow + 17px title.
                 padding: EdgeInsets.fromLTRB(
-                  20,
-                  MediaQuery.of(context).padding.top + 16,
-                  20,
-                  36,
+                  8,
+                  MediaQuery.of(context).padding.top + 8,
+                  16,
+                  40,
                 ),
                 child: Row(
                   children: [
+                    if (Navigator.of(context).canPop())
+                      IconButton(
+                        icon: Icon(Icons.arrow_back_ios_new_rounded,
+                            color: Fg.almond, size: 18),
+                        onPressed: () => Navigator.pop(context),
+                      )
+                    else
+                      const SizedBox(width: 12),
                     Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Messages',
-                            style: TextStyle(
-                              fontSize: 22,
-                              fontWeight: FontWeight.w600,
-                              color: Fg.almond,
-                            ),
-                          ),
-                          const SizedBox(height: 2),
-                          Text(
-                            'Direct messages with other farmers',
-                            style: TextStyle(
-                              fontSize: 12.5,
-                              color: Fg.matchaLight,
-                            ),
-                          ),
-                        ],
+                      child: Text(
+                        'Messages',
+                        style: TextStyle(
+                          fontSize: 17,
+                          fontWeight: FontWeight.w600,
+                          color: Fg.almond,
+                        ),
                       ),
                     ),
                     GestureDetector(

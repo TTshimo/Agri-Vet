@@ -1,3 +1,4 @@
+// ignore_for_file: invalid_use_of_visible_for_testing_member
 // Renders the main screens as PNGs so layout and colours can be reviewed
 // without a phone. Not part of `flutter test` (it lives outside test/);
 // the Screenshots workflow runs it and publishes the images to the
@@ -115,22 +116,27 @@ void main() {
           return l;
         });
 
-        await tester.pumpWidget(
-          MultiProvider(
-            providers: [
-              ChangeNotifierProvider(create: (_) => ThemeProvider()),
-              ChangeNotifierProvider.value(value: lang!),
-            ],
-            child: MaterialApp(
-              debugShowCheckedModeBanner: false,
-              theme: ThemeData(useMaterial3: true, fontFamily: 'Roboto'),
-              darkTheme: ThemeData(
-                  useMaterial3: true, brightness: Brightness.dark, fontFamily: 'Roboto'),
-              themeMode: dark ? ThemeMode.dark : ThemeMode.light,
-              home: RepaintBoundary(key: const ValueKey('shot'), child: shot.build()),
+        // Pump inside runAsync so real asset loading (knowledge base,
+        // language files) completes before the picture is taken.
+        await tester.runAsync(() async {
+          await tester.pumpWidget(
+            MultiProvider(
+              providers: [
+                ChangeNotifierProvider(create: (_) => ThemeProvider()),
+                ChangeNotifierProvider.value(value: lang!),
+              ],
+              child: MaterialApp(
+                debugShowCheckedModeBanner: false,
+                theme: ThemeData(useMaterial3: true, fontFamily: 'Roboto'),
+                darkTheme: ThemeData(
+                    useMaterial3: true, brightness: Brightness.dark, fontFamily: 'Roboto'),
+                themeMode: dark ? ThemeMode.dark : ThemeMode.light,
+                home: RepaintBoundary(key: const ValueKey('shot'), child: shot.build()),
+              ),
             ),
-          ),
-        );
+          );
+          await Future<void>.delayed(const Duration(milliseconds: 800));
+        });
         for (var i = 0; i < 5; i++) {
           await tester.runAsync(() => Future<void>.delayed(const Duration(milliseconds: 100)));
           await tester.pump(const Duration(milliseconds: 200));

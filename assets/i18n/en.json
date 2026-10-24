@@ -1,5 +1,6 @@
 {
   "_comment": "English source for diagnosis-screen text. Edit here only; scripts/translate.py generates the other languages. {placeholders} must stay as-is.",
+  "ui.diag.affects": "Affects",
   "ui.diag.analyse_photo": "Analyse photo",
   "ui.diag.analysing": "Analysing...",
   "ui.diag.analysis_failed": "Analysis failed. Try another photo.",
@@ -9,7 +10,6 @@
   "ui.diag.animal_type.cattle": "Cattle",
   "ui.diag.animal_type.goat": "Goat",
   "ui.diag.animal_type.poultry": "Poultry",
-  "ui.diag.affects": "Affects",
   "ui.diag.back": "Back",
   "ui.diag.behavioural": "Behavioural",
   "ui.diag.camera": "Camera",
@@ -33,6 +33,7 @@
   "ui.diag.select_animal_type": "Select animal type",
   "ui.diag.skip_questions": "Skip remaining questions",
   "ui.diag.spreads_by": "Spreads by",
+  "ui.diag.subtitle": "Photograph a sick animal or plant",
   "ui.diag.title": "Diagnose",
   "ui.diag.treatment": "Treatment",
   "ui.diag.upload_prompt": "Take a photo or upload from your gallery",

@@ -328,8 +328,8 @@ class _LoginScreenState extends State<LoginScreen> {
                       onTap: () => Navigator.of(context).push(
                         MaterialPageRoute(builder: (_) => const RegisterScreen()),
                       ),
-                      child: RichText(
-                        text: TextSpan(
+                      child: Text.rich(
+                        TextSpan(
                           style: TextStyle(color: Fg.almondSoft, fontSize: 12.5),
                           children: [
                             const TextSpan(text: "Don't have an account? "),
