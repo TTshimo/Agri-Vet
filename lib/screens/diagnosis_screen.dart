@@ -547,6 +547,7 @@ class _DiagnosisScreenState extends State<DiagnosisScreen> {
               style: ElevatedButton.styleFrom(
                 backgroundColor: Bg.rust,
                 disabledBackgroundColor: Bg.rust.withOpacity(0.35),
+                disabledForegroundColor: Fg.almond.withOpacity(0.75),
                 foregroundColor: Fg.almond,
                 padding: const EdgeInsets.symmetric(vertical: 15),
                 shape: RoundedRectangleBorder(
@@ -715,6 +716,7 @@ class _DiagnosisScreenState extends State<DiagnosisScreen> {
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Bg.rust,
                     disabledBackgroundColor: Bg.rust.withOpacity(0.35),
+                    disabledForegroundColor: Fg.almond.withOpacity(0.75),
                     foregroundColor: Fg.almond,
                     padding: const EdgeInsets.symmetric(vertical: 14),
                     shape: RoundedRectangleBorder(
@@ -835,11 +837,6 @@ class _DiagnosisScreenState extends State<DiagnosisScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          const Align(
-            alignment: Alignment.centerRight,
-            child: _LanguageChip(onLight: true),
-          ),
-          const SizedBox(height: 12),
 
           _GlassCard(
             borderColor: riskColor.withOpacity(0.35),

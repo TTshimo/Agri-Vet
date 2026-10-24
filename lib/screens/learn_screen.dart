@@ -82,7 +82,7 @@ class _LearnScreenState extends State<LearnScreen> {
                   slivers: [
                     SliverToBoxAdapter(
                       child: _WavyHeader(
-                        height: MediaQuery.of(context).padding.top + 118,
+                        height: MediaQuery.of(context).padding.top + 96, // same as Community
                         child: Padding(
                           padding: EdgeInsets.fromLTRB(
                             20,
