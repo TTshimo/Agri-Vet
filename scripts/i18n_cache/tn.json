@@ -1,0 +1,22 @@
+{
+  "kb.animals.healthy.rec.high": "da39a3ee5e6b",
+  "kb.animals.healthy.rec.medium": "da39a3ee5e6b",
+  "kb.plants.healthy.rec.high": "da39a3ee5e6b",
+  "kb.plants.healthy.rec.medium": "da39a3ee5e6b",
+  "ui.diag.analyse_photo": "47dac297a6be",
+  "ui.diag.analysing": "127c14c49cb0",
+  "ui.diag.analysis_failed": "61413f0b198e",
+  "ui.diag.animal": "7389b3b752fa",
+  "ui.diag.animal_type": "bcc71fa02637",
+  "ui.diag.animal_type.cattle": "13d7dd547e71",
+  "ui.diag.animal_type.goat": "0e3f5fc25846",
+  "ui.diag.animal_type.poultry": "f14d50cf8e7b",
+  "ui.diag.camera": "4da9c9af9631",
+  "ui.diag.gallery": "9c30a3485a58",
+  "ui.diag.match_percent": "131347635f2b",
+  "ui.diag.plant": "612687a2ab9b",
+  "ui.diag.select_animal_type": "62d25917b73b",
+  "ui.diag.upload_prompt": "b70c69f9b010",
+  "ui.diag.upload_tip": "a63c198faca1",
+  "ui.diag.what_diagnosing": "aadba8f12dbc"
+}
