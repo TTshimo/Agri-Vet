@@ -22,7 +22,16 @@ jobs:
           cache: true
 
       - name: Install packages
-        run: flutter pub get
+        run: |
+          set +e
+          flutter pub get > pub.txt 2>&1
+          status=$?
+          cat pub.txt
+          if [ $status -ne 0 ]; then
+            msg=$(tail -40 pub.txt | sed 's/%/%25/g' | sed ':a;N;$!ba;s/\n/%0A/g')
+            echo "::error title=flutter pub get failed::$msg"
+          fi
+          exit $status
 
       - name: Analyze
         run: |
