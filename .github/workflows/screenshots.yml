@@ -1,0 +1,52 @@
+name: Screenshots
+
+# Renders the main screens (light + dark, small phone, long languages) and
+# publishes the PNGs to the `screenshots` branch for review.
+on:
+  pull_request:
+    paths:
+      - lib/**
+      - assets/**
+      - test_screenshots/**
+      - pubspec.yaml
+      - .github/workflows/screenshots.yml
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: screenshots-${{ github.head_ref || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  shots:
+    if: github.event_name == 'workflow_dispatch' || github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      - run: flutter pub get
+
+      - name: Render screens
+        continue-on-error: true
+        run: flutter test test_screenshots --update-goldens --reporter=github
+
+      - name: Publish to the screenshots branch
+        run: |
+          src="$GITHUB_SHA"
+          mkdir -p /tmp/shots && cp test_screenshots/shots/*.png /tmp/shots/ 2>/dev/null || true
+          cd /tmp/shots
+          ls -1 *.png > INDEX.txt 2>/dev/null || echo "no screenshots rendered" > INDEX.txt
+          echo "Rendered from ${src}" >> INDEX.txt
+          git init -q -b screenshots
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A && git commit -qm "Screenshots for ${src}"
+          git push -qf "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git" screenshots
