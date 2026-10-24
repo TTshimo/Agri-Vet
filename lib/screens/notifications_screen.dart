@@ -4,19 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:intl/intl.dart';
 import 'chat_screen.dart';
 import 'user_profile_screen.dart';
-
-/// AgroLens palette — matcha green / almond / white, light module variant.
-class _C {
-  static const matchaDark = Color(0xFF374530);
-  static const matcha = Color(0xFF5C7148);
-  static const matchaLight = Color(0xFFD6E0C4);
-  static const almond = Color(0xFFF6EFE2);
-  static const ink = Color(0xFF2B2820);
-  static const inkSoft = Color(0xFF726C5C);
-  static const rust = Color(0xFFC1703E);
-  static const hairline = Color(0xFFEDE6D6);
-  static const danger = Color(0xFFC94C3F);
-}
+import '../theme/palette.dart';
 
 /// Bottom wave finishing off the dark matcha header band — same shape
 /// used across the other restyled screens for a consistent silhouette.
@@ -205,16 +193,16 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
   Color _iconColorFor(NotificationType type) {
     switch (type) {
       case NotificationType.like:
-        return _C.danger;
+        return Bg.danger;
       case NotificationType.palRequest:
       case NotificationType.palAccept:
-        return _C.matcha;
+        return Bg.matcha;
       case NotificationType.msgRequest:
       case NotificationType.msgAccept:
       case NotificationType.message:
-        return _C.rust;
+        return Bg.rust;
       default:
-        return _C.inkSoft;
+        return Bg.inkSoft;
     }
   }
 
@@ -261,14 +249,14 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
         .limit(100);
 
     return Scaffold(
-      backgroundColor: _C.almond,
+      backgroundColor: Bg.almond,
       body: CustomScrollView(
         slivers: [
           SliverToBoxAdapter(
             child: ClipPath(
               clipper: _HeaderWaveClipper(),
               child: Container(
-                color: _C.matchaDark,
+                color: Bg.matchaDark,
                 padding: EdgeInsets.fromLTRB(
                   8,
                   MediaQuery.of(context).padding.top + 8,
@@ -279,7 +267,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                   children: [
                     IconButton(
                       icon: Icon(Icons.arrow_back_ios_new_rounded,
-                          color: _C.almond, size: 18),
+                          color: Fg.almond, size: 18),
                       onPressed: () => Navigator.pop(context),
                     ),
                     Expanded(
@@ -288,7 +276,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                         style: TextStyle(
                           fontSize: 17,
                           fontWeight: FontWeight.w600,
-                          color: _C.almond,
+                          color: Fg.almond,
                         ),
                       ),
                     ),
@@ -305,7 +293,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                           child: Text(
                             'Mark all read',
                             style: TextStyle(
-                              color: _C.matchaLight,
+                              color: Fg.matchaLight,
                               fontSize: 12,
                               fontWeight: FontWeight.w500,
                             ),
@@ -325,7 +313,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
               if (snapshot.connectionState == ConnectionState.waiting) {
                 return SliverFillRemaining(
                   child: Center(
-                    child: CircularProgressIndicator(color: _C.matcha),
+                    child: CircularProgressIndicator(color: Fg.matcha),
                   ),
                 );
               }
@@ -342,13 +330,13 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                           width: 64,
                           height: 64,
                           decoration: BoxDecoration(
-                            color: _C.matchaLight.withOpacity(0.5),
+                            color: Bg.matchaLight.withOpacity(0.5),
                             shape: BoxShape.circle,
                           ),
                           child: Icon(
                             Icons.notifications_none_rounded,
                             size: 26,
-                            color: _C.matcha.withOpacity(0.7),
+                            color: Fg.matcha.withOpacity(0.7),
                           ),
                         ),
                         const SizedBox(height: 14),
@@ -357,7 +345,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                           style: TextStyle(
                               fontSize: 15,
                               fontWeight: FontWeight.w500,
-                              color: _C.ink),
+                              color: Fg.ink),
                         ),
                       ],
                     ),
@@ -381,13 +369,13 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                         margin: const EdgeInsets.only(bottom: 10),
                         decoration: BoxDecoration(
                           color: isRead
-                              ? Colors.white
-                              : _C.matchaLight.withOpacity(0.35),
+                              ? Bg.surface
+                              : Bg.matchaLight.withOpacity(0.35),
                           borderRadius: BorderRadius.circular(16),
                           border: isRead
                               ? null
                               : Border.all(
-                                  color: _C.matcha.withOpacity(0.25)),
+                                  color: Bg.matcha.withOpacity(0.25)),
                         ),
                         child: InkWell(
                           borderRadius: BorderRadius.circular(16),
@@ -401,13 +389,13 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                                   children: [
                                     CircleAvatar(
                                       radius: 20,
-                                      backgroundColor: _C.matchaLight,
+                                      backgroundColor: Bg.matchaLight,
                                       child: Text(
                                         _initials(fromName),
                                         style: TextStyle(
                                           fontSize: 12,
                                           fontWeight: FontWeight.w600,
-                                          color: _C.matchaDark,
+                                          color: Fg.matchaDark,
                                         ),
                                       ),
                                     ),
@@ -417,10 +405,10 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                                       child: Container(
                                         padding: const EdgeInsets.all(3),
                                         decoration: BoxDecoration(
-                                          color: Colors.white,
+                                          color: Bg.surface,
                                           shape: BoxShape.circle,
                                           border: Border.all(
-                                              color: _C.almond, width: 2),
+                                              color: Bg.almond, width: 2),
                                         ),
                                         child: Icon(
                                           _iconFor(type),
@@ -440,7 +428,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                                       fontWeight: isRead
                                           ? FontWeight.w400
                                           : FontWeight.w500,
-                                      color: _C.ink,
+                                      color: Fg.ink,
                                       height: 1.4,
                                     ),
                                   ),
@@ -450,7 +438,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                                   _timeAgo(ts),
                                   style: TextStyle(
                                     fontSize: 11,
-                                    color: _C.inkSoft,
+                                    color: Fg.inkSoft,
                                   ),
                                 ),
                               ],

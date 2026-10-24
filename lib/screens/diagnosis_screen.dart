@@ -11,22 +11,11 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:provider/provider.dart';
 import '../providers/language_provider.dart';
 import '../services/behavioural_score.dart';
+import '../theme/palette.dart';
 
 // Self-contained palette for the redesign — matcha green / almond / rust.
 // Matches the palette used across the other redesigned screens. Fold into
 // a shared AppColors in main.dart later if you want it app-wide.
-class _C {
-  static const matchaDark = Color(0xFF374530);
-  static const matchaHeader = Color(0xFF4A5B41);
-  static const matcha = Color(0xFF5C7148);
-  static const matchaTint = Color(0xFFD6E0C4);
-  static const almond = Color(0xFFF6EFE2);
-  static const ink = Color(0xFF2B2820);
-  static const inkSoft = Color(0xFF726C5C);
-  static const rust = Color(0xFFC1703E);
-  static const rustBg = Color(0xFFF1DECB);
-}
-
 enum DiagnosisType { animal, plant }
 
 enum _FlowStep { upload, profiling, result }
@@ -176,7 +165,7 @@ class _DiagnosisScreenState extends State<DiagnosisScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
           content: Text(_t('ui.diag.analysis_failed')),
-          backgroundColor: _C.rust,
+          backgroundColor: Bg.rust,
         ));
       }
     } finally {
@@ -275,7 +264,7 @@ class _DiagnosisScreenState extends State<DiagnosisScreen> {
   Widget build(BuildContext context) {
     context.watch<LanguageProvider>(); // rebuild when the language changes
     return Scaffold(
-      backgroundColor: _C.almond,
+      backgroundColor: Bg.almond,
       body: Stack(
         children: [
           Positioned.fill(
@@ -350,16 +339,16 @@ class _DiagnosisScreenState extends State<DiagnosisScreen> {
                     Navigator.of(context).pop();
                   }
                 },
-                child: const Icon(Icons.arrow_back_rounded,
-                    color: _C.almond, size: 22),
+                child: Icon(Icons.arrow_back_rounded,
+                    color: Fg.almond, size: 22),
               ),
             if (showBack) const SizedBox(width: 12),
             Text(
               title,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.w600,
-                color: _C.almond,
+                color: Fg.almond,
               ),
             ),
             const Spacer(),
@@ -378,7 +367,7 @@ class _DiagnosisScreenState extends State<DiagnosisScreen> {
         children: [
           Text(
             _t('ui.diag.what_diagnosing'),
-            style: TextStyle(fontSize: 15, fontWeight: FontWeight.w500, color: _C.ink),
+            style: TextStyle(fontSize: 15, fontWeight: FontWeight.w500, color: Fg.ink),
           ),
           const SizedBox(height: 12),
           _TypeToggle(
@@ -437,7 +426,7 @@ class _DiagnosisScreenState extends State<DiagnosisScreen> {
             const SizedBox(height: 18),
             Text(
               _t('ui.diag.animal_type'),
-              style: TextStyle(fontSize: 13, fontWeight: FontWeight.w500, color: _C.ink),
+              style: TextStyle(fontSize: 13, fontWeight: FontWeight.w500, color: Fg.ink),
             ),
             const SizedBox(height: 8),
             _GlassCard(
@@ -447,12 +436,12 @@ class _DiagnosisScreenState extends State<DiagnosisScreen> {
                   child: DropdownButtonFormField<String>(
                     value: _animalType.isEmpty ? null : _animalType,
                     isExpanded: true,
-                    icon: Icon(Icons.keyboard_arrow_down_rounded, color: _C.inkSoft),
-                    style: TextStyle(fontSize: 13, color: _C.ink),
-                    dropdownColor: _C.almond,
+                    icon: Icon(Icons.keyboard_arrow_down_rounded, color: Fg.inkSoft),
+                    style: TextStyle(fontSize: 13, color: Fg.ink),
+                    dropdownColor: Bg.almond,
                     decoration: InputDecoration(
                       hintText: _t('ui.diag.select_animal_type'),
-                      hintStyle: TextStyle(fontSize: 13, color: _C.inkSoft),
+                      hintStyle: TextStyle(fontSize: 13, color: Fg.inkSoft),
                       border: InputBorder.none,
                       contentPadding:
                           const EdgeInsets.symmetric(horizontal: 10, vertical: 12),
@@ -475,9 +464,9 @@ class _DiagnosisScreenState extends State<DiagnosisScreen> {
             child: ElevatedButton(
               onPressed: _selectedImage == null || _analysing ? null : _analyse,
               style: ElevatedButton.styleFrom(
-                backgroundColor: _C.rust,
-                disabledBackgroundColor: _C.rust.withOpacity(0.35),
-                foregroundColor: _C.rustBg,
+                backgroundColor: Bg.rust,
+                disabledBackgroundColor: Bg.rust.withOpacity(0.35),
+                foregroundColor: Fg.rustBg,
                 padding: const EdgeInsets.symmetric(vertical: 15),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(16),
@@ -488,11 +477,11 @@ class _DiagnosisScreenState extends State<DiagnosisScreen> {
                   ? Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        const SizedBox(
+                        SizedBox(
                           width: 18,
                           height: 18,
                           child: CircularProgressIndicator(
-                              strokeWidth: 2, color: _C.rustBg),
+                              strokeWidth: 2, color: Fg.rustBg),
                         ),
                         const SizedBox(width: 10),
                         Text(_t('ui.diag.analysing')),
@@ -535,7 +524,7 @@ class _DiagnosisScreenState extends State<DiagnosisScreen> {
                   'current': _currentQuestion + 1,
                   'total': _questions.length,
                 }),
-                style: TextStyle(fontSize: 12, color: _C.inkSoft),
+                style: TextStyle(fontSize: 12, color: Fg.inkSoft),
               ),
               const Spacer(),
               Text(
@@ -543,7 +532,7 @@ class _DiagnosisScreenState extends State<DiagnosisScreen> {
                 style: TextStyle(
                   fontSize: 12,
                   fontWeight: FontWeight.w600,
-                  color: _C.matcha,
+                  color: Fg.matcha,
                 ),
               ),
             ],
@@ -553,8 +542,8 @@ class _DiagnosisScreenState extends State<DiagnosisScreen> {
             borderRadius: BorderRadius.circular(4),
             child: LinearProgressIndicator(
               value: progress,
-              backgroundColor: Colors.white.withOpacity(0.6),
-              valueColor: AlwaysStoppedAnimation(_C.matcha),
+              backgroundColor: Bg.surface.withOpacity(0.6),
+              valueColor: AlwaysStoppedAnimation(Fg.matcha),
               minHeight: 6,
             ),
           ),
@@ -566,7 +555,7 @@ class _DiagnosisScreenState extends State<DiagnosisScreen> {
             style: TextStyle(
               fontSize: 17,
               fontWeight: FontWeight.w500,
-              color: _C.ink,
+              color: Fg.ink,
               height: 1.45,
             ),
           ),
@@ -585,8 +574,8 @@ class _DiagnosisScreenState extends State<DiagnosisScreen> {
               child: GestureDetector(
                 onTap: () => _answerQuestion(qId, enOption),
                 child: _GlassCard(
-                  borderColor: isSelected ? _C.matcha.withOpacity(0.6) : null,
-                  glossTint: isSelected ? _C.matchaTint : null,
+                  borderColor: isSelected ? Bg.matcha.withOpacity(0.6) : null,
+                  glossTint: isSelected ? Bg.matchaTint : null,
                   child: Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
                     child: Row(
@@ -596,7 +585,7 @@ class _DiagnosisScreenState extends State<DiagnosisScreen> {
                             displayLabel,
                             style: TextStyle(
                               fontSize: 14,
-                              color: isSelected ? _C.matchaDark : _C.ink,
+                              color: isSelected ? Fg.matchaDark : Fg.ink,
                               fontWeight: isSelected ? FontWeight.w500 : FontWeight.w400,
                             ),
                           ),
@@ -605,7 +594,7 @@ class _DiagnosisScreenState extends State<DiagnosisScreen> {
                           isSelected
                               ? Icons.check_circle_rounded
                               : Icons.radio_button_unchecked_rounded,
-                          color: isSelected ? _C.matcha : _C.inkSoft.withOpacity(0.5),
+                          color: isSelected ? Fg.matcha : Fg.inkSoft.withOpacity(0.5),
                           size: 20,
                         ),
                       ],
@@ -625,14 +614,14 @@ class _DiagnosisScreenState extends State<DiagnosisScreen> {
                   child: OutlinedButton(
                     onPressed: _previousQuestion,
                     style: OutlinedButton.styleFrom(
-                      side: BorderSide(color: _C.inkSoft.withOpacity(0.3)),
+                      side: BorderSide(color: Bg.inkSoft.withOpacity(0.3)),
                       padding: const EdgeInsets.symmetric(vertical: 14),
                       shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(14)),
                     ),
                     child: Text(
                       _t('ui.diag.back'),
-                      style: TextStyle(color: _C.inkSoft),
+                      style: TextStyle(color: Fg.inkSoft),
                     ),
                   ),
                 ),
@@ -643,9 +632,9 @@ class _DiagnosisScreenState extends State<DiagnosisScreen> {
                 child: ElevatedButton(
                   onPressed: currentAnswer == null ? null : _nextQuestion,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: _C.rust,
-                    disabledBackgroundColor: _C.rust.withOpacity(0.35),
-                    foregroundColor: _C.rustBg,
+                    backgroundColor: Bg.rust,
+                    disabledBackgroundColor: Bg.rust.withOpacity(0.35),
+                    foregroundColor: Fg.rustBg,
                     padding: const EdgeInsets.symmetric(vertical: 14),
                     shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(14)),
@@ -671,7 +660,7 @@ class _DiagnosisScreenState extends State<DiagnosisScreen> {
                 _t('ui.diag.skip_questions'),
                 style: TextStyle(
                   fontSize: 13,
-                  color: _C.inkSoft,
+                  color: Fg.inkSoft,
                   decoration: TextDecoration.underline,
                 ),
               ),
@@ -689,12 +678,12 @@ class _DiagnosisScreenState extends State<DiagnosisScreen> {
     final confidence = (_result!.modelConfidence * 100).toStringAsFixed(0);
 
     return _GlassCard(
-      borderColor: _C.matcha.withOpacity(0.35),
+      borderColor: Bg.matcha.withOpacity(0.35),
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
         child: Row(
           children: [
-            Icon(Icons.image_search_rounded, size: 18, color: _C.matchaDark),
+            Icon(Icons.image_search_rounded, size: 18, color: Fg.matchaDark),
             const SizedBox(width: 10),
             Expanded(
               child: Column(
@@ -702,14 +691,14 @@ class _DiagnosisScreenState extends State<DiagnosisScreen> {
                 children: [
                   Text(
                     _t('ui.diag.detected_from_image'),
-                    style: TextStyle(fontSize: 11, color: _C.inkSoft),
+                    style: TextStyle(fontSize: 11, color: Fg.inkSoft),
                   ),
                   Text(
                     '$name  ·  ${_t('ui.diag.match_percent', args: {'percent': confidence})}',
                     style: TextStyle(
                       fontSize: 13,
                       fontWeight: FontWeight.w600,
-                      color: _C.matchaDark,
+                      color: Fg.matchaDark,
                     ),
                   ),
                 ],
@@ -730,7 +719,7 @@ class _DiagnosisScreenState extends State<DiagnosisScreen> {
     // Two-tone risk language, consistent with the rest of the app: only
     // "high" gets the rust warning treatment, everything else reads calm.
     final isHigh = riskLevel == 'high';
-    final riskColor = isHigh ? _C.rust : _C.matcha;
+    final riskColor = isHigh ? Bg.rust : Bg.matcha;
     String riskLabel;
     IconData riskIcon;
     switch (riskLevel) {
@@ -779,7 +768,7 @@ class _DiagnosisScreenState extends State<DiagnosisScreen> {
                   width: double.infinity,
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
-                    color: _C.matchaHeader.withOpacity(0.88),
+                    color: Bg.matchaHeader.withOpacity(0.88),
                     borderRadius: const BorderRadius.vertical(
                       top: Radius.circular(18),
                     ),
@@ -793,10 +782,10 @@ class _DiagnosisScreenState extends State<DiagnosisScreen> {
                           Expanded(
                             child: Text(
                               displayName,
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontSize: 18,
                                 fontWeight: FontWeight.w600,
-                                color: _C.almond,
+                                color: Fg.almond,
                                 letterSpacing: -0.3,
                               ),
                             ),
@@ -806,21 +795,21 @@ class _DiagnosisScreenState extends State<DiagnosisScreen> {
                             padding:
                                 const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                             decoration: BoxDecoration(
-                              color: Colors.white.withOpacity(0.15),
+                              color: Bg.surface.withOpacity(0.15),
                               borderRadius: BorderRadius.circular(999),
-                              border: Border.all(color: Colors.white.withOpacity(0.4)),
+                              border: Border.all(color: Bg.surface.withOpacity(0.4)),
                             ),
                             child: Row(
                               mainAxisSize: MainAxisSize.min,
                               children: [
-                                Icon(riskIcon, size: 13, color: _C.almond),
+                                Icon(riskIcon, size: 13, color: Fg.almond),
                                 const SizedBox(width: 4),
                                 Text(
                                   riskLabel,
-                                  style: const TextStyle(
+                                  style: TextStyle(
                                     fontSize: 11,
                                     fontWeight: FontWeight.w600,
-                                    color: _C.almond,
+                                    color: Fg.almond,
                                   ),
                                 ),
                               ],
@@ -918,13 +907,13 @@ class _DiagnosisScreenState extends State<DiagnosisScreen> {
               _currentQuestion = 0;
             }),
             style: OutlinedButton.styleFrom(
-              side: BorderSide(color: _C.inkSoft.withOpacity(0.3)),
+              side: BorderSide(color: Bg.inkSoft.withOpacity(0.3)),
               padding: const EdgeInsets.symmetric(vertical: 14),
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
             ),
             child: Text(
               _t('ui.diag.diagnose_again'),
-              style: TextStyle(color: _C.inkSoft),
+              style: TextStyle(color: Fg.inkSoft),
             ),
           ),
         ],
@@ -944,7 +933,7 @@ class _DiagnosisScreenState extends State<DiagnosisScreen> {
               style: TextStyle(
                 fontSize: 13,
                 fontWeight: FontWeight.w600,
-                color: _C.inkSoft,
+                color: Fg.inkSoft,
                 letterSpacing: 0.4,
               ),
             ),
@@ -965,15 +954,15 @@ class _DiagnosisScreenState extends State<DiagnosisScreen> {
                   children: [
                     Text(
                       qText,
-                      style: TextStyle(fontSize: 12, color: _C.inkSoft, height: 1.3),
+                      style: TextStyle(fontSize: 12, color: Fg.inkSoft, height: 1.3),
                     ),
                     const SizedBox(height: 3),
                     Text(
                       displayAnswer,
                       style: TextStyle(
-                          fontSize: 13, fontWeight: FontWeight.w500, color: _C.ink),
+                          fontSize: 13, fontWeight: FontWeight.w500, color: Fg.ink),
                     ),
-                    Divider(height: 16, color: Colors.white.withOpacity(0.7)),
+                    Divider(height: 16, color: Bg.surface.withOpacity(0.7)),
                   ],
                 ),
               );
@@ -1039,7 +1028,7 @@ class _WavyHeader extends StatelessWidget {
         children: [
           ClipPath(
             clipper: _WavyHeaderClipper(),
-            child: Container(color: _C.matchaHeader.withOpacity(0.88)),
+            child: Container(color: Bg.matchaHeader.withOpacity(0.88)),
           ),
           child,
         ],
@@ -1078,7 +1067,7 @@ class _WavyHeaderClipper extends CustomClipper<Path> {
 class _BottomFieldWavePainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
-    final paint = Paint()..color = _C.matchaTint.withOpacity(0.5);
+    final paint = Paint()..color = Bg.matchaTint.withOpacity(0.5);
     final path = Path()
       ..moveTo(0, size.height * 0.82)
       ..cubicTo(
@@ -1121,10 +1110,10 @@ class _GlassCard extends StatelessWidget {
         filter: ImageFilter.blur(sigmaX: 18, sigmaY: 18),
         child: Container(
           decoration: BoxDecoration(
-            color: Colors.white.withOpacity(0.5),
+            color: Bg.surface.withOpacity(0.5),
             borderRadius: BorderRadius.circular(18),
             border: Border.all(
-              color: borderColor ?? Colors.white.withOpacity(0.85),
+              color: borderColor ?? Bg.surface.withOpacity(0.85),
               width: 0.8,
             ),
           ),
@@ -1138,7 +1127,7 @@ class _GlassCard extends StatelessWidget {
                   heightFactor: 0.4,
                   child: Container(
                     decoration: BoxDecoration(
-                      color: (glossTint ?? Colors.white).withOpacity(0.4),
+                      color: (glossTint ?? Bg.surface).withOpacity(0.4),
                       borderRadius: const BorderRadius.vertical(
                         top: Radius.circular(18),
                       ),
@@ -1212,19 +1201,19 @@ class _TypeSegment extends StatelessWidget {
         duration: const Duration(milliseconds: 200),
         padding: const EdgeInsets.symmetric(vertical: 13),
         decoration: BoxDecoration(
-          color: selected ? _C.matchaHeader : Colors.transparent,
+          color: selected ? Bg.matchaHeader : Colors.transparent,
           borderRadius: BorderRadius.circular(14),
         ),
         child: Column(
           children: [
-            Icon(icon, size: 19, color: selected ? _C.almond : _C.inkSoft),
+            Icon(icon, size: 19, color: selected ? Fg.almond : Fg.inkSoft),
             const SizedBox(height: 6),
             Text(
               label,
               style: TextStyle(
                 fontSize: 12,
                 fontWeight: FontWeight.w500,
-                color: selected ? _C.almond : _C.inkSoft,
+                color: selected ? Fg.almond : Fg.inkSoft,
               ),
             ),
           ],
@@ -1249,15 +1238,15 @@ class _ConfidenceBar extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       children: [
-        Text(label, style: TextStyle(fontSize: 11, color: _C.matchaTint)),
+        Text(label, style: TextStyle(fontSize: 11, color: Fg.matchaTint)),
         const SizedBox(width: 8),
         Expanded(
           child: ClipRRect(
             borderRadius: BorderRadius.circular(3),
             child: LinearProgressIndicator(
               value: value,
-              backgroundColor: Colors.white.withOpacity(0.15),
-              valueColor: AlwaysStoppedAnimation(_C.almond),
+              backgroundColor: Bg.surface.withOpacity(0.15),
+              valueColor: AlwaysStoppedAnimation(Fg.almond),
               minHeight: 5,
             ),
           ),
@@ -1266,7 +1255,7 @@ class _ConfidenceBar extends StatelessWidget {
         Text(
           trailingLabel ?? '${(value * 100).toStringAsFixed(0)}%',
           style: TextStyle(
-              fontSize: 11, color: _C.matchaTint, fontWeight: FontWeight.w600),
+              fontSize: 11, color: Fg.matchaTint, fontWeight: FontWeight.w600),
         ),
       ],
     );
@@ -1284,15 +1273,15 @@ class _LanguageChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final i18n = context.watch<LanguageProvider>();
-    final fg = onLight ? _C.matchaDark : _C.almond;
+    final fg = onLight ? Fg.matchaDark : Fg.almond;
     return GestureDetector(
       onTap: () => _pick(context, i18n),
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
         decoration: BoxDecoration(
           color: onLight
-              ? _C.matchaTint.withOpacity(0.7)
-              : Colors.white.withOpacity(0.16),
+              ? Bg.matchaTint.withOpacity(0.7)
+              : Bg.surface.withOpacity(0.16),
           borderRadius: BorderRadius.circular(999),
         ),
         child: Row(
@@ -1314,7 +1303,7 @@ class _LanguageChip extends StatelessWidget {
   void _pick(BuildContext context, LanguageProvider i18n) {
     showModalBottomSheet<void>(
       context: context,
-      backgroundColor: _C.almond,
+      backgroundColor: Bg.almond,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
@@ -1325,9 +1314,9 @@ class _LanguageChip extends StatelessWidget {
           children: [
             for (final lang in i18n.languages)
               ListTile(
-                title: Text(lang.label, style: const TextStyle(color: _C.ink)),
+                title: Text(lang.label, style: TextStyle(color: Fg.ink)),
                 trailing: lang.code == i18n.code
-                    ? const Icon(Icons.check_circle, color: _C.rust)
+                    ? Icon(Icons.check_circle, color: Fg.rust)
                     : null,
                 onTap: () {
                   i18n.setLanguage(lang.code);
@@ -1349,10 +1338,10 @@ class _ActionCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final accent = isHigh ? _C.rust : _C.matcha;
+    final accent = isHigh ? Bg.rust : Bg.matcha;
     return _GlassCard(
       borderColor: accent.withOpacity(0.5),
-      glossTint: isHigh ? _C.rustBg : _C.matchaTint,
+      glossTint: isHigh ? Bg.rustBg : Bg.matchaTint,
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
@@ -1379,7 +1368,7 @@ class _ActionCard extends StatelessWidget {
             const SizedBox(height: 8),
             Text(
               content,
-              style: TextStyle(fontSize: 13, color: _C.ink, height: 1.6),
+              style: TextStyle(fontSize: 13, color: Fg.ink, height: 1.6),
             ),
           ],
         ),
@@ -1404,7 +1393,7 @@ class _UploadZone extends StatelessWidget {
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(14),
             border: Border.all(
-              color: _C.matcha.withOpacity(0.4),
+              color: Bg.matcha.withOpacity(0.4),
               width: 1.5,
               style: BorderStyle.solid,
             ),
@@ -1412,18 +1401,18 @@ class _UploadZone extends StatelessWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(Icons.add_photo_alternate_outlined, size: 36, color: _C.matchaHeader),
+              Icon(Icons.add_photo_alternate_outlined, size: 36, color: Fg.matchaHeader),
               const SizedBox(height: 10),
               Text(
                 context.watch<LanguageProvider>().t('ui.diag.upload_prompt'),
                 textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 13, color: _C.ink),
+                style: TextStyle(fontSize: 13, color: Fg.ink),
               ),
               const SizedBox(height: 4),
               Text(
                 context.watch<LanguageProvider>().t('ui.diag.upload_tip'),
                 textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 11, color: _C.inkSoft),
+                style: TextStyle(fontSize: 11, color: Fg.inkSoft),
               ),
             ],
           ),
@@ -1480,9 +1469,9 @@ class _SecondaryButton extends StatelessWidget {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(icon, size: 17, color: _C.matchaHeader),
+              Icon(icon, size: 17, color: Fg.matchaHeader),
               const SizedBox(width: 6),
-              Text(label, style: TextStyle(fontSize: 13, color: _C.ink)),
+              Text(label, style: TextStyle(fontSize: 13, color: Fg.ink)),
             ],
           ),
         ),
@@ -1505,24 +1494,24 @@ class _InfoRow extends StatelessWidget {
           ? Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(label, style: TextStyle(fontSize: 12, color: _C.inkSoft)),
+                Text(label, style: TextStyle(fontSize: 12, color: Fg.inkSoft)),
                 const SizedBox(height: 4),
                 Text(
                   value,
                   style: TextStyle(
                     fontSize: 13,
                     fontWeight: FontWeight.w500,
-                    color: _C.ink,
+                    color: Fg.ink,
                     height: 1.5,
                   ),
                 ),
-                Divider(height: 16, color: Colors.white.withOpacity(0.7)),
+                Divider(height: 16, color: Bg.surface.withOpacity(0.7)),
               ],
             )
           : Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(label, style: TextStyle(fontSize: 13, color: _C.inkSoft)),
+                Text(label, style: TextStyle(fontSize: 13, color: Fg.inkSoft)),
                 const SizedBox(width: 12),
                 Flexible(
                   child: Text(
@@ -1531,7 +1520,7 @@ class _InfoRow extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 13,
                       fontWeight: FontWeight.w500,
-                      color: _C.ink,
+                      color: Fg.ink,
                     ),
                   ),
                 ),
@@ -1571,14 +1560,14 @@ class _ExpandableSectionState extends State<_ExpandableSection> {
             decoration: BoxDecoration(
               border: widget.isLast
                   ? null
-                  : Border(bottom: BorderSide(color: Colors.white.withOpacity(0.7))),
+                  : Border(bottom: BorderSide(color: Bg.surface.withOpacity(0.7))),
             ),
             child: Row(
               children: [
                 if (widget.highlight)
                   Padding(
                     padding: const EdgeInsets.only(right: 6),
-                    child: Icon(Icons.warning_amber_rounded, size: 16, color: _C.rust),
+                    child: Icon(Icons.warning_amber_rounded, size: 16, color: Fg.rust),
                   ),
                 Expanded(
                   child: Text(
@@ -1586,7 +1575,7 @@ class _ExpandableSectionState extends State<_ExpandableSection> {
                     style: TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.w500,
-                      color: widget.highlight ? _C.rust : _C.ink,
+                      color: widget.highlight ? Fg.rust : Fg.ink,
                     ),
                   ),
                 ),
@@ -1594,7 +1583,7 @@ class _ExpandableSectionState extends State<_ExpandableSection> {
                   _expanded
                       ? Icons.keyboard_arrow_up_rounded
                       : Icons.keyboard_arrow_down_rounded,
-                  color: _C.inkSoft,
+                  color: Fg.inkSoft,
                 ),
               ],
             ),
@@ -1606,7 +1595,7 @@ class _ExpandableSectionState extends State<_ExpandableSection> {
             padding: const EdgeInsets.fromLTRB(16, 0, 16, 14),
             child: Text(
               widget.content,
-              style: TextStyle(fontSize: 13, color: _C.inkSoft, height: 1.6),
+              style: TextStyle(fontSize: 13, color: Fg.inkSoft, height: 1.6),
             ),
           ),
       ],

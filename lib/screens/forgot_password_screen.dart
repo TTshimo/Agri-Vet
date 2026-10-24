@@ -1,19 +1,7 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-
-class _C {
-  static const bgDark = Color(0xFF1F2A1A);
-  static const waveDark = Color(0xFF2C3A23);
-  static const waveDarkSoft = Color(0xFF374530);
-  static const almond = Color(0xFFF6EFE2);
-  static const almondSoft = Color(0xFFB9C4A6);
-  static const almondMuted = Color(0xFF8E9A7C);
-  static const rust = Color(0xFFC1703E);
-  static const ink = Color(0xFF2B2820);
-  static const fieldFill = Color(0x1EFFFFFF);
-  static const fieldBorder = Color(0x33FFFFFF);
-}
+import '../theme/palette.dart';
 
 class _FieldWavesPainter extends CustomPainter {
   @override
@@ -33,7 +21,7 @@ class _FieldWavesPainter extends CustomPainter {
       ..lineTo(size.width, 0)
       ..lineTo(0, 0)
       ..close();
-    canvas.drawPath(p1, Paint()..color = _C.waveDark);
+    canvas.drawPath(p1, Paint()..color = Bg.waveDark);
 
     final p2 = Path()
       ..moveTo(0, size.height * 0.30)
@@ -45,7 +33,7 @@ class _FieldWavesPainter extends CustomPainter {
       ..lineTo(size.width, 0)
       ..lineTo(0, 0)
       ..close();
-    canvas.drawPath(p2, Paint()..color = _C.waveDarkSoft.withOpacity(0.7));
+    canvas.drawPath(p2, Paint()..color = Bg.waveDarkSoft.withOpacity(0.7));
   }
 
   @override
@@ -108,7 +96,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: _C.bgDark,
+      backgroundColor: Bg.bgDark,
       body: Stack(
         children: [
           Positioned(
@@ -131,10 +119,10 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                       width: 34,
                       height: 34,
                       decoration: BoxDecoration(
-                        color: _C.fieldFill,
+                        color: Bg.fieldFill,
                         shape: BoxShape.circle,
                       ),
-                      child: const Icon(Icons.arrow_back, size: 16, color: _C.almond),
+                      child: Icon(Icons.arrow_back, size: 16, color: Fg.almond),
                     ),
                   ),
                   const SizedBox(height: 28),
@@ -142,41 +130,41 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                     width: 56,
                     height: 56,
                     decoration: BoxDecoration(
-                      color: _C.rust.withOpacity(0.18),
+                      color: Bg.rust.withOpacity(0.18),
                       borderRadius: BorderRadius.circular(16),
                     ),
-                    child: const Icon(Icons.mark_email_unread_outlined,
-                        color: _C.rust, size: 26),
+                    child: Icon(Icons.mark_email_unread_outlined,
+                        color: Fg.rust, size: 26),
                   ),
                   const SizedBox(height: 20),
                   Text(
                     _sent ? 'Check your inbox' : 'Forgot your password?',
-                    style: const TextStyle(
-                        color: _C.almond, fontSize: 22, fontWeight: FontWeight.w600),
+                    style: TextStyle(
+                        color: Fg.almond, fontSize: 22, fontWeight: FontWeight.w600),
                   ),
                   const SizedBox(height: 8),
                   Text(
                     _sent
                         ? "We've sent a reset link to ${_emailCtrl.text.trim()}. Follow it to set a new password."
                         : "Enter the email you signed up with and we'll send you a link to reset it.",
-                    style: TextStyle(color: _C.almondSoft, fontSize: 13, height: 1.5),
+                    style: TextStyle(color: Fg.almondSoft, fontSize: 13, height: 1.5),
                   ),
                   const SizedBox(height: 28),
                   if (!_sent) ...[
                     Container(
                       decoration: BoxDecoration(
-                        color: _C.fieldFill,
+                        color: Bg.fieldFill,
                         borderRadius: BorderRadius.circular(10),
-                        border: Border.all(color: _C.fieldBorder, width: 0.8),
+                        border: Border.all(color: Bg.fieldBorder, width: 0.8),
                       ),
                       child: TextField(
                         controller: _emailCtrl,
                         keyboardType: TextInputType.emailAddress,
-                        style: const TextStyle(color: _C.almond, fontSize: 14),
+                        style: TextStyle(color: Fg.almond, fontSize: 14),
                         decoration: InputDecoration(
                           hintText: 'Email address',
-                          hintStyle: TextStyle(color: _C.almondMuted.withOpacity(0.8), fontSize: 13.5),
-                          prefixIcon: const Icon(Icons.mail_outline, size: 18, color: _C.almondSoft),
+                          hintStyle: TextStyle(color: Fg.almondMuted.withOpacity(0.8), fontSize: 13.5),
+                          prefixIcon: Icon(Icons.mail_outline, size: 18, color: Fg.almondSoft),
                           border: InputBorder.none,
                           contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
                         ),
@@ -192,16 +180,16 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                       child: ElevatedButton(
                         onPressed: _loading ? null : _sendResetLink,
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: _C.rust,
-                          foregroundColor: _C.ink,
+                          backgroundColor: Bg.rust,
+                          foregroundColor: Fg.ink,
                           padding: const EdgeInsets.symmetric(vertical: 14),
                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                         ),
                         child: _loading
-                            ? const SizedBox(
+                            ? SizedBox(
                                 height: 18,
                                 width: 18,
-                                child: CircularProgressIndicator(strokeWidth: 2, color: _C.ink),
+                                child: CircularProgressIndicator(strokeWidth: 2, color: Fg.ink),
                               )
                             : const Text('Send reset link', style: TextStyle(fontWeight: FontWeight.w600)),
                       ),
@@ -212,8 +200,8 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                       child: OutlinedButton(
                         onPressed: () => Navigator.of(context).pop(),
                         style: OutlinedButton.styleFrom(
-                          foregroundColor: _C.almond,
-                          side: BorderSide(color: _C.fieldBorder, width: 0.8),
+                          foregroundColor: Fg.almond,
+                          side: BorderSide(color: Bg.fieldBorder, width: 0.8),
                           padding: const EdgeInsets.symmetric(vertical: 14),
                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                         ),
@@ -226,12 +214,12 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                       onTap: () => Navigator.of(context).pop(),
                       child: RichText(
                         text: TextSpan(
-                          style: TextStyle(color: _C.almondSoft, fontSize: 12.5),
+                          style: TextStyle(color: Fg.almondSoft, fontSize: 12.5),
                           children: [
                             const TextSpan(text: 'Remembered the password? '),
                             TextSpan(
                               text: 'Log in',
-                              style: const TextStyle(color: _C.almond, fontWeight: FontWeight.w600),
+                              style: TextStyle(color: Fg.almond, fontWeight: FontWeight.w600),
                             ),
                           ],
                         ),

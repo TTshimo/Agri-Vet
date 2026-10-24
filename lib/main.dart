@@ -14,6 +14,7 @@ import 'firebase_options.dart';
 import 'package:provider/provider.dart';
 import 'providers/theme_provider.dart';
 import 'providers/language_provider.dart';
+import 'theme/palette.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -43,6 +44,21 @@ class AgriVetApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final themeProvider = context.watch<ThemeProvider>();
+
+    // Screens read their colours from Palette (Bg/Fg) rather than the
+    // Theme, so when dark mode flips, repaint everything already on screen
+    // (navigation and form state are kept).
+    if (Palette.dark != themeProvider.isDark) {
+      Palette.dark = themeProvider.isDark;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!context.mounted) return;
+        void rebuild(Element element) {
+          element.markNeedsBuild();
+          element.visitChildren(rebuild);
+        }
+        (context as Element).visitChildren(rebuild);
+      });
+    }
 
     return MaterialApp(
       title: 'AgroLens',

@@ -2,18 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'user_profile_screen.dart';
-
-/// AgroLens palette — matcha green / almond / white, light module variant.
-class _C {
-  static const matchaDark = Color(0xFF374530);
-  static const matcha = Color(0xFF5C7148);
-  static const matchaLight = Color(0xFFD6E0C4);
-  static const almond = Color(0xFFF6EFE2);
-  static const ink = Color(0xFF2B2820);
-  static const inkSoft = Color(0xFF726C5C);
-  static const rust = Color(0xFFC1703E);
-  static const hairline = Color(0xFFEDE6D6);
-}
+import '../theme/palette.dart';
 
 /// Bottom wave finishing off the dark matcha header band — same shape
 /// used across the other restyled screens for a consistent silhouette.
@@ -71,14 +60,14 @@ class _MakePalScreenState extends State<MakePalScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: _C.almond,
+      backgroundColor: Bg.almond,
       body: CustomScrollView(
         slivers: [
           SliverToBoxAdapter(
             child: ClipPath(
               clipper: _HeaderWaveClipper(),
               child: Container(
-                color: _C.matchaDark,
+                color: Bg.matchaDark,
                 padding: EdgeInsets.fromLTRB(
                   16,
                   MediaQuery.of(context).padding.top + 8,
@@ -92,7 +81,7 @@ class _MakePalScreenState extends State<MakePalScreen> {
                         IconButton(
                           padding: EdgeInsets.zero,
                           icon: Icon(Icons.arrow_back_ios_new_rounded,
-                              color: _C.almond, size: 18),
+                              color: Fg.almond, size: 18),
                           onPressed: () => Navigator.pop(context),
                         ),
                         Expanded(
@@ -102,7 +91,7 @@ class _MakePalScreenState extends State<MakePalScreen> {
                             style: TextStyle(
                               fontSize: 17,
                               fontWeight: FontWeight.w600,
-                              color: _C.almond,
+                              color: Fg.almond,
                             ),
                           ),
                         ),
@@ -114,18 +103,18 @@ class _MakePalScreenState extends State<MakePalScreen> {
                       padding: const EdgeInsets.only(bottom: 12),
                       child: Text(
                         'Find other farmers to connect with',
-                        style: TextStyle(fontSize: 12.5, color: _C.matchaLight),
+                        style: TextStyle(fontSize: 12.5, color: Fg.matchaLight),
                       ),
                     ),
                     TextField(
                       controller: _searchController,
-                      style: TextStyle(color: _C.almond, fontSize: 14),
+                      style: TextStyle(color: Fg.almond, fontSize: 14),
                       decoration: InputDecoration(
                         hintText: 'Search farmers...',
                         hintStyle: TextStyle(
-                            color: _C.almond.withOpacity(0.5), fontSize: 14),
+                            color: Fg.almond.withOpacity(0.5), fontSize: 14),
                         prefixIcon: Icon(Icons.search,
-                            color: _C.almond.withOpacity(0.6), size: 20),
+                            color: Fg.almond.withOpacity(0.6), size: 20),
                         suffixIcon: _query.isNotEmpty
                             ? GestureDetector(
                                 onTap: () {
@@ -133,12 +122,12 @@ class _MakePalScreenState extends State<MakePalScreen> {
                                   setState(() => _query = '');
                                 },
                                 child: Icon(Icons.close,
-                                    color: _C.almond.withOpacity(0.6),
+                                    color: Fg.almond.withOpacity(0.6),
                                     size: 18),
                               )
                             : null,
                         filled: true,
-                        fillColor: Colors.white.withOpacity(0.12),
+                        fillColor: Bg.surface.withOpacity(0.12),
                         contentPadding: const EdgeInsets.symmetric(
                             horizontal: 14, vertical: 10),
                         border: OutlineInputBorder(
@@ -173,7 +162,7 @@ class _MakePalScreenState extends State<MakePalScreen> {
                   if (snapshot.connectionState == ConnectionState.waiting) {
                     return SliverFillRemaining(
                       child: Center(
-                        child: CircularProgressIndicator(color: _C.matcha),
+                        child: CircularProgressIndicator(color: Fg.matcha),
                       ),
                     );
                   }
@@ -200,13 +189,13 @@ class _MakePalScreenState extends State<MakePalScreen> {
                               width: 64,
                               height: 64,
                               decoration: BoxDecoration(
-                                color: _C.matchaLight.withOpacity(0.5),
+                                color: Bg.matchaLight.withOpacity(0.5),
                                 shape: BoxShape.circle,
                               ),
                               child: Icon(
                                 Icons.people_outline_rounded,
                                 size: 26,
-                                color: _C.matcha.withOpacity(0.7),
+                                color: Fg.matcha.withOpacity(0.7),
                               ),
                             ),
                             const SizedBox(height: 14),
@@ -217,7 +206,7 @@ class _MakePalScreenState extends State<MakePalScreen> {
                               style: TextStyle(
                                   fontSize: 15,
                                   fontWeight: FontWeight.w500,
-                                  color: _C.ink),
+                                  color: Fg.ink),
                             ),
                           ],
                         ),
@@ -457,7 +446,7 @@ class _PalRowState extends State<_PalRow> {
     return Container(
       margin: const EdgeInsets.only(bottom: 10),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Bg.surface,
         borderRadius: BorderRadius.circular(16),
       ),
       child: InkWell(
@@ -469,13 +458,13 @@ class _PalRowState extends State<_PalRow> {
             children: [
               CircleAvatar(
                 radius: 20,
-                backgroundColor: _C.matchaLight,
+                backgroundColor: Bg.matchaLight,
                 child: Text(
                   widget.initials,
                   style: TextStyle(
                     fontSize: 12.5,
                     fontWeight: FontWeight.w600,
-                    color: _C.matchaDark,
+                    color: Fg.matchaDark,
                   ),
                 ),
               ),
@@ -489,7 +478,7 @@ class _PalRowState extends State<_PalRow> {
                       style: TextStyle(
                         fontSize: 13.5,
                         fontWeight: FontWeight.w500,
-                        color: _C.ink,
+                        color: Fg.ink,
                       ),
                     ),
                     if (widget.location.isNotEmpty)
@@ -497,7 +486,7 @@ class _PalRowState extends State<_PalRow> {
                         padding: const EdgeInsets.only(top: 2),
                         child: Text(
                           widget.location,
-                          style: TextStyle(fontSize: 11.5, color: _C.inkSoft),
+                          style: TextStyle(fontSize: 11.5, color: Fg.inkSoft),
                         ),
                       ),
                   ],
@@ -517,7 +506,7 @@ class _PalRowState extends State<_PalRow> {
       return SizedBox(
         width: 18,
         height: 18,
-        child: CircularProgressIndicator(strokeWidth: 2, color: _C.matcha),
+        child: CircularProgressIndicator(strokeWidth: 2, color: Fg.matcha),
       );
     }
 
@@ -581,9 +570,9 @@ class _SmallButton extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
         decoration: BoxDecoration(
-          color: filled ? _C.rust : _C.almond,
+          color: filled ? Bg.rust : Bg.almond,
           borderRadius: BorderRadius.circular(999),
-          border: filled ? null : Border.all(color: _C.hairline),
+          border: filled ? null : Border.all(color: Bg.hairline),
         ),
         child: loading
             ? SizedBox(
@@ -591,7 +580,7 @@ class _SmallButton extends StatelessWidget {
                 height: 12,
                 child: CircularProgressIndicator(
                   strokeWidth: 2,
-                  color: filled ? _C.almond : _C.inkSoft,
+                  color: filled ? Fg.almond : Fg.inkSoft,
                 ),
               )
             : Text(
@@ -599,7 +588,7 @@ class _SmallButton extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 12,
                   fontWeight: FontWeight.w500,
-                  color: filled ? _C.almond : _C.inkSoft,
+                  color: filled ? Fg.almond : Fg.inkSoft,
                 ),
               ),
       ),
@@ -621,20 +610,20 @@ class _SmallTag extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
         decoration: BoxDecoration(
-          color: _C.matchaLight,
+          color: Bg.matchaLight,
           borderRadius: BorderRadius.circular(999),
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(icon, size: 12, color: _C.matchaDark),
+            Icon(icon, size: 12, color: Fg.matchaDark),
             const SizedBox(width: 4),
             Text(
               label,
               style: TextStyle(
                 fontSize: 11,
                 fontWeight: FontWeight.w500,
-                color: _C.matchaDark,
+                color: Fg.matchaDark,
               ),
             ),
           ],

@@ -2,18 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'user_profile_screen.dart';
-
-/// AgroLens palette — matcha green / almond / white, light module variant.
-class _C {
-  static const matchaDark = Color(0xFF374530);
-  static const matcha = Color(0xFF5C7148);
-  static const matchaLight = Color(0xFFD6E0C4);
-  static const almond = Color(0xFFF6EFE2);
-  static const ink = Color(0xFF2B2820);
-  static const inkSoft = Color(0xFF726C5C);
-  static const rust = Color(0xFFC1703E);
-  static const hairline = Color(0xFFEDE6D6);
-}
+import '../theme/palette.dart';
 
 /// Bottom wave finishing off the dark matcha header band — same shape
 /// used across the other restyled screens for a consistent silhouette.
@@ -95,14 +84,14 @@ class _PalRequestsScreenState extends State<PalRequestsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: _C.almond,
+      backgroundColor: Bg.almond,
       body: CustomScrollView(
         slivers: [
           SliverToBoxAdapter(
             child: ClipPath(
               clipper: _HeaderWaveClipper(),
               child: Container(
-                color: _C.matchaDark,
+                color: Bg.matchaDark,
                 padding: EdgeInsets.fromLTRB(
                   8,
                   MediaQuery.of(context).padding.top + 8,
@@ -113,7 +102,7 @@ class _PalRequestsScreenState extends State<PalRequestsScreen> {
                   children: [
                     IconButton(
                       icon: Icon(Icons.arrow_back_ios_new_rounded,
-                          color: _C.almond, size: 18),
+                          color: Fg.almond, size: 18),
                       onPressed: () => Navigator.pop(context),
                     ),
                     Text(
@@ -121,7 +110,7 @@ class _PalRequestsScreenState extends State<PalRequestsScreen> {
                       style: TextStyle(
                         fontSize: 17,
                         fontWeight: FontWeight.w600,
-                        color: _C.almond,
+                        color: Fg.almond,
                       ),
                     ),
                   ],
@@ -141,7 +130,7 @@ class _PalRequestsScreenState extends State<PalRequestsScreen> {
               if (snapshot.connectionState == ConnectionState.waiting) {
                 return SliverFillRemaining(
                   child: Center(
-                    child: CircularProgressIndicator(color: _C.matcha),
+                    child: CircularProgressIndicator(color: Fg.matcha),
                   ),
                 );
               }
@@ -158,13 +147,13 @@ class _PalRequestsScreenState extends State<PalRequestsScreen> {
                           width: 64,
                           height: 64,
                           decoration: BoxDecoration(
-                            color: _C.matchaLight.withOpacity(0.5),
+                            color: Bg.matchaLight.withOpacity(0.5),
                             shape: BoxShape.circle,
                           ),
                           child: Icon(
                             Icons.person_add_alt_1_rounded,
                             size: 26,
-                            color: _C.matcha.withOpacity(0.7),
+                            color: Fg.matcha.withOpacity(0.7),
                           ),
                         ),
                         const SizedBox(height: 14),
@@ -173,12 +162,12 @@ class _PalRequestsScreenState extends State<PalRequestsScreen> {
                           style: TextStyle(
                               fontSize: 15,
                               fontWeight: FontWeight.w500,
-                              color: _C.ink),
+                              color: Fg.ink),
                         ),
                         const SizedBox(height: 4),
                         Text(
                           'Requests from other farmers will show up here.',
-                          style: TextStyle(fontSize: 12.5, color: _C.inkSoft),
+                          style: TextStyle(fontSize: 12.5, color: Fg.inkSoft),
                         ),
                       ],
                     ),
@@ -283,7 +272,7 @@ class _RequestRowState extends State<_RequestRow> {
         return Container(
           margin: const EdgeInsets.only(bottom: 10),
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: Bg.surface,
             borderRadius: BorderRadius.circular(16),
           ),
           child: InkWell(
@@ -295,13 +284,13 @@ class _RequestRowState extends State<_RequestRow> {
                 children: [
                   CircleAvatar(
                     radius: 20,
-                    backgroundColor: _C.matchaLight,
+                    backgroundColor: Bg.matchaLight,
                     child: Text(
                       widget.initials(name),
                       style: TextStyle(
                         fontSize: 12.5,
                         fontWeight: FontWeight.w600,
-                        color: _C.matchaDark,
+                        color: Fg.matchaDark,
                       ),
                     ),
                   ),
@@ -315,7 +304,7 @@ class _RequestRowState extends State<_RequestRow> {
                           style: TextStyle(
                             fontSize: 13.5,
                             fontWeight: FontWeight.w500,
-                            color: _C.ink,
+                            color: Fg.ink,
                           ),
                         ),
                         if (location.toString().isNotEmpty)
@@ -323,7 +312,7 @@ class _RequestRowState extends State<_RequestRow> {
                             padding: const EdgeInsets.only(top: 2),
                             child: Text(
                               location,
-                              style: TextStyle(fontSize: 11.5, color: _C.inkSoft),
+                              style: TextStyle(fontSize: 11.5, color: Fg.inkSoft),
                             ),
                           ),
                       ],
@@ -335,7 +324,7 @@ class _RequestRowState extends State<_RequestRow> {
                       width: 18,
                       height: 18,
                       child: CircularProgressIndicator(
-                          strokeWidth: 2, color: _C.rust),
+                          strokeWidth: 2, color: Fg.rust),
                     )
                   else
                     Row(
@@ -347,7 +336,7 @@ class _RequestRowState extends State<_RequestRow> {
                             padding: const EdgeInsets.symmetric(
                                 horizontal: 12, vertical: 7),
                             decoration: BoxDecoration(
-                              color: _C.rust,
+                              color: Bg.rust,
                               borderRadius: BorderRadius.circular(999),
                             ),
                             child: Text(
@@ -355,7 +344,7 @@ class _RequestRowState extends State<_RequestRow> {
                               style: TextStyle(
                                 fontSize: 12,
                                 fontWeight: FontWeight.w500,
-                                color: _C.almond,
+                                color: Fg.almond,
                               ),
                             ),
                           ),
@@ -367,16 +356,16 @@ class _RequestRowState extends State<_RequestRow> {
                             padding: const EdgeInsets.symmetric(
                                 horizontal: 12, vertical: 7),
                             decoration: BoxDecoration(
-                              color: _C.almond,
+                              color: Bg.almond,
                               borderRadius: BorderRadius.circular(999),
-                              border: Border.all(color: _C.hairline),
+                              border: Border.all(color: Bg.hairline),
                             ),
                             child: Text(
                               'Delete',
                               style: TextStyle(
                                 fontSize: 12,
                                 fontWeight: FontWeight.w500,
-                                color: _C.inkSoft,
+                                color: Fg.inkSoft,
                               ),
                             ),
                           ),

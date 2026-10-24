@@ -11,18 +11,7 @@ import 'package:url_launcher/url_launcher.dart';
 import '../services/notification_service.dart';
 import '../providers/theme_provider.dart';
 import '../providers/language_provider.dart';
-
-/// AgroLens palette — matcha green / almond / white, light module variant.
-class _C {
-  static const matchaDark = Color(0xFF374530);
-  static const matcha = Color(0xFF5C7148);
-  static const almond = Color(0xFFF6EFE2);
-  static const ink = Color(0xFF2B2820);
-  static const inkSoft = Color(0xFF726C5C);
-  static const rust = Color(0xFFC1703E);
-  static const hairline = Color(0xFFEDE6D6);
-  static const danger = Color(0xFFC94C3F);
-}
+import '../theme/palette.dart';
 
 /// Bottom wave finishing off the dark matcha header band — same shape
 /// used across the other restyled screens for a consistent silhouette.
@@ -86,14 +75,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
     final isDark = themeProv.isDark;
 
     return Scaffold(
-      backgroundColor: _C.almond,
+      backgroundColor: Bg.almond,
       body: CustomScrollView(
         slivers: [
           SliverToBoxAdapter(
             child: ClipPath(
               clipper: _HeaderWaveClipper(),
               child: Container(
-                color: _C.matchaDark,
+                color: Bg.matchaDark,
                 padding: EdgeInsets.fromLTRB(
                   8,
                   MediaQuery.of(context).padding.top + 8,
@@ -104,7 +93,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   children: [
                     IconButton(
                       icon: Icon(Icons.arrow_back_ios_new_rounded,
-                          color: _C.almond, size: 18),
+                          color: Fg.almond, size: 18),
                       onPressed: () => Navigator.pop(context),
                     ),
                     Text(
@@ -112,7 +101,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       style: TextStyle(
                         fontSize: 17,
                         fontWeight: FontWeight.w600,
-                        color: _C.almond,
+                        color: Fg.almond,
                       ),
                     ),
                   ],
@@ -138,7 +127,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 _card([
                   for (final (i, lang) in langProv.languages.indexed) ...[
                     if (i > 0)
-                      const Divider(height: 1, color: _C.hairline, indent: 48),
+                      Divider(height: 1, color: Bg.hairline, indent: 48),
                     _RadioRow(
                       icon: lang.code == 'en' ? Icons.language : Icons.translate,
                       label: lang.label,
@@ -147,12 +136,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     ),
                   ],
                 ]),
-                const Padding(
+                Padding(
                   padding: EdgeInsets.fromLTRB(4, 8, 4, 0),
                   child: Text(
                     'Diagnosis results are shown in this language. '
                     'Translations other than English are machine-generated.',
-                    style: TextStyle(fontSize: 11, color: _C.inkSoft, height: 1.4),
+                    style: TextStyle(fontSize: 11, color: Fg.inkSoft, height: 1.4),
                   ),
                 ),
 
@@ -164,14 +153,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     value: _prefs.alerts,
                     onChanged: (v) => _updatePrefs(_prefs.copyWith(alerts: v)),
                   ),
-                  const Divider(height: 1, color: _C.hairline, indent: 48),
+                  Divider(height: 1, color: Bg.hairline, indent: 48),
                   _ToggleRow(
                     icon: Icons.forum_outlined,
                     label: 'Community activity',
                     value: _prefs.community,
                     onChanged: (v) => _updatePrefs(_prefs.copyWith(community: v)),
                   ),
-                  const Divider(height: 1, color: _C.hairline, indent: 48),
+                  Divider(height: 1, color: Bg.hairline, indent: 48),
                   _ToggleRow(
                     icon: Icons.chat_bubble_outline,
                     label: 'Messages',
@@ -187,19 +176,19 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     label: 'Change password',
                     onTap: () => _changePassword(context),
                   ),
-                  const Divider(height: 1, color: _C.hairline, indent: 48),
+                  Divider(height: 1, color: Bg.hairline, indent: 48),
                   _TileRow(
                     icon: Icons.privacy_tip_outlined,
                     label: 'Privacy settings',
                     onTap: () => _showPrivacySheet(context),
                   ),
-                  const Divider(height: 1, color: _C.hairline, indent: 48),
+                  Divider(height: 1, color: Bg.hairline, indent: 48),
                   _TileRow(
                     icon: Icons.download_outlined,
                     label: _exporting ? 'Preparing your data...' : 'Download my data',
                     onTap: _exporting ? () {} : () => _exportData(context),
                   ),
-                  const Divider(height: 1, color: _C.hairline, indent: 48),
+                  Divider(height: 1, color: Bg.hairline, indent: 48),
                   _TileRow(
                     icon: Icons.help_outline,
                     label: 'Help & support',
@@ -212,14 +201,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   _TileRow(
                     icon: Icons.logout,
                     label: 'Log out',
-                    color: _C.danger,
+                    color: Bg.danger,
                     onTap: () => _confirmLogout(context),
                   ),
-                  const Divider(height: 1, color: _C.hairline, indent: 48),
+                  Divider(height: 1, color: Bg.hairline, indent: 48),
                   _TileRow(
                     icon: Icons.delete_forever_outlined,
                     label: 'Delete account',
-                    color: _C.danger,
+                    color: Bg.danger,
                     onTap: () => _confirmDeleteAccount(context),
                   ),
                 ]),
@@ -236,16 +225,16 @@ class _SettingsScreenState extends State<SettingsScreen> {
   Widget _header(String t) => Padding(
         padding: const EdgeInsets.fromLTRB(2, 20, 2, 8),
         child: Text(t,
-            style: const TextStyle(
+            style: TextStyle(
                 fontSize: 11,
                 fontWeight: FontWeight.w600,
-                color: _C.inkSoft,
+                color: Fg.inkSoft,
                 letterSpacing: 0.9)),
       );
 
   Widget _card(List<Widget> children) => Container(
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: Bg.surface,
           borderRadius: BorderRadius.circular(16),
         ),
         child: Column(children: children),
@@ -337,7 +326,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   void _showPrivacySheet(BuildContext context) {
     showModalBottomSheet(
       context: context,
-      backgroundColor: _C.almond,
+      backgroundColor: Bg.almond,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
@@ -351,21 +340,21 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
-                    color: _C.ink)),
+                    color: Fg.ink)),
             const SizedBox(height: 12),
             Text(
               'Your farm location data is only used to improve '
               'agricultural advice. It is never shared publicly '
               'or with third parties.',
-              style: TextStyle(fontSize: 13, color: _C.inkSoft, height: 1.5),
+              style: TextStyle(fontSize: 13, color: Fg.inkSoft, height: 1.5),
             ),
             const SizedBox(height: 20),
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: _C.rust,
-                  foregroundColor: _C.almond,
+                  backgroundColor: Bg.rust,
+                  foregroundColor: Fg.almond,
                   padding: const EdgeInsets.symmetric(vertical: 13),
                   shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12)),
@@ -392,7 +381,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
               onPressed: () => Navigator.pop(context),
               child: const Text('Cancel')),
           ElevatedButton(
-            style: ElevatedButton.styleFrom(backgroundColor: _C.danger),
+            style: ElevatedButton.styleFrom(backgroundColor: Bg.danger),
             onPressed: () async {
               await NotificationService.instance.stop();
               await FirebaseAuth.instance.signOut();
@@ -425,7 +414,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
               onPressed: () => Navigator.pop(dialogContext),
               child: const Text('Cancel')),
           ElevatedButton(
-            style: ElevatedButton.styleFrom(backgroundColor: _C.danger),
+            style: ElevatedButton.styleFrom(backgroundColor: Bg.danger),
             onPressed: () {
               Navigator.pop(dialogContext);
               _deleteAccount(context);
@@ -495,7 +484,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             child: const Text('Cancel'),
           ),
           ElevatedButton(
-            style: ElevatedButton.styleFrom(backgroundColor: _C.danger),
+            style: ElevatedButton.styleFrom(backgroundColor: Bg.danger),
             onPressed: () => Navigator.pop(dialogContext, controller.text),
             child: const Text('Delete my account',
                 style: TextStyle(color: Colors.white)),
@@ -521,15 +510,15 @@ class _ToggleRow extends StatelessWidget {
   Widget build(BuildContext context) => Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
         child: Row(children: [
-          Icon(icon, size: 20, color: _C.matcha),
+          Icon(icon, size: 20, color: Fg.matcha),
           const SizedBox(width: 12),
           Expanded(
               child: Text(label,
-                  style: TextStyle(fontSize: 14, color: _C.ink))),
+                  style: TextStyle(fontSize: 14, color: Fg.ink))),
           Switch(
             value: value,
             onChanged: onChanged,
-            activeThumbColor: _C.rust,
+            activeThumbColor: Fg.rust,
           ),
         ]),
       );
@@ -552,13 +541,13 @@ class _RadioRow extends StatelessWidget {
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
           child: Row(children: [
-            Icon(icon, size: 20, color: _C.matcha),
+            Icon(icon, size: 20, color: Fg.matcha),
             const SizedBox(width: 12),
             Expanded(
                 child: Text(label,
-                    style: TextStyle(fontSize: 14, color: _C.ink))),
+                    style: TextStyle(fontSize: 14, color: Fg.ink))),
             if (selected)
-              Icon(Icons.check_circle, size: 18, color: _C.rust),
+              Icon(Icons.check_circle, size: 18, color: Fg.rust),
           ]),
         ),
       );
@@ -581,14 +570,14 @@ class _TileRow extends StatelessWidget {
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
           child: Row(children: [
-            Icon(icon, size: 20, color: color ?? _C.matcha),
+            Icon(icon, size: 20, color: color ?? Fg.matcha),
             const SizedBox(width: 12),
             Expanded(
               child: Text(label,
-                  style: TextStyle(fontSize: 14, color: color ?? _C.ink)),
+                  style: TextStyle(fontSize: 14, color: color ?? Fg.ink)),
             ),
             Icon(Icons.chevron_right_rounded,
-                color: color ?? _C.inkSoft, size: 18),
+                color: color ?? Fg.inkSoft, size: 18),
           ]),
         ),
       );

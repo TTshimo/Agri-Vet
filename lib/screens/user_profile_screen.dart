@@ -2,20 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'chat_screen.dart';
-
-/// AgroLens palette — matcha green / almond / white, light module variant.
-class _C {
-  static const matchaDark = Color(0xFF374530);
-  static const matcha = Color(0xFF5C7148);
-  static const matchaLight = Color(0xFFD6E0C4);
-  static const almond = Color(0xFFF6EFE2);
-  static const ink = Color(0xFF2B2820);
-  static const inkSoft = Color(0xFF726C5C);
-  static const rust = Color(0xFFC1703E);
-  static const rustBg = Color(0xFFF1DECB);
-  static const hairline = Color(0xFFEDE6D6);
-  static const danger = Color(0xFFC94C3F);
-}
+import '../theme/palette.dart';
 
 /// Bottom wave finishing off the dark matcha header band — same shape
 /// used across the other restyled screens for a consistent silhouette.
@@ -298,7 +285,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
               child: const Text('Cancel')),
           TextButton(
             onPressed: () => Navigator.pop(context, true),
-            style: TextButton.styleFrom(foregroundColor: _C.danger),
+            style: TextButton.styleFrom(foregroundColor: Fg.danger),
             child: const Text('Block'),
           ),
         ],
@@ -439,7 +426,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: _C.almond,
+      backgroundColor: Bg.almond,
       body: FutureBuilder<DocumentSnapshot>(
         future: FirebaseFirestore.instance
             .collection('users')
@@ -448,7 +435,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
         builder: (context, snap) {
           if (!snap.hasData) {
             return Center(
-              child: CircularProgressIndicator(color: _C.matcha),
+              child: CircularProgressIndicator(color: Fg.matcha),
             );
           }
           final data = snap.data!.data() as Map<String, dynamic>? ?? {};
@@ -463,7 +450,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                 child: ClipPath(
                   clipper: _HeaderWaveClipper(),
                   child: Container(
-                    color: _C.matchaDark,
+                    color: Bg.matchaDark,
                     padding: EdgeInsets.fromLTRB(
                       16,
                       MediaQuery.of(context).padding.top + 8,
@@ -476,7 +463,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                           children: [
                             IconButton(
                               icon: Icon(Icons.arrow_back_ios_new_rounded,
-                                  color: _C.almond, size: 18),
+                                  color: Fg.almond, size: 18),
                               onPressed: () => Navigator.pop(context),
                             ),
                             const Spacer(),
@@ -485,13 +472,13 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                         const SizedBox(height: 4),
                         CircleAvatar(
                           radius: 36,
-                          backgroundColor: _C.matcha,
+                          backgroundColor: Bg.matcha,
                           child: Text(
                             _initials(name),
                             style: TextStyle(
                               fontSize: 24,
                               fontWeight: FontWeight.w600,
-                              color: _C.almond,
+                              color: Fg.almond,
                             ),
                           ),
                         ),
@@ -501,7 +488,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                           style: TextStyle(
                             fontSize: 19,
                             fontWeight: FontWeight.w600,
-                            color: _C.almond,
+                            color: Fg.almond,
                           ),
                         ),
                         if (location.toString().isNotEmpty) ...[
@@ -510,13 +497,13 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               Icon(Icons.location_on_outlined,
-                                  size: 14, color: _C.matchaLight),
+                                  size: 14, color: Fg.matchaLight),
                               const SizedBox(width: 4),
                               Text(
                                 location,
                                 style: TextStyle(
                                   fontSize: 13,
-                                  color: _C.matchaLight,
+                                  color: Fg.matchaLight,
                                 ),
                               ),
                             ],
@@ -531,7 +518,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                               textAlign: TextAlign.center,
                               style: TextStyle(
                                 fontSize: 13,
-                                color: _C.almond.withOpacity(0.85),
+                                color: Fg.almond.withOpacity(0.85),
                                 height: 1.4,
                               ),
                             ),
@@ -544,7 +531,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                             '$postCount ${postCount == 1 ? 'post' : 'posts'}',
                             style: TextStyle(
                               fontSize: 12,
-                              color: _C.matchaLight,
+                              color: Fg.matchaLight,
                             ),
                           ),
                         ),
@@ -569,7 +556,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                     style: TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.w600,
-                      color: _C.ink,
+                      color: Fg.ink,
                     ),
                   ),
                 ),
@@ -593,7 +580,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
           child: SizedBox(
             width: 20,
             height: 20,
-            child: CircularProgressIndicator(strokeWidth: 2, color: _C.matcha),
+            child: CircularProgressIndicator(strokeWidth: 2, color: Fg.matcha),
           ),
         ),
       );
@@ -810,7 +797,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
               child: Center(
                 child: Text(
                   'No posts yet',
-                  style: TextStyle(fontSize: 13, color: _C.inkSoft),
+                  style: TextStyle(fontSize: 13, color: Fg.inkSoft),
                 ),
               ),
             ),
@@ -825,14 +812,14 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                 child: Container(
                   padding: const EdgeInsets.all(14),
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: Bg.surface,
                     borderRadius: BorderRadius.circular(16),
                   ),
                   child: Text(
                     data['content'] ?? '',
                     style: TextStyle(
                       fontSize: 14,
-                      color: _C.ink,
+                      color: Fg.ink,
                       height: 1.4,
                     ),
                   ),
@@ -864,7 +851,7 @@ class _ActionButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final color = danger ? _C.danger : _C.rust;
+    final color = danger ? Bg.danger : Bg.rust;
     return SizedBox(
       height: 42,
       child: filled
@@ -872,7 +859,7 @@ class _ActionButton extends StatelessWidget {
               onPressed: loading ? null : onTap,
               style: ElevatedButton.styleFrom(
                 backgroundColor: color,
-                foregroundColor: _C.almond,
+                foregroundColor: Fg.almond,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
                 ),
@@ -920,17 +907,17 @@ class _InfoBanner extends StatelessWidget {
       width: double.infinity,
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
       decoration: BoxDecoration(
-        color: _C.rustBg,
+        color: Bg.rustBg,
         borderRadius: BorderRadius.circular(12),
       ),
       child: Row(
         children: [
-          Icon(icon, size: 16, color: _C.rust),
+          Icon(icon, size: 16, color: Fg.rust),
           const SizedBox(width: 8),
           Expanded(
             child: Text(
               text,
-              style: TextStyle(fontSize: 12, color: _C.rust),
+              style: TextStyle(fontSize: 12, color: Fg.rust),
             ),
           ),
         ],

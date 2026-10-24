@@ -1,20 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:intl/intl.dart';
-
-/// AgroLens palette — matcha green / almond / white, light module variant.
-class _C {
-  static const matchaDark = Color(0xFF374530);
-  static const matcha = Color(0xFF5C7148);
-  static const matchaLight = Color(0xFFD6E0C4);
-  static const almond = Color(0xFFF6EFE2);
-  static const ink = Color(0xFF2B2820);
-  static const inkSoft = Color(0xFF726C5C);
-  static const rust = Color(0xFFC1703E);
-  static const rustBg = Color(0xFFF1DECB);
-  static const hairline = Color(0xFFEDE6D6);
-  static const danger = Color(0xFFC94C3F);
-}
+import '../theme/palette.dart';
 
 /// Bottom wave finishing off the dark matcha header band — same shape
 /// used across the other restyled screens for a consistent silhouette.
@@ -169,7 +156,7 @@ class _ChatScreenState extends State<ChatScreen> {
               child: const Text('Cancel')),
           TextButton(
             onPressed: () => Navigator.pop(context, true),
-            style: TextButton.styleFrom(foregroundColor: _C.danger),
+            style: TextButton.styleFrom(foregroundColor: Fg.danger),
             child: const Text('Decline'),
           ),
         ],
@@ -292,7 +279,7 @@ class _ChatScreenState extends State<ChatScreen> {
           ),
           TextButton(
             onPressed: () => Navigator.pop(context, true),
-            style: TextButton.styleFrom(foregroundColor: _C.danger),
+            style: TextButton.styleFrom(foregroundColor: Fg.danger),
             child: const Text('Delete'),
           ),
         ],
@@ -396,8 +383,8 @@ class _ChatScreenState extends State<ChatScreen> {
           WidgetsBinding.instance.addPostFrameCallback((_) {
             if (mounted) Navigator.pop(context);
           });
-          return const Scaffold(
-            backgroundColor: _C.almond,
+          return Scaffold(
+            backgroundColor: Bg.almond,
             body: SizedBox.shrink(),
           );
         }
@@ -407,14 +394,14 @@ class _ChatScreenState extends State<ChatScreen> {
         final inputLocked = isPending && !iAmRequester;
 
         return Scaffold(
-          backgroundColor: _C.almond,
+          backgroundColor: Bg.almond,
           body: Column(
             children: [
               // Header
               ClipPath(
                 clipper: _HeaderWaveClipper(),
                 child: Container(
-                  color: _C.matchaDark,
+                  color: Bg.matchaDark,
                   padding: EdgeInsets.fromLTRB(
                     0,
                     MediaQuery.of(context).padding.top + 8,
@@ -425,18 +412,18 @@ class _ChatScreenState extends State<ChatScreen> {
                     children: [
                       IconButton(
                         icon: Icon(Icons.arrow_back_ios_new_rounded,
-                            color: _C.almond, size: 18),
+                            color: Fg.almond, size: 18),
                         onPressed: () => Navigator.pop(context),
                       ),
                       CircleAvatar(
                         radius: 18,
-                        backgroundColor: _C.matcha,
+                        backgroundColor: Bg.matcha,
                         child: Text(
                           _initials(widget.otherName),
                           style: TextStyle(
                             fontSize: 12,
                             fontWeight: FontWeight.w600,
-                            color: _C.almond,
+                            color: Fg.almond,
                           ),
                         ),
                       ),
@@ -450,13 +437,13 @@ class _ChatScreenState extends State<ChatScreen> {
                               style: TextStyle(
                                 fontSize: 15.5,
                                 fontWeight: FontWeight.w600,
-                                color: _C.almond,
+                                color: Fg.almond,
                               ),
                             ),
                             Text(
                               isPending ? 'Message request' : 'Farmer',
                               style: TextStyle(
-                                  fontSize: 11.5, color: _C.matchaLight),
+                                  fontSize: 11.5, color: Fg.matchaLight),
                             ),
                           ],
                         ),
@@ -471,19 +458,19 @@ class _ChatScreenState extends State<ChatScreen> {
                   width: double.infinity,
                   padding:
                       const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                  color: _C.rustBg,
+                  color: Bg.rustBg,
                   child: iAmRequester
                       ? Row(
                           children: [
                             Icon(Icons.schedule_rounded,
-                                size: 16, color: _C.rust),
+                                size: 16, color: Fg.rust),
                             const SizedBox(width: 8),
                             Expanded(
                               child: Text(
                                 'Message request sent — waiting for '
                                 '${widget.otherName} to accept.',
                                 style: TextStyle(
-                                    fontSize: 12.5, color: _C.rust),
+                                    fontSize: 12.5, color: Fg.rust),
                               ),
                             ),
                           ],
@@ -494,7 +481,7 @@ class _ChatScreenState extends State<ChatScreen> {
                             Row(
                               children: [
                                 Icon(Icons.mark_email_unread_rounded,
-                                    size: 16, color: _C.rust),
+                                    size: 16, color: Fg.rust),
                                 const SizedBox(width: 8),
                                 Expanded(
                                   child: Text(
@@ -502,7 +489,7 @@ class _ChatScreenState extends State<ChatScreen> {
                                     style: TextStyle(
                                         fontSize: 12.5,
                                         fontWeight: FontWeight.w500,
-                                        color: _C.rust),
+                                        color: Fg.rust),
                                   ),
                                 ),
                               ],
@@ -518,8 +505,8 @@ class _ChatScreenState extends State<ChatScreen> {
                                           ? null
                                           : _acceptRequest,
                                       style: ElevatedButton.styleFrom(
-                                        backgroundColor: _C.rust,
-                                        foregroundColor: _C.almond,
+                                        backgroundColor: Bg.rust,
+                                        foregroundColor: Fg.almond,
                                         shape: RoundedRectangleBorder(
                                           borderRadius:
                                               BorderRadius.circular(12),
@@ -549,8 +536,8 @@ class _ChatScreenState extends State<ChatScreen> {
                                           ? null
                                           : _declineRequest,
                                       style: OutlinedButton.styleFrom(
-                                        foregroundColor: _C.danger,
-                                        side: BorderSide(color: _C.danger),
+                                        foregroundColor: Fg.danger,
+                                        side: BorderSide(color: Bg.danger),
                                         shape: RoundedRectangleBorder(
                                           borderRadius:
                                               BorderRadius.circular(12),
@@ -578,7 +565,7 @@ class _ChatScreenState extends State<ChatScreen> {
                   builder: (context, snapshot) {
                     if (snapshot.connectionState == ConnectionState.waiting) {
                       return Center(
-                        child: CircularProgressIndicator(color: _C.matcha),
+                        child: CircularProgressIndicator(color: Fg.matcha),
                       );
                     }
 
@@ -591,13 +578,13 @@ class _ChatScreenState extends State<ChatScreen> {
                           children: [
                             CircleAvatar(
                               radius: 32,
-                              backgroundColor: _C.matchaLight,
+                              backgroundColor: Bg.matchaLight,
                               child: Text(
                                 _initials(widget.otherName),
                                 style: TextStyle(
                                   fontSize: 20,
                                   fontWeight: FontWeight.w600,
-                                  color: _C.matchaDark,
+                                  color: Fg.matchaDark,
                                 ),
                               ),
                             ),
@@ -607,7 +594,7 @@ class _ChatScreenState extends State<ChatScreen> {
                               style: TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.w600,
-                                color: _C.ink,
+                                color: Fg.ink,
                               ),
                             ),
                             const SizedBox(height: 4),
@@ -616,7 +603,7 @@ class _ChatScreenState extends State<ChatScreen> {
                                   ? 'Say hello to start the conversation.'
                                   : 'Send a message to start the conversation.',
                               style: TextStyle(
-                                  fontSize: 13, color: _C.inkSoft),
+                                  fontSize: 13, color: Fg.inkSoft),
                             ),
                           ],
                         ),
@@ -658,14 +645,14 @@ class _ChatScreenState extends State<ChatScreen> {
                                   padding: const EdgeInsets.symmetric(
                                       horizontal: 12, vertical: 4),
                                   decoration: BoxDecoration(
-                                    color: _C.matchaLight.withOpacity(0.6),
+                                    color: Bg.matchaLight.withOpacity(0.6),
                                     borderRadius: BorderRadius.circular(10),
                                   ),
                                   child: Text(
                                     dateLabel,
                                     style: TextStyle(
                                       fontSize: 11,
-                                      color: _C.matchaDark,
+                                      color: Fg.matchaDark,
                                     ),
                                   ),
                                 ),
@@ -710,7 +697,7 @@ class _ChatScreenState extends State<ChatScreen> {
                 Container(
                   padding:
                       const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-                  color: _C.rustBg,
+                  color: Bg.rustBg,
                   child: Row(
                     children: [
                       Icon(
@@ -718,7 +705,7 @@ class _ChatScreenState extends State<ChatScreen> {
                             ? Icons.edit
                             : Icons.reply_rounded,
                         size: 14,
-                        color: _C.rust,
+                        color: Fg.rust,
                       ),
                       const SizedBox(width: 6),
                       Expanded(
@@ -729,7 +716,7 @@ class _ChatScreenState extends State<ChatScreen> {
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                           style: TextStyle(
-                              fontSize: 12, color: _C.rust),
+                              fontSize: 12, color: Fg.rust),
                         ),
                       ),
                       GestureDetector(
@@ -738,7 +725,7 @@ class _ChatScreenState extends State<ChatScreen> {
                           'Cancel',
                           style: TextStyle(
                               fontSize: 12,
-                              color: _C.rust,
+                              color: Fg.rust,
                               fontWeight: FontWeight.w600),
                         ),
                       ),
@@ -756,15 +743,15 @@ class _ChatScreenState extends State<ChatScreen> {
                     MediaQuery.of(context).padding.bottom + 10,
                   ),
                   decoration: BoxDecoration(
-                    color: Colors.white,
-                    border: Border(top: BorderSide(color: _C.hairline)),
+                    color: Bg.surface,
+                    border: Border(top: BorderSide(color: Bg.hairline)),
                   ),
                   child: Text(
                     'Accept the request above to reply.',
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       fontSize: 12.5,
-                      color: _C.inkSoft,
+                      color: Fg.inkSoft,
                     ),
                   ),
                 )
@@ -777,8 +764,8 @@ class _ChatScreenState extends State<ChatScreen> {
                     MediaQuery.of(context).padding.bottom + 8,
                   ),
                   decoration: BoxDecoration(
-                    color: Colors.white,
-                    border: Border(top: BorderSide(color: _C.hairline)),
+                    color: Bg.surface,
+                    border: Border(top: BorderSide(color: Bg.hairline)),
                   ),
                   child: Row(
                     children: [
@@ -792,9 +779,9 @@ class _ChatScreenState extends State<ChatScreen> {
                                 ? 'Edit message...'
                                 : 'Message ${widget.otherName}...',
                             hintStyle: TextStyle(
-                                fontSize: 14, color: _C.inkSoft),
+                                fontSize: 14, color: Fg.inkSoft),
                             filled: true,
-                            fillColor: _C.almond,
+                            fillColor: Bg.almond,
                             contentPadding: const EdgeInsets.symmetric(
                                 horizontal: 14, vertical: 10),
                             border: OutlineInputBorder(
@@ -802,7 +789,7 @@ class _ChatScreenState extends State<ChatScreen> {
                               borderSide: BorderSide.none,
                             ),
                           ),
-                          style: TextStyle(fontSize: 14, color: _C.ink),
+                          style: TextStyle(fontSize: 14, color: Fg.ink),
                           textCapitalization: TextCapitalization.sentences,
                         ),
                       ),
@@ -817,7 +804,7 @@ class _ChatScreenState extends State<ChatScreen> {
                           width: 42,
                           height: 42,
                           decoration: BoxDecoration(
-                            color: _C.rust,
+                            color: Bg.rust,
                             borderRadius: BorderRadius.circular(21),
                           ),
                           child: _submitting
@@ -830,7 +817,7 @@ class _ChatScreenState extends State<ChatScreen> {
                                   _editingMessageId != null
                                       ? Icons.check_rounded
                                       : Icons.send_rounded,
-                                  color: _C.almond,
+                                  color: Fg.almond,
                                   size: 20,
                                 ),
                         ),
@@ -911,10 +898,10 @@ class _MessageBubble extends StatelessWidget {
                     const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                 decoration: BoxDecoration(
                   color: isDeleted
-                      ? _C.hairline
+                      ? Bg.hairline
                       : isMe
-                          ? _C.matchaDark
-                          : Colors.white,
+                          ? Bg.matchaDark
+                          : Bg.surface,
                   borderRadius: BorderRadius.only(
                     topLeft: const Radius.circular(16),
                     topRight: const Radius.circular(16),
@@ -923,7 +910,7 @@ class _MessageBubble extends StatelessWidget {
                   ),
                   border: isMe
                       ? null
-                      : Border.all(color: _C.hairline),
+                      : Border.all(color: Bg.hairline),
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -934,14 +921,14 @@ class _MessageBubble extends StatelessWidget {
                         padding: const EdgeInsets.all(8),
                         decoration: BoxDecoration(
                           color: isMe
-                              ? Colors.white.withOpacity(0.15)
-                              : _C.almond,
+                              ? Bg.surface.withOpacity(0.15)
+                              : Bg.almond,
                           borderRadius: BorderRadius.circular(8),
                           border: Border(
                             left: BorderSide(
                               color: isMe
-                                  ? Colors.white.withOpacity(0.6)
-                                  : _C.matchaDark,
+                                  ? Bg.surface.withOpacity(0.6)
+                                  : Bg.matchaDark,
                               width: 3,
                             ),
                           ),
@@ -956,7 +943,7 @@ class _MessageBubble extends StatelessWidget {
                                 fontWeight: FontWeight.w600,
                                 color: isMe
                                     ? Colors.white.withOpacity(0.9)
-                                    : _C.matchaDark,
+                                    : Fg.matchaDark,
                               ),
                             ),
                             const SizedBox(height: 2),
@@ -968,7 +955,7 @@ class _MessageBubble extends StatelessWidget {
                                 fontSize: 12,
                                 color: isMe
                                     ? Colors.white.withOpacity(0.7)
-                                    : _C.inkSoft,
+                                    : Fg.inkSoft,
                               ),
                             ),
                           ],
@@ -982,7 +969,7 @@ class _MessageBubble extends StatelessWidget {
                         style: TextStyle(
                           fontSize: 14,
                           fontStyle: FontStyle.italic,
-                          color: _C.inkSoft,
+                          color: Fg.inkSoft,
                         ),
                       )
                     else
@@ -990,7 +977,7 @@ class _MessageBubble extends StatelessWidget {
                         text,
                         style: TextStyle(
                           fontSize: 14,
-                          color: isMe ? _C.almond : _C.ink,
+                          color: isMe ? Fg.almond : Fg.ink,
                           height: 1.4,
                         ),
                       ),
@@ -1008,14 +995,14 @@ class _MessageBubble extends StatelessWidget {
                         'edited · ',
                         style: TextStyle(
                           fontSize: 10,
-                          color: _C.inkSoft,
+                          color: Fg.inkSoft,
                         ),
                       ),
                     Text(
                       time,
                       style: TextStyle(
                         fontSize: 10,
-                        color: _C.inkSoft,
+                        color: Fg.inkSoft,
                       ),
                     ),
                   ],
@@ -1042,8 +1029,8 @@ class _MessageActionsSheet extends StatelessWidget {
     return Container(
       padding: EdgeInsets.fromLTRB(
           0, 12, 0, MediaQuery.of(context).padding.bottom + 12),
-      decoration: const BoxDecoration(
-        color: Colors.white,
+      decoration: BoxDecoration(
+        color: Bg.surface,
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
       child: Column(
@@ -1053,14 +1040,14 @@ class _MessageActionsSheet extends StatelessWidget {
             width: 36,
             height: 4,
             decoration: BoxDecoration(
-              color: _C.hairline,
+              color: Bg.hairline,
               borderRadius: BorderRadius.circular(2),
             ),
           ),
           const SizedBox(height: 12),
           if (onReply != null)
             ListTile(
-              leading: Icon(Icons.reply_rounded, color: _C.ink),
+              leading: Icon(Icons.reply_rounded, color: Fg.ink),
               title: const Text('Reply'),
               onTap: () {
                 Navigator.pop(context);
@@ -1069,7 +1056,7 @@ class _MessageActionsSheet extends StatelessWidget {
             ),
           if (onEdit != null)
             ListTile(
-              leading: Icon(Icons.edit_outlined, color: _C.ink),
+              leading: Icon(Icons.edit_outlined, color: Fg.ink),
               title: const Text('Edit'),
               onTap: () {
                 Navigator.pop(context);
@@ -1078,8 +1065,8 @@ class _MessageActionsSheet extends StatelessWidget {
             ),
           if (onDelete != null)
             ListTile(
-              leading: Icon(Icons.delete_outline, color: _C.danger),
-              title: Text('Delete', style: TextStyle(color: _C.danger)),
+              leading: Icon(Icons.delete_outline, color: Fg.danger),
+              title: Text('Delete', style: TextStyle(color: Fg.danger)),
               onTap: () {
                 Navigator.pop(context);
                 onDelete?.call();

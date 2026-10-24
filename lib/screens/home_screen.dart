@@ -4,21 +4,12 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:intl/intl.dart';
 import 'package:url_launcher/url_launcher.dart';
+import '../theme/palette.dart';
 
 // Self-contained palette for the redesign — matcha green / almond / rust.
 // Not pulled from main.dart's AppColors so this file renders correctly
 // regardless of what that defines. Fold these into AppColors later if you
 // want the palette shared app-wide.
-class _C {
-  static const matchaDark = Color(0xFF374530);
-  static const matcha = Color(0xFF5C7148);
-  static const matchaTint = Color(0xFFD6E0C4);
-  static const almond = Color(0xFFF6EFE2);
-  static const ink = Color(0xFF2B2820);
-  static const inkSoft = Color(0xFF726C5C);
-  static const rust = Color(0xFFC1703E);
-}
-
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
@@ -78,7 +69,7 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: _C.almond,
+      backgroundColor: Bg.almond,
       body: Stack(
         children: [
           Positioned.fill(
@@ -89,7 +80,7 @@ class _HomeScreenState extends State<HomeScreen> {
               // Header: greeting + category chips
               SliverToBoxAdapter(
                 child: Container(
-                  color: _C.matchaDark,
+                  color: Bg.matchaDark,
                   padding: EdgeInsets.fromLTRB(
                     20,
                     MediaQuery.of(context).padding.top + 16,
@@ -103,7 +94,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         '$_greeting, $_firstName',
                         style: TextStyle(
                           fontSize: 13,
-                          color: _C.matchaTint,
+                          color: Fg.matchaTint,
                         ),
                       ),
                       const SizedBox(height: 4),
@@ -112,7 +103,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         style: TextStyle(
                           fontSize: 22,
                           fontWeight: FontWeight.w600,
-                          color: _C.almond,
+                          color: Fg.almond,
                           letterSpacing: -0.3,
                         ),
                       ),
@@ -138,14 +129,14 @@ class _HomeScreenState extends State<HomeScreen> {
                                     horizontal: 14, vertical: 8),
                                 decoration: BoxDecoration(
                                   color: selected
-                                      ? _C.almond
-                                      : Colors.white.withOpacity(0.14),
+                                      ? Bg.almond
+                                      : Bg.surface.withOpacity(0.14),
                                   borderRadius: BorderRadius.circular(999),
                                   border: selected
                                       ? null
                                       : Border.all(
                                           color:
-                                              Colors.white.withOpacity(0.35),
+                                              Bg.surface.withOpacity(0.35),
                                           width: 0.7,
                                         ),
                                 ),
@@ -155,8 +146,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                       cat.icon,
                                       size: 14,
                                       color: selected
-                                          ? _C.matchaDark
-                                          : _C.almond,
+                                          ? Fg.matchaDark
+                                          : Fg.almond,
                                     ),
                                     const SizedBox(width: 6),
                                     Text(
@@ -165,8 +156,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                         fontSize: 12,
                                         fontWeight: FontWeight.w500,
                                         color: selected
-                                            ? _C.matchaDark
-                                            : _C.almond,
+                                            ? Fg.matchaDark
+                                            : Fg.almond,
                                       ),
                                     ),
                                   ],
@@ -187,7 +178,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   if (snapshot.connectionState == ConnectionState.waiting) {
                     return SliverFillRemaining(
                       child: Center(
-                        child: CircularProgressIndicator(color: _C.matcha),
+                        child: CircularProgressIndicator(color: Fg.matcha),
                       ),
                     );
                   }
@@ -253,7 +244,7 @@ class _HomeScreenState extends State<HomeScreen> {
 class _FieldWavesPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
-    final paint = Paint()..color = _C.matchaTint.withOpacity(0.5);
+    final paint = Paint()..color = Bg.matchaTint.withOpacity(0.5);
 
     final top = Path()
       ..moveTo(0, size.height * 0.22)
@@ -311,10 +302,10 @@ class _GlassCard extends StatelessWidget {
         filter: ImageFilter.blur(sigmaX: 18, sigmaY: 18),
         child: Container(
           decoration: BoxDecoration(
-            color: Colors.white.withOpacity(0.5),
+            color: Bg.surface.withOpacity(0.5),
             borderRadius: BorderRadius.circular(20),
             border: Border.all(
-              color: borderColor ?? Colors.white.withOpacity(0.85),
+              color: borderColor ?? Bg.surface.withOpacity(0.85),
               width: 0.8,
             ),
           ),
@@ -354,7 +345,7 @@ class _AlertCard extends StatelessWidget {
     return GestureDetector(
       onTap: () => _openUrl(data['url']),
       child: _GlassCard(
-        borderColor: _C.rust.withOpacity(0.45),
+        borderColor: Bg.rust.withOpacity(0.45),
         child: Padding(
           padding: const EdgeInsets.all(14),
           child: Column(
@@ -362,21 +353,21 @@ class _AlertCard extends StatelessWidget {
             children: [
               Row(
                 children: [
-                  const Icon(Icons.warning_amber_rounded,
-                      size: 14, color: _C.rust),
+                  Icon(Icons.warning_amber_rounded,
+                      size: 14, color: Fg.rust),
                   const SizedBox(width: 6),
                   Text(
                     'Disease alert',
                     style: TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.w600,
-                      color: _C.rust,
+                      color: Fg.rust,
                     ),
                   ),
                   const Spacer(),
                   Text(
                     _timeAgo(data['publishedAt']),
-                    style: TextStyle(fontSize: 11, color: _C.inkSoft),
+                    style: TextStyle(fontSize: 11, color: Fg.inkSoft),
                   ),
                 ],
               ),
@@ -386,7 +377,7 @@ class _AlertCard extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 15,
                   fontWeight: FontWeight.w600,
-                  color: _C.ink,
+                  color: Fg.ink,
                   height: 1.4,
                 ),
               ),
@@ -398,7 +389,7 @@ class _AlertCard extends StatelessWidget {
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
                     fontSize: 13,
-                    color: _C.inkSoft,
+                    color: Fg.inkSoft,
                     height: 1.5,
                   ),
                 ),
@@ -407,12 +398,12 @@ class _AlertCard extends StatelessWidget {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  _SourceBadge(source: data['source'] ?? '', color: _C.rust),
+                  _SourceBadge(source: data['source'] ?? '', color: Bg.rust),
                   Text(
                     'Read more →',
                     style: TextStyle(
                       fontSize: 12,
-                      color: _C.rust,
+                      color: Fg.rust,
                       fontWeight: FontWeight.w500,
                     ),
                   ),
@@ -489,14 +480,14 @@ class _NewsCard extends StatelessWidget {
                       style: TextStyle(
                         fontSize: 13.5,
                         fontWeight: FontWeight.w500,
-                        color: _C.ink,
+                        color: Fg.ink,
                         height: 1.4,
                       ),
                     ),
                     const SizedBox(height: 6),
                     Text(
                       _timeAgo(data['publishedAt']),
-                      style: TextStyle(fontSize: 11, color: _C.inkSoft),
+                      style: TextStyle(fontSize: 11, color: Fg.inkSoft),
                     ),
                   ],
                 ),
@@ -546,7 +537,7 @@ class _SourcesFooter extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 11,
                   fontWeight: FontWeight.w600,
-                  color: _C.inkSoft,
+                  color: Fg.inkSoft,
                   letterSpacing: 0.4,
                 ),
               ),
@@ -568,15 +559,15 @@ class _SourcesFooter extends StatelessWidget {
                           padding: const EdgeInsets.symmetric(
                               horizontal: 10, vertical: 4),
                           decoration: BoxDecoration(
-                            color: Colors.white.withOpacity(0.6),
+                            color: Bg.surface.withOpacity(0.6),
                             borderRadius: BorderRadius.circular(999),
                             border: Border.all(
-                                color: Colors.white.withOpacity(0.8),
+                                color: Bg.surface.withOpacity(0.8),
                                 width: 0.6),
                           ),
                           child: Text(
                             s,
-                            style: TextStyle(fontSize: 11, color: _C.inkSoft),
+                            style: TextStyle(fontSize: 11, color: Fg.inkSoft),
                           ),
                         ))
                     .toList(),
@@ -584,7 +575,7 @@ class _SourcesFooter extends StatelessWidget {
               const SizedBox(height: 8),
               Text(
                 'Updated every 30 minutes. Tap any article to read the full story.',
-                style: TextStyle(fontSize: 11, color: _C.inkSoft, height: 1.4),
+                style: TextStyle(fontSize: 11, color: Fg.inkSoft, height: 1.4),
               ),
             ],
           ),
@@ -608,7 +599,7 @@ class _EmptyView extends StatelessWidget {
             Icon(
               Icons.newspaper_outlined,
               size: 48,
-              color: _C.inkSoft.withOpacity(0.5),
+              color: Fg.inkSoft.withOpacity(0.5),
             ),
             const SizedBox(height: 16),
             Text(
@@ -616,14 +607,14 @@ class _EmptyView extends StatelessWidget {
               style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.w500,
-                color: _C.inkSoft,
+                color: Fg.inkSoft,
               ),
             ),
             const SizedBox(height: 6),
             Text(
               'News is fetched every 30 minutes.\nCheck back shortly.',
               textAlign: TextAlign.center,
-              style: TextStyle(fontSize: 13, color: _C.inkSoft, height: 1.5),
+              style: TextStyle(fontSize: 13, color: Fg.inkSoft, height: 1.5),
             ),
           ],
         ),
@@ -644,21 +635,21 @@ class _ErrorView extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(Icons.wifi_off_rounded, size: 48, color: _C.inkSoft),
+            Icon(Icons.wifi_off_rounded, size: 48, color: Fg.inkSoft),
             const SizedBox(height: 16),
             Text(
               'Could not load news',
               style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.w500,
-                color: _C.inkSoft,
+                color: Fg.inkSoft,
               ),
             ),
             const SizedBox(height: 6),
             Text(
               error,
               textAlign: TextAlign.center,
-              style: TextStyle(fontSize: 12, color: _C.inkSoft),
+              style: TextStyle(fontSize: 12, color: Fg.inkSoft),
             ),
           ],
         ),
@@ -688,33 +679,33 @@ Future<void> _openUrl(String? url) async {
 _CategoryStyle _categoryStyle(String category) {
   switch (category) {
     case 'alert':
-      return const _CategoryStyle(
+      return _CategoryStyle(
         icon: Icons.warning_amber_rounded,
-        color: _C.rust,
+        color: Bg.rust,
         label: 'Alert',
       );
     case 'livestock':
-      return const _CategoryStyle(
+      return _CategoryStyle(
         icon: Icons.pets_rounded,
-        color: _C.rust,
+        color: Bg.rust,
         label: 'Livestock',
       );
     case 'weather':
-      return const _CategoryStyle(
+      return _CategoryStyle(
         icon: Icons.cloud_outlined,
-        color: _C.matcha,
+        color: Bg.matcha,
         label: 'Weather',
       );
     case 'policy':
-      return const _CategoryStyle(
+      return _CategoryStyle(
         icon: Icons.policy_outlined,
-        color: _C.matcha,
+        color: Bg.matcha,
         label: 'Policy',
       );
     default:
-      return const _CategoryStyle(
+      return _CategoryStyle(
         icon: Icons.eco_rounded,
-        color: _C.matcha,
+        color: Bg.matcha,
         label: 'Crops',
       );
   }

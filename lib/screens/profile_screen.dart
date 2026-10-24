@@ -5,20 +5,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'login_screen.dart';
 import '../services/notification_service.dart';
 import 'profile_social_menu.dart';
-
-/// AgroLens palette — matcha green / almond / white, light module variant.
-class _C {
-  static const matchaDark = Color(0xFF374530);
-  static const matcha = Color(0xFF5C7148);
-  static const matchaLight = Color(0xFFD6E0C4);
-  static const almond = Color(0xFFF6EFE2);
-  static const almondDeep = Color(0xFFE8DCC6);
-  static const ink = Color(0xFF2B2820);
-  static const inkSoft = Color(0xFF726C5C);
-  static const rust = Color(0xFFC1703E);
-  static const hairline = Color(0xFFEDE6D6);
-  static const muted = Color(0xFFB8AE97);
-}
+import '../theme/palette.dart';
 
 /// Bottom wave that finishes off the dark matcha header band.
 class _HeaderWaveClipper extends CustomClipper<Path> {
@@ -64,7 +51,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Widget build(BuildContext context) {
     final uid = _uid;
     return Scaffold(
-      backgroundColor: _C.almond,
+      backgroundColor: Bg.almond,
       body: uid == null
           ? const Center(child: Text('Not signed in'))
           : StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
@@ -122,16 +109,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
       child: Container(
         width: double.infinity,
         padding: const EdgeInsets.fromLTRB(20, 20, 20, 60),
-        color: _C.matchaDark,
+        color: Bg.matchaDark,
         child: Column(
           children: [
             Row(
               children: [
                 Text('Profile',
-                    style: TextStyle(color: _C.matchaLight, fontSize: 13, fontWeight: FontWeight.w500)),
+                    style: TextStyle(color: Fg.matchaLight, fontSize: 13, fontWeight: FontWeight.w500)),
                 const Spacer(),
                 IconButton(
-                  icon: Icon(Icons.settings_outlined, color: _C.matchaLight, size: 20),
+                  icon: Icon(Icons.settings_outlined, color: Fg.matchaLight, size: 20),
                   onPressed: () {
                     // TODO: navigate to settings screen
                   },
@@ -144,13 +131,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
               children: [
                 CircleAvatar(
                   radius: 38,
-                  backgroundColor: _C.rust,
+                  backgroundColor: Bg.rust,
                   backgroundImage:
                       (data['photoUrl'] as String?)?.isNotEmpty == true ? NetworkImage(data['photoUrl']) : null,
                   child: (data['photoUrl'] as String?)?.isNotEmpty == true
                       ? null
                       : Text(initials,
-                          style: const TextStyle(color: _C.almond, fontSize: 24, fontWeight: FontWeight.w600)),
+                          style: TextStyle(color: Fg.almond, fontSize: 24, fontWeight: FontWeight.w600)),
                 ),
                 Positioned(
                   bottom: -2,
@@ -163,25 +150,25 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       width: 26,
                       height: 26,
                       decoration: BoxDecoration(
-                        color: _C.almond,
+                        color: Bg.almond,
                         shape: BoxShape.circle,
-                        border: Border.all(color: _C.matchaDark, width: 2),
+                        border: Border.all(color: Bg.matchaDark, width: 2),
                       ),
-                      child: const Icon(Icons.camera_alt_outlined, size: 13, color: _C.matchaDark),
+                      child: Icon(Icons.camera_alt_outlined, size: 13, color: Fg.matchaDark),
                     ),
                   ),
                 ),
               ],
             ),
             const SizedBox(height: 10),
-            Text(name, style: const TextStyle(color: _C.almond, fontSize: 17, fontWeight: FontWeight.w600)),
+            Text(name, style: TextStyle(color: Fg.almond, fontSize: 17, fontWeight: FontWeight.w600)),
             const SizedBox(height: 3),
             Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Icon(Icons.location_on_outlined, size: 13, color: _C.matchaLight),
+                Icon(Icons.location_on_outlined, size: 13, color: Fg.matchaLight),
                 const SizedBox(width: 4),
-                Text(location, style: TextStyle(color: _C.matchaLight, fontSize: 12)),
+                Text(location, style: TextStyle(color: Fg.matchaLight, fontSize: 12)),
               ],
             ),
             if (verified) ...[
@@ -189,16 +176,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
                 decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.12),
+                  color: Bg.surface.withOpacity(0.12),
                   borderRadius: BorderRadius.circular(999),
                 ),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Icon(Icons.verified_outlined, size: 13, color: _C.matchaLight),
+                    Icon(Icons.verified_outlined, size: 13, color: Fg.matchaLight),
                     const SizedBox(width: 4),
                     Text('Verified farmer',
-                        style: TextStyle(color: _C.matchaLight, fontSize: 11, fontWeight: FontWeight.w500)),
+                        style: TextStyle(color: Fg.matchaLight, fontSize: 11, fontWeight: FontWeight.w500)),
                   ],
                 ),
               ),
@@ -261,24 +248,24 @@ class _ProfileScreenState extends State<ProfileScreen> {
       child: Row(
         children: [
           Expanded(
-            child: Text(text, style: const TextStyle(color: _C.ink, fontSize: 13, fontWeight: FontWeight.w600)),
+            child: Text(text, style: TextStyle(color: Fg.ink, fontSize: 13, fontWeight: FontWeight.w600)),
           ),
-          if (editable) Icon(Icons.edit_outlined, size: 14, color: _C.matcha),
+          if (editable) Icon(Icons.edit_outlined, size: 14, color: Fg.matcha),
         ],
       ),
     );
   }
 
   Widget _buildCommunityMenu(BuildContext context, String uid) {
-    return const ProfileSocialMenu(
-      cardColor: Colors.white,
-      borderColor: _C.hairline,
+    return ProfileSocialMenu(
+      cardColor: Bg.surface,
+      borderColor: Bg.hairline,
     );
   }
 
   Widget _buildAccountDetails(Map<String, dynamic> data) {
     return Container(
-      decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(16)),
+      decoration: BoxDecoration(color: Bg.surface, borderRadius: BorderRadius.circular(16)),
       padding: const EdgeInsets.symmetric(horizontal: 14),
       child: Column(
         children: [
@@ -295,7 +282,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Widget _buildFarmDetails(Map<String, dynamic> data) {
     final animals = (data['animalsKept'] as List?)?.join(', ');
     return Container(
-      decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(16)),
+      decoration: BoxDecoration(color: Bg.surface, borderRadius: BorderRadius.circular(16)),
       padding: const EdgeInsets.symmetric(horizontal: 14),
       child: Column(
         children: [
@@ -315,10 +302,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
       width: double.infinity,
       child: OutlinedButton.icon(
         onPressed: _logout,
-        icon: const Icon(Icons.logout, size: 16, color: _C.rust),
-        label: const Text('Log out', style: TextStyle(color: _C.rust, fontWeight: FontWeight.w500)),
+        icon: Icon(Icons.logout, size: 16, color: Fg.rust),
+        label: Text('Log out', style: TextStyle(color: Fg.rust, fontWeight: FontWeight.w500)),
         style: OutlinedButton.styleFrom(
-          side: const BorderSide(color: _C.almondDeep, width: 0.8),
+          side: BorderSide(color: Bg.almondDeep, width: 0.8),
           padding: const EdgeInsets.symmetric(vertical: 13),
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
         ),
@@ -337,12 +324,12 @@ class _StatCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 12),
-      decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(16)),
+      decoration: BoxDecoration(color: Bg.surface, borderRadius: BorderRadius.circular(16)),
       child: Column(
         children: [
-          Text(value, style: const TextStyle(color: _C.ink, fontSize: 18, fontWeight: FontWeight.w600)),
+          Text(value, style: TextStyle(color: Fg.ink, fontSize: 18, fontWeight: FontWeight.w600)),
           const SizedBox(height: 2),
-          Text(label, style: const TextStyle(color: _C.inkSoft, fontSize: 10.5)),
+          Text(label, style: TextStyle(color: Fg.inkSoft, fontSize: 10.5)),
         ],
       ),
     );
@@ -361,18 +348,18 @@ class _DetailRow extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 10),
       decoration: BoxDecoration(
-        border: isLast ? null : const Border(bottom: BorderSide(color: _C.hairline, width: 0.6)),
+        border: isLast ? null : Border(bottom: BorderSide(color: Bg.hairline, width: 0.6)),
       ),
       child: Row(
         children: [
-          Text(label, style: const TextStyle(color: _C.inkSoft, fontSize: 12)),
+          Text(label, style: TextStyle(color: Fg.inkSoft, fontSize: 12)),
           const Spacer(),
           const SizedBox(width: 10),
           Flexible(
             child: Text(
               value,
               textAlign: TextAlign.right,
-              style: const TextStyle(color: _C.ink, fontSize: 12.5),
+              style: TextStyle(color: Fg.ink, fontSize: 12.5),
             ),
           ),
         ],

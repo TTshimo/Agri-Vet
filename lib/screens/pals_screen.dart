@@ -2,17 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'user_profile_screen.dart';
-
-/// AgroLens palette — matcha green / almond / white, light module variant.
-class _C {
-  static const matchaDark = Color(0xFF374530);
-  static const matcha = Color(0xFF5C7148);
-  static const matchaLight = Color(0xFFD6E0C4);
-  static const almond = Color(0xFFF6EFE2);
-  static const ink = Color(0xFF2B2820);
-  static const inkSoft = Color(0xFF726C5C);
-  static const muted = Color(0xFFB8AE97);
-}
+import '../theme/palette.dart';
 
 /// Bottom wave finishing off the dark matcha header band — same shape
 /// used across the other restyled screens for a consistent silhouette.
@@ -78,14 +68,14 @@ class _PalsScreenState extends State<PalsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: _C.almond,
+      backgroundColor: Bg.almond,
       body: CustomScrollView(
         slivers: [
           SliverToBoxAdapter(
             child: ClipPath(
               clipper: _HeaderWaveClipper(),
               child: Container(
-                color: _C.matchaDark,
+                color: Bg.matchaDark,
                 padding: EdgeInsets.fromLTRB(
                   16,
                   MediaQuery.of(context).padding.top + 8,
@@ -99,7 +89,7 @@ class _PalsScreenState extends State<PalsScreen> {
                         IconButton(
                           padding: EdgeInsets.zero,
                           icon: Icon(Icons.arrow_back_ios_new_rounded,
-                              color: _C.almond, size: 18),
+                              color: Fg.almond, size: 18),
                           onPressed: () => Navigator.pop(context),
                         ),
                         Expanded(
@@ -109,7 +99,7 @@ class _PalsScreenState extends State<PalsScreen> {
                             style: TextStyle(
                               fontSize: 17,
                               fontWeight: FontWeight.w600,
-                              color: _C.almond,
+                              color: Fg.almond,
                             ),
                           ),
                         ),
@@ -119,13 +109,13 @@ class _PalsScreenState extends State<PalsScreen> {
                     const SizedBox(height: 10),
                     TextField(
                       controller: _searchController,
-                      style: TextStyle(color: _C.almond, fontSize: 14),
+                      style: TextStyle(color: Fg.almond, fontSize: 14),
                       decoration: InputDecoration(
                         hintText: 'Search pals...',
                         hintStyle: TextStyle(
-                            color: _C.almond.withOpacity(0.5), fontSize: 14),
+                            color: Fg.almond.withOpacity(0.5), fontSize: 14),
                         prefixIcon: Icon(Icons.search,
-                            color: _C.almond.withOpacity(0.6), size: 20),
+                            color: Fg.almond.withOpacity(0.6), size: 20),
                         suffixIcon: _query.isNotEmpty
                             ? GestureDetector(
                                 onTap: () {
@@ -133,12 +123,12 @@ class _PalsScreenState extends State<PalsScreen> {
                                   setState(() => _query = '');
                                 },
                                 child: Icon(Icons.close,
-                                    color: _C.almond.withOpacity(0.6),
+                                    color: Fg.almond.withOpacity(0.6),
                                     size: 18),
                               )
                             : null,
                         filled: true,
-                        fillColor: Colors.white.withOpacity(0.12),
+                        fillColor: Bg.surface.withOpacity(0.12),
                         contentPadding: const EdgeInsets.symmetric(
                             horizontal: 14, vertical: 10),
                         border: OutlineInputBorder(
@@ -160,7 +150,7 @@ class _PalsScreenState extends State<PalsScreen> {
               if (snapshot.connectionState == ConnectionState.waiting) {
                 return SliverFillRemaining(
                   child: Center(
-                    child: CircularProgressIndicator(color: _C.matcha),
+                    child: CircularProgressIndicator(color: Fg.matcha),
                   ),
                 );
               }
@@ -177,13 +167,13 @@ class _PalsScreenState extends State<PalsScreen> {
                           width: 64,
                           height: 64,
                           decoration: BoxDecoration(
-                            color: _C.matchaLight.withOpacity(0.5),
+                            color: Bg.matchaLight.withOpacity(0.5),
                             shape: BoxShape.circle,
                           ),
                           child: Icon(
                             Icons.diversity_3_rounded,
                             size: 26,
-                            color: _C.matcha.withOpacity(0.7),
+                            color: Fg.matcha.withOpacity(0.7),
                           ),
                         ),
                         const SizedBox(height: 14),
@@ -192,12 +182,12 @@ class _PalsScreenState extends State<PalsScreen> {
                           style: TextStyle(
                               fontSize: 15,
                               fontWeight: FontWeight.w500,
-                              color: _C.ink),
+                              color: Fg.ink),
                         ),
                         const SizedBox(height: 4),
                         Text(
                           'Head to Make a Pal to connect with farmers.',
-                          style: TextStyle(fontSize: 12.5, color: _C.inkSoft),
+                          style: TextStyle(fontSize: 12.5, color: Fg.inkSoft),
                         ),
                       ],
                     ),
@@ -230,7 +220,7 @@ class _PalsScreenState extends State<PalsScreen> {
                           return Container(
                             margin: const EdgeInsets.only(bottom: 10),
                             decoration: BoxDecoration(
-                              color: Colors.white,
+                              color: Bg.surface,
                               borderRadius: BorderRadius.circular(16),
                             ),
                             child: InkWell(
@@ -250,13 +240,13 @@ class _PalsScreenState extends State<PalsScreen> {
                                   children: [
                                     CircleAvatar(
                                       radius: 20,
-                                      backgroundColor: _C.matchaLight,
+                                      backgroundColor: Bg.matchaLight,
                                       child: Text(
                                         _initials(name),
                                         style: TextStyle(
                                           fontSize: 12.5,
                                           fontWeight: FontWeight.w600,
-                                          color: _C.matchaDark,
+                                          color: Fg.matchaDark,
                                         ),
                                       ),
                                     ),
@@ -271,7 +261,7 @@ class _PalsScreenState extends State<PalsScreen> {
                                             style: TextStyle(
                                               fontSize: 13.5,
                                               fontWeight: FontWeight.w500,
-                                              color: _C.ink,
+                                              color: Fg.ink,
                                             ),
                                           ),
                                           if (location.toString().isNotEmpty)
@@ -282,7 +272,7 @@ class _PalsScreenState extends State<PalsScreen> {
                                                 location,
                                                 style: TextStyle(
                                                     fontSize: 11.5,
-                                                    color: _C.inkSoft),
+                                                    color: Fg.inkSoft),
                                               ),
                                             ),
                                         ],
@@ -290,7 +280,7 @@ class _PalsScreenState extends State<PalsScreen> {
                                     ),
                                     Icon(
                                       Icons.chevron_right_rounded,
-                                      color: _C.muted,
+                                      color: Fg.muted,
                                       size: 18,
                                     ),
                                   ],
