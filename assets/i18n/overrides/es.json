@@ -1,0 +1,11 @@
+{
+  "kb.animals.foot and mouth.display_name": "Fiebre aftosa",
+  "kb.animals.goat pox.display_name": "Viruela caprina",
+  "kb.animals.healthy.display_name": "Animal sano",
+  "kb.animals.lumpy cow disease.display_name": "Dermatosis nodular contagiosa",
+  "kb.plants.healthy.display_name": "Planta sana",
+  "kb.plants.potato late blight.display_name": "Tizón tardío de la papa",
+  "kb.plants.sorghum cereal grain mold.display_name": "Moho del grano de sorgo",
+  "kb.plants.tomato late blight.display_name": "Tizón tardío del tomate",
+  "kb.plants.watermelon mosaic virus.display_name": "Virus del mosaico de la sandía"
+}

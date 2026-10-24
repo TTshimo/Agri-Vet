@@ -1,0 +1,11 @@
+{
+  "kb.animals.foot and mouth.display_name": "Fièvre aphteuse",
+  "kb.animals.goat pox.display_name": "Variole caprine",
+  "kb.animals.healthy.display_name": "Animal en bonne santé",
+  "kb.animals.lumpy cow disease.display_name": "Dermatose nodulaire contagieuse",
+  "kb.plants.healthy.display_name": "Plante saine",
+  "kb.plants.potato late blight.display_name": "Mildiou de la pomme de terre",
+  "kb.plants.sorghum cereal grain mold.display_name": "Moisissure des grains de sorgho",
+  "kb.plants.tomato late blight.display_name": "Mildiou de la tomate",
+  "kb.plants.watermelon mosaic virus.display_name": "Virus de la mosaïque de la pastèque"
+}

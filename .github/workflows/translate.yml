@@ -52,15 +52,23 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
-          cache: pip
-          cache-dependency-path: scripts/requirements-translate.txt
+
+      # Only download PyTorch + the model if there's something to translate
+      # (an override-only change just needs merging).
+      - name: Anything new to translate?
+        id: check
+        run: |
+          todo=$(python scripts/translate.py --only ${{ matrix.code }} --check | grep -oE '[0-9]+ to translate' | grep -oE '^[0-9]+')
+          echo "todo=${todo:-0}" >> "$GITHUB_OUTPUT"
 
       - name: Install CPU-only PyTorch and transformers
+        if: steps.check.outputs.todo != '0'
         run: |
           pip install torch --index-url https://download.pytorch.org/whl/cpu
           pip install -r scripts/requirements-translate.txt
 
       - name: Cache the NLLB model
+        if: steps.check.outputs.todo != '0'
         uses: actions/cache@v4
         with:
           path: ~/.cache/huggingface
