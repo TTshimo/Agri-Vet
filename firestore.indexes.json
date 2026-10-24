@@ -97,8 +97,8 @@
       "queryScope": "COLLECTION",
       "fields": [
         {
-          "fieldPath": "category",
-          "order": "ASCENDING"
+          "fieldPath": "categories",
+          "arrayConfig": "CONTAINS"
         },
         {
           "fieldPath": "publishedAt",

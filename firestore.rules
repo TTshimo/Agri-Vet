@@ -22,10 +22,10 @@ service cloud.firestore {
     // workflow (web scraper) using the Firebase Admin SDK, which
     // authenticates as a service account and bypasses these rules
     // entirely — so no client create/update path is needed here.
-    // Documents carry a `category` field (alert, livestock, crop, weather,
-    // policy) that the Home screen filters/queries on client-side via
-    // `.where('category', isEqualTo: ...)`, rather than living in separate
-    // collections. The app only ever reads this collection.
+    // Documents carry `categories` (alert, livestock, crop, weather; the
+    // first is also stored as `category`) that the Home screen filters on
+    // via `.where('categories', arrayContains: ...)`, rather than living in
+    // separate collections. The app only ever reads this collection.
 
     match /news/{itemId} {
       allow read: if isSignedIn();

@@ -68,7 +68,9 @@ class _HomeScreenState extends State<HomeScreen> {
     }
     return FirebaseFirestore.instance
         .collection('news')
-        .where('category', isEqualTo: category)
+        // Articles can carry several tags (an outbreak story is both
+        // 'alert' and 'livestock'), so filter on the full list.
+        .where('categories', arrayContains: category)
         .orderBy('publishedAt', descending: true)
         .limit(50);
   }
