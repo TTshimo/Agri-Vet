@@ -1,6 +1,14 @@
+import 'dart:convert';
+import 'dart:io';
+
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
+import 'package:share_plus/share_plus.dart';
+import 'package:url_launcher/url_launcher.dart';
+import '../services/notification_service.dart';
 import '../providers/theme_provider.dart';
 import '../providers/language_provider.dart';
 
@@ -43,10 +51,33 @@ class SettingsScreen extends StatefulWidget {
   State<SettingsScreen> createState() => _SettingsScreenState();
 }
 
+const kSupportEmail = 'tumisangtshimologo@gmail.com';
+
 class _SettingsScreenState extends State<SettingsScreen> {
-  bool _diagnosisNotifs = true;
-  bool _communityNotifs = true;
-  bool _messageNotifs = true;
+  NotificationPrefs _prefs = const NotificationPrefs();
+  bool _exporting = false;
+
+  @override
+  void initState() {
+    super.initState();
+    NotificationService.instance.loadPrefs().then((p) {
+      if (mounted) setState(() => _prefs = p);
+    }).catchError((Object e) {
+      debugPrint('Could not load notification settings: $e');
+    });
+  }
+
+  Future<void> _updatePrefs(NotificationPrefs next) async {
+    final previous = _prefs;
+    setState(() => _prefs = next);
+    try {
+      await NotificationService.instance.savePrefs(next);
+    } catch (e) {
+      if (!mounted) return;
+      setState(() => _prefs = previous);
+      _showSnack(context, 'Could not save. Check your connection.');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -128,24 +159,24 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 _header('NOTIFICATIONS'),
                 _card([
                   _ToggleRow(
-                    icon: Icons.biotech_outlined,
-                    label: 'Diagnosis results',
-                    value: _diagnosisNotifs,
-                    onChanged: (v) => setState(() => _diagnosisNotifs = v),
+                    icon: Icons.coronavirus_outlined,
+                    label: 'Disease outbreak alerts',
+                    value: _prefs.alerts,
+                    onChanged: (v) => _updatePrefs(_prefs.copyWith(alerts: v)),
                   ),
                   const Divider(height: 1, color: _C.hairline, indent: 48),
                   _ToggleRow(
                     icon: Icons.forum_outlined,
                     label: 'Community activity',
-                    value: _communityNotifs,
-                    onChanged: (v) => setState(() => _communityNotifs = v),
+                    value: _prefs.community,
+                    onChanged: (v) => _updatePrefs(_prefs.copyWith(community: v)),
                   ),
                   const Divider(height: 1, color: _C.hairline, indent: 48),
                   _ToggleRow(
                     icon: Icons.chat_bubble_outline,
                     label: 'Messages',
-                    value: _messageNotifs,
-                    onChanged: (v) => setState(() => _messageNotifs = v),
+                    value: _prefs.messages,
+                    onChanged: (v) => _updatePrefs(_prefs.copyWith(messages: v)),
                   ),
                 ]),
 
@@ -165,15 +196,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   const Divider(height: 1, color: _C.hairline, indent: 48),
                   _TileRow(
                     icon: Icons.download_outlined,
-                    label: 'Download my data',
-                    onTap: () => _showSnack(
-                        context, 'Data export will be emailed to you.'),
+                    label: _exporting ? 'Preparing your data...' : 'Download my data',
+                    onTap: _exporting ? () {} : () => _exportData(context),
                   ),
                   const Divider(height: 1, color: _C.hairline, indent: 48),
                   _TileRow(
                     icon: Icons.help_outline,
                     label: 'Help & support',
-                    onTap: () => _showSnack(context, 'Opening support...'),
+                    onTap: () => _contactSupport(context),
                   ),
                 ]),
 
@@ -230,6 +260,77 @@ class _SettingsScreenState extends State<SettingsScreen> {
     await FirebaseAuth.instance.sendPasswordResetEmail(email: email);
     if (context.mounted) {
       _showSnack(context, 'Password reset link sent to $email');
+    }
+  }
+
+  /// Collects the user's profile, posts and diagnoses into a JSON file and
+  /// opens the phone's share sheet so they can save or send it.
+  Future<void> _exportData(BuildContext context) async {
+    final uid = FirebaseAuth.instance.currentUser?.uid;
+    if (uid == null) return;
+    setState(() => _exporting = true);
+    try {
+      final fs = FirebaseFirestore.instance;
+      final results = await Future.wait([
+        fs.collection('users').doc(uid).get(),
+        fs.collection('posts').where('uid', isEqualTo: uid).get(),
+        fs.collection('diagnoses').where('uid', isEqualTo: uid).get(),
+      ]);
+      final profile = results[0] as DocumentSnapshot<Map<String, dynamic>>;
+      final posts = results[1] as QuerySnapshot<Map<String, dynamic>>;
+      final diagnoses = results[2] as QuerySnapshot<Map<String, dynamic>>;
+
+      final export = {
+        'exportedAt': DateTime.now().toUtc().toIso8601String(),
+        'account': {
+          'uid': uid,
+          'email': FirebaseAuth.instance.currentUser?.email,
+        },
+        'profile': _jsonSafe(profile.data()),
+        'posts': [for (final d in posts.docs) {'id': d.id, ..._jsonSafe(d.data())}],
+        'diagnoses': [
+          for (final d in diagnoses.docs) {'id': d.id, ..._jsonSafe(d.data())}
+        ],
+      };
+
+      final dir = await getTemporaryDirectory();
+      final file = File('${dir.path}/agrolens-my-data.json');
+      await file.writeAsString(const JsonEncoder.withIndent('  ').convert(export));
+      await Share.shareXFiles(
+        [XFile(file.path, mimeType: 'application/json')],
+        subject: 'My AgroLens data',
+      );
+    } catch (e) {
+      debugPrint('Export failed: $e');
+      if (context.mounted) {
+        _showSnack(context, 'Could not export your data. Try again later.');
+      }
+    } finally {
+      if (mounted) setState(() => _exporting = false);
+    }
+  }
+
+  /// Firestore Timestamps/GeoPoints aren't JSON; turn them into strings.
+  static dynamic _jsonSafe(dynamic value) {
+    if (value is Timestamp) return value.toDate().toUtc().toIso8601String();
+    if (value is GeoPoint) return {'lat': value.latitude, 'lng': value.longitude};
+    if (value is DocumentReference) return value.path;
+    if (value is Map) {
+      return {for (final e in value.entries) '${e.key}': _jsonSafe(e.value)};
+    }
+    if (value is List) return value.map(_jsonSafe).toList();
+    return value;
+  }
+
+  Future<void> _contactSupport(BuildContext context) async {
+    final uri = Uri(
+      scheme: 'mailto',
+      path: kSupportEmail,
+      query: 'subject=${Uri.encodeComponent('AgroLens support')}',
+    );
+    final opened = await launchUrl(uri);
+    if (!opened && context.mounted) {
+      _showSnack(context, 'Email us at $kSupportEmail');
     }
   }
 
@@ -293,6 +394,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           ElevatedButton(
             style: ElevatedButton.styleFrom(backgroundColor: _C.danger),
             onPressed: () async {
+              await NotificationService.instance.stop();
               await FirebaseAuth.instance.signOut();
               if (context.mounted) {
                 Navigator.of(context).pushNamedAndRemoveUntil(
@@ -312,36 +414,90 @@ class _SettingsScreenState extends State<SettingsScreen> {
   void _confirmDeleteAccount(BuildContext context) {
     showDialog(
       context: context,
-      builder: (_) => AlertDialog(
+      builder: (dialogContext) => AlertDialog(
         title: const Text('Delete account?'),
         content: const Text(
-          'This will permanently delete your profile, farm data, '
-          'and diagnosis history. This cannot be undone.',
+          'This will permanently delete your profile, posts, comments, '
+          'pals, messages and diagnosis history. This cannot be undone.',
         ),
         actions: [
           TextButton(
-              onPressed: () => Navigator.pop(context),
+              onPressed: () => Navigator.pop(dialogContext),
               child: const Text('Cancel')),
           ElevatedButton(
             style: ElevatedButton.styleFrom(backgroundColor: _C.danger),
-            onPressed: () async {
-              try {
-                await FirebaseAuth.instance.currentUser?.delete();
-                if (context.mounted) {
-                  Navigator.of(context).pushNamedAndRemoveUntil(
-                    '/login',
-                    (route) => false,
-                  );
-                }
-              } catch (e) {
-                if (context.mounted) {
-                  _showSnack(
-                      context, 'Re-authenticate to delete your account.');
-                  Navigator.pop(context);
-                }
-              }
+            onPressed: () {
+              Navigator.pop(dialogContext);
+              _deleteAccount(context);
             },
             child: const Text('Delete',
+                style: TextStyle(color: Colors.white)),
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// Firebase only deletes a login that was used recently, so confirm the
+  /// password first. Deleting the login triggers the cleanUpDeletedUser
+  /// Cloud Function, which removes all of the user's data.
+  Future<void> _deleteAccount(BuildContext context) async {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) return;
+
+    final email = user.email;
+    if (email != null && email.isNotEmpty) {
+      final password = await _askPassword(context);
+      if (password == null) return;
+      try {
+        await user.reauthenticateWithCredential(
+          EmailAuthProvider.credential(email: email, password: password),
+        );
+      } on FirebaseAuthException {
+        if (context.mounted) _showSnack(context, 'That password is not correct.');
+        return;
+      }
+    }
+
+    try {
+      await NotificationService.instance.stop();
+      await user.delete();
+      if (context.mounted) {
+        Navigator.of(context).pushNamedAndRemoveUntil('/login', (route) => false);
+      }
+    } on FirebaseAuthException catch (e) {
+      if (!context.mounted) return;
+      _showSnack(
+        context,
+        e.code == 'requires-recent-login'
+            ? 'Please log out, log back in, then delete your account.'
+            : 'Could not delete your account. Try again later.',
+      );
+    }
+  }
+
+  Future<String?> _askPassword(BuildContext context) {
+    final controller = TextEditingController();
+    return showDialog<String>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: const Text('Confirm your password'),
+        content: TextField(
+          controller: controller,
+          obscureText: true,
+          autofocus: true,
+          decoration: const InputDecoration(hintText: 'Password'),
+          onSubmitted: (v) => Navigator.pop(dialogContext, v),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext),
+            child: const Text('Cancel'),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(backgroundColor: _C.danger),
+            onPressed: () => Navigator.pop(dialogContext, controller.text),
+            child: const Text('Delete my account',
                 style: TextStyle(color: Colors.white)),
           ),
         ],

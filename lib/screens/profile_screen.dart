@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 import 'login_screen.dart';
+import '../services/notification_service.dart';
 import 'profile_social_menu.dart';
 
 /// AgroLens palette — matcha green / almond / white, light module variant.
@@ -50,6 +51,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   final _uid = FirebaseAuth.instance.currentUser?.uid;
 
   Future<void> _logout() async {
+    await NotificationService.instance.stop();
     await FirebaseAuth.instance.signOut();
     if (!mounted) return;
     Navigator.of(context).pushAndRemoveUntil(
