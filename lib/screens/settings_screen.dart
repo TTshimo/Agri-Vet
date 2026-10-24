@@ -105,20 +105,25 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
                 _header('LANGUAGE'),
                 _card([
-                  _RadioRow(
-                    icon: Icons.language,
-                    label: 'English',
-                    selected: langProv.language == AppLanguage.english,
-                    onTap: () => langProv.setLanguage(AppLanguage.english),
-                  ),
-                  const Divider(height: 1, color: _C.hairline, indent: 48),
-                  _RadioRow(
-                    icon: Icons.translate,
-                    label: 'Setswana',
-                    selected: langProv.language == AppLanguage.setswana,
-                    onTap: () => langProv.setLanguage(AppLanguage.setswana),
-                  ),
+                  for (final (i, lang) in langProv.languages.indexed) ...[
+                    if (i > 0)
+                      const Divider(height: 1, color: _C.hairline, indent: 48),
+                    _RadioRow(
+                      icon: lang.code == 'en' ? Icons.language : Icons.translate,
+                      label: lang.label,
+                      selected: langProv.code == lang.code,
+                      onTap: () => langProv.setLanguage(lang.code),
+                    ),
+                  ],
                 ]),
+                const Padding(
+                  padding: EdgeInsets.fromLTRB(4, 8, 4, 0),
+                  child: Text(
+                    'Diagnosis results are shown in this language. '
+                    'Translations other than English are machine-generated.',
+                    style: TextStyle(fontSize: 11, color: _C.inkSoft, height: 1.4),
+                  ),
+                ),
 
                 _header('NOTIFICATIONS'),
                 _card([

@@ -25,7 +25,18 @@ jobs:
         run: flutter pub get
 
       - name: Analyze
-        run: flutter analyze --no-fatal-infos --no-fatal-warnings
+        run: |
+          set +e
+          flutter analyze --no-fatal-infos --no-fatal-warnings > analyze.txt 2>&1
+          status=$?
+          cat analyze.txt
+          # Surface errors/warnings as annotations on the PR's Files tab.
+          grep -E "^\s*(error|warning) • " analyze.txt | while IFS='•' read -r level msg loc rule; do
+            level=$(echo "$level" | xargs); msg=$(echo "$msg" | xargs)
+            file=$(echo "$loc" | xargs | cut -d: -f1); line=$(echo "$loc" | xargs | cut -d: -f2)
+            echo "::${level} file=${file},line=${line}::${msg} [$(echo "$rule" | xargs)]"
+          done
+          exit $status
 
       - name: Test
-        run: flutter test
+        run: flutter test --reporter=github

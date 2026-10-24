@@ -8,7 +8,8 @@ import 'package:image/image.dart' as img;
 import 'package:tflite_flutter/tflite_flutter.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import '../services/translation_service.dart';
+import 'package:provider/provider.dart';
+import '../providers/language_provider.dart';
 import '../services/behavioural_score.dart';
 
 // Self-contained palette for the redesign — matcha green / almond / rust.
@@ -44,7 +45,6 @@ class _DiagnosisScreenState extends State<DiagnosisScreen> {
   bool _analysing = false;
   _DiagnosisResult? _result;
   String _animalType = '';
-  bool _showSetswana = false;
   _FlowStep _step = _FlowStep.upload;
 
   Map<String, dynamic> _knowledgeBase = {};
@@ -53,7 +53,34 @@ class _DiagnosisScreenState extends State<DiagnosisScreen> {
   int _currentQuestion = 0;
 
   final _picker = ImagePicker();
-  final _translation = TranslationService();
+
+  // ── Language ──────────────────────────────────────────────────────────
+  // Everything the farmer reads comes through LanguageProvider, in the
+  // language chosen in Settings (English fallback for anything missing).
+  LanguageProvider get _i18n => context.read<LanguageProvider>();
+
+  String _t(String key, {Map<String, Object>? args}) => _i18n.t(key, args: args);
+
+  String get _kbBase {
+    final category = _result?.type == DiagnosisType.animal ? 'animals' : 'plants';
+    return 'kb.$category.${_result?.diseaseKey}';
+  }
+
+  String _english(Object? value) =>
+      value is Map ? (value['en']?.toString() ?? '') : (value?.toString() ?? '');
+
+  /// A knowledge-base field (display_name, affects, treatment, ...).
+  String _kb(Map<String, dynamic> data, String field) =>
+      _i18n.t('$_kbBase.$field', fallback: _english(data[field]));
+
+  String _questionText(Map<String, dynamic> q) =>
+      _i18n.t('$_kbBase.q.${q['id']}', fallback: _english(q['question']));
+
+  List<String> _optionsEn(Map<String, dynamic> q) =>
+      ((q['options'] as Map<String, dynamic>?)?['en'] as List?)?.cast<String>() ?? [];
+
+  String _optionText(Map<String, dynamic> q, int i) =>
+      _i18n.t('$_kbBase.q.${q['id']}.o$i', fallback: _optionsEn(q)[i]);
 
   @override
   void initState() {
@@ -145,9 +172,10 @@ class _DiagnosisScreenState extends State<DiagnosisScreen> {
 
       if (questions.isEmpty) _saveToFirestore(_result!);
     } catch (e) {
+      debugPrint('Diagnosis failed: $e');
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          content: Text('Analysis failed: ${e.toString()}'),
+          content: Text(_t('ui.diag.analysis_failed')),
           backgroundColor: _C.rust,
         ));
       }
@@ -245,6 +273,7 @@ class _DiagnosisScreenState extends State<DiagnosisScreen> {
 
   @override
   Widget build(BuildContext context) {
+    context.watch<LanguageProvider>(); // rebuild when the language changes
     return Scaffold(
       backgroundColor: _C.almond,
       body: Stack(
@@ -277,17 +306,17 @@ class _DiagnosisScreenState extends State<DiagnosisScreen> {
     String title;
     switch (_step) {
       case _FlowStep.profiling:
-        title = _showSetswana ? 'Dipotso di seng mmalwa' : 'A few questions';
+        title = _t('ui.diag.questions_title');
         break;
       case _FlowStep.result:
-        title = _showSetswana ? 'Sepelo sa supego' : 'Diagnosis result';
+        title = _t('ui.diag.result_title');
         break;
       default:
         title = _selectedType == DiagnosisType.animal
-            ? (_showSetswana ? 'Supego ya leruo' : 'Animal diagnosis')
+            ? _t('ui.diag.animal_title')
             : _selectedType == DiagnosisType.plant
-                ? (_showSetswana ? 'Supego ya semela' : 'Plant diagnosis')
-                : (_showSetswana ? 'Supa' : 'Diagnose');
+                ? _t('ui.diag.plant_title')
+                : _t('ui.diag.title');
     }
 
     final showBack = widget.initialType != null || _step != _FlowStep.upload;
@@ -334,25 +363,7 @@ class _DiagnosisScreenState extends State<DiagnosisScreen> {
               ),
             ),
             const Spacer(),
-            if (_step != _FlowStep.upload)
-              GestureDetector(
-                onTap: () => setState(() => _showSetswana = !_showSetswana),
-                child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                  decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.16),
-                    borderRadius: BorderRadius.circular(999),
-                  ),
-                  child: Text(
-                    _showSetswana ? 'EN' : 'TN',
-                    style: const TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w600,
-                      color: _C.almond,
-                    ),
-                  ),
-                ),
-              ),
+            if (_step != _FlowStep.upload) const _LanguageChip(),
           ],
         ),
       ),
@@ -366,7 +377,7 @@ class _DiagnosisScreenState extends State<DiagnosisScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'What are you diagnosing?',
+            _t('ui.diag.what_diagnosing'),
             style: TextStyle(fontSize: 15, fontWeight: FontWeight.w500, color: _C.ink),
           ),
           const SizedBox(height: 12),
@@ -408,7 +419,7 @@ class _DiagnosisScreenState extends State<DiagnosisScreen> {
               Expanded(
                 child: _SecondaryButton(
                   icon: Icons.camera_alt_outlined,
-                  label: 'Camera',
+                  label: _t('ui.diag.camera'),
                   onTap: () => _pickImage(ImageSource.camera),
                 ),
               ),
@@ -416,7 +427,7 @@ class _DiagnosisScreenState extends State<DiagnosisScreen> {
               Expanded(
                 child: _SecondaryButton(
                   icon: Icons.photo_library_outlined,
-                  label: 'Gallery',
+                  label: _t('ui.diag.gallery'),
                   onTap: () => _pickImage(ImageSource.gallery),
                 ),
               ),
@@ -425,7 +436,7 @@ class _DiagnosisScreenState extends State<DiagnosisScreen> {
           if (_selectedType == DiagnosisType.animal) ...[
             const SizedBox(height: 18),
             Text(
-              'Animal type',
+              _t('ui.diag.animal_type'),
               style: TextStyle(fontSize: 13, fontWeight: FontWeight.w500, color: _C.ink),
             ),
             const SizedBox(height: 8),
@@ -440,14 +451,17 @@ class _DiagnosisScreenState extends State<DiagnosisScreen> {
                     style: TextStyle(fontSize: 13, color: _C.ink),
                     dropdownColor: _C.almond,
                     decoration: InputDecoration(
-                      hintText: 'Select animal type',
+                      hintText: _t('ui.diag.select_animal_type'),
                       hintStyle: TextStyle(fontSize: 13, color: _C.inkSoft),
                       border: InputBorder.none,
                       contentPadding:
                           const EdgeInsets.symmetric(horizontal: 10, vertical: 12),
                     ),
                     items: ['Cattle', 'Goat', 'Poultry']
-                        .map((e) => DropdownMenuItem(value: e, child: Text(e)))
+                        .map((e) => DropdownMenuItem(
+                              value: e,
+                              child: Text(_t('ui.diag.animal_type.${e.toLowerCase()}')),
+                            ))
                         .toList(),
                     onChanged: (v) => setState(() => _animalType = v ?? ''),
                   ),
@@ -471,21 +485,21 @@ class _DiagnosisScreenState extends State<DiagnosisScreen> {
                 elevation: 0,
               ),
               child: _analysing
-                  ? const Row(
+                  ? Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        SizedBox(
+                        const SizedBox(
                           width: 18,
                           height: 18,
                           child: CircularProgressIndicator(
                               strokeWidth: 2, color: _C.rustBg),
                         ),
-                        SizedBox(width: 10),
-                        Text('Analysing...'),
+                        const SizedBox(width: 10),
+                        Text(_t('ui.diag.analysing')),
                       ],
                     )
-                  : const Text('Analyse photo',
-                      style: TextStyle(fontWeight: FontWeight.w600)),
+                  : Text(_t('ui.diag.analyse_photo'),
+                      style: const TextStyle(fontWeight: FontWeight.w600)),
             ),
           ),
         ],
@@ -498,19 +512,8 @@ class _DiagnosisScreenState extends State<DiagnosisScreen> {
 
     final q = _questions[_currentQuestion];
     final qId = q['id'] as String? ?? '';
-    final lang = _showSetswana ? 'tn' : 'en';
-
-    final questionText =
-        (q['question'] as Map<String, dynamic>?)?[lang]?.toString() ??
-        (q['question'] as Map<String, dynamic>?)?['en']?.toString() ??
-        '';
-
-    final optionsEn =
-        ((q['options'] as Map<String, dynamic>?)?['en'] as List?)
-            ?.cast<String>() ?? [];
-    final optionsTn =
-        ((q['options'] as Map<String, dynamic>?)?['tn'] as List?)
-            ?.cast<String>() ?? [];
+    final questionText = _questionText(q);
+    final optionsEn = _optionsEn(q);
 
     final currentAnswer = _answers[qId];
     final isLastQuestion = _currentQuestion == _questions.length - 1;
@@ -521,16 +524,17 @@ class _DiagnosisScreenState extends State<DiagnosisScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          if (_result != null) _buildDiseaseBanner(lang),
+          if (_result != null) _buildDiseaseBanner(),
 
           const SizedBox(height: 18),
 
           Row(
             children: [
               Text(
-                _showSetswana
-                    ? 'Potso ${_currentQuestion + 1} ya ${_questions.length}'
-                    : 'Question ${_currentQuestion + 1} of ${_questions.length}',
+                _t('ui.diag.question_of', args: {
+                  'current': _currentQuestion + 1,
+                  'total': _questions.length,
+                }),
                 style: TextStyle(fontSize: 12, color: _C.inkSoft),
               ),
               const Spacer(),
@@ -571,9 +575,9 @@ class _DiagnosisScreenState extends State<DiagnosisScreen> {
 
           ...List.generate(optionsEn.length, (i) {
             final enOption = optionsEn[i];
-            final displayLabel = (_showSetswana && i < optionsTn.length)
-                ? optionsTn[i]
-                : enOption;
+            // Answers are stored by their English text (the scoring weights
+            // are keyed on it); only the label shown is translated.
+            final displayLabel = _optionText(q, i);
             final isSelected = currentAnswer == enOption;
 
             return Padding(
@@ -627,7 +631,7 @@ class _DiagnosisScreenState extends State<DiagnosisScreen> {
                           borderRadius: BorderRadius.circular(14)),
                     ),
                     child: Text(
-                      _showSetswana ? 'Moago' : 'Back',
+                      _t('ui.diag.back'),
                       style: TextStyle(color: _C.inkSoft),
                     ),
                   ),
@@ -649,8 +653,8 @@ class _DiagnosisScreenState extends State<DiagnosisScreen> {
                   ),
                   child: Text(
                     isLastQuestion
-                        ? (_showSetswana ? 'Bona supego' : 'See diagnosis')
-                        : (_showSetswana ? 'E e latelang' : 'Next'),
+                        ? _t('ui.diag.see_diagnosis')
+                        : _t('ui.diag.next'),
                     style: const TextStyle(fontWeight: FontWeight.w600),
                   ),
                 ),
@@ -664,9 +668,7 @@ class _DiagnosisScreenState extends State<DiagnosisScreen> {
             onTap: _finishProfiling,
             child: Center(
               child: Text(
-                _showSetswana
-                    ? 'Tlola dipotso tse di setseng'
-                    : 'Skip remaining questions',
+                _t('ui.diag.skip_questions'),
                 style: TextStyle(
                   fontSize: 13,
                   color: _C.inkSoft,
@@ -682,9 +684,8 @@ class _DiagnosisScreenState extends State<DiagnosisScreen> {
     );
   }
 
-  Widget _buildDiseaseBanner(String lang) {
-    final nameMap = _result!.diseaseData['display_name'] as Map<String, dynamic>? ?? {};
-    final name = nameMap[lang]?.toString() ?? nameMap['en']?.toString() ?? _result!.diseaseKey;
+  Widget _buildDiseaseBanner() {
+    final name = _kb(_result!.diseaseData, 'display_name');
     final confidence = (_result!.modelConfidence * 100).toStringAsFixed(0);
 
     return _GlassCard(
@@ -700,11 +701,11 @@ class _DiagnosisScreenState extends State<DiagnosisScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    _showSetswana ? 'Semelo se se bonweng mo setshwantshong' : 'Detected from image',
+                    _t('ui.diag.detected_from_image'),
                     style: TextStyle(fontSize: 11, color: _C.inkSoft),
                   ),
                   Text(
-                    '$name  ·  $confidence% match',
+                    '$name  ·  ${_t('ui.diag.match_percent', args: {'percent': confidence})}',
                     style: TextStyle(
                       fontSize: 13,
                       fontWeight: FontWeight.w600,
@@ -722,13 +723,9 @@ class _DiagnosisScreenState extends State<DiagnosisScreen> {
 
   Widget _buildResult() {
     final r = _result!;
-    final lang = _showSetswana ? 'tn' : 'en';
     final diseaseData = r.diseaseData;
     final riskLevel = r.finalRiskLevel;
-
-    final nameMap = diseaseData['display_name'] as Map<String, dynamic>? ?? {};
-    final displayName =
-        nameMap[lang]?.toString() ?? nameMap['en']?.toString() ?? r.diseaseKey;
+    final displayName = _kb(diseaseData, 'display_name');
 
     // Two-tone risk language, consistent with the rest of the app: only
     // "high" gets the rust warning treatment, everything else reads calm.
@@ -738,45 +735,39 @@ class _DiagnosisScreenState extends State<DiagnosisScreen> {
     IconData riskIcon;
     switch (riskLevel) {
       case 'high':
-        riskLabel = _showSetswana ? 'Kotsing e kgolo' : 'High risk';
+        riskLabel = _t('ui.diag.risk_high');
         riskIcon = Icons.warning_rounded;
         break;
       case 'medium':
-        riskLabel = _showSetswana ? 'Lebelela' : 'Monitor';
+        riskLabel = _t('ui.diag.risk_monitor');
         riskIcon = Icons.info_rounded;
         break;
       case 'none':
-        riskLabel = _showSetswana ? 'E itekanetseng' : 'Healthy';
+        riskLabel = _t('ui.diag.risk_healthy');
         riskIcon = Icons.check_circle_rounded;
         break;
       default: // 'low'
-        riskLabel = _showSetswana ? 'Lebelela' : 'Low concern';
+        riskLabel = _t('ui.diag.risk_low');
         riskIcon = Icons.info_outline_rounded;
     }
 
-    String loc(String field) {
-      final val = diseaseData[field];
-      if (val is Map<String, dynamic>) {
-        return val[lang]?.toString() ?? val['en']?.toString() ?? '';
-      }
-      return val?.toString() ?? '';
-    }
+    String loc(String field) => _kb(diseaseData, field);
 
     final recKey = (riskLevel == 'low' || riskLevel == 'none') ? 'low' : riskLevel;
     final recommendation =
-        (diseaseData['recommendations'] as Map<String, dynamic>?)?[recKey]
-            as Map<String, dynamic>?;
-    final recommendationText =
-        recommendation?[lang]?.toString() ?? recommendation?['en']?.toString() ?? '';
+        (diseaseData['recommendations'] as Map<String, dynamic>?)?[recKey];
+    final recommendationText = recommendation == null
+        ? ''
+        : _i18n.t('$_kbBase.rec.$recKey', fallback: _english(recommendation));
 
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          _LangToggle(
-            showSetswana: _showSetswana,
-            onToggle: (v) => setState(() => _showSetswana = v),
+          const Align(
+            alignment: Alignment.centerRight,
+            child: _LanguageChip(onLight: true),
           ),
           const SizedBox(height: 12),
 
@@ -839,13 +830,13 @@ class _DiagnosisScreenState extends State<DiagnosisScreen> {
                       ),
                       const SizedBox(height: 12),
                       _ConfidenceBar(
-                        label: _showSetswana ? 'Setshwantsho' : 'Image match',
+                        label: _t('ui.diag.image_match'),
                         value: r.modelConfidence,
                       ),
                       if (r.answers.isNotEmpty) ...[
                         const SizedBox(height: 6),
                         _ConfidenceBar(
-                          label: _showSetswana ? 'Maitshwaro' : 'Behavioural',
+                          label: _t('ui.diag.behavioural'),
                           value: (r.behavioralScore).clamp(0.0, 1.0),
                           trailingLabel: riskLabel,
                         ),
@@ -859,17 +850,17 @@ class _DiagnosisScreenState extends State<DiagnosisScreen> {
                     children: [
                       if (loc('affects').isNotEmpty && loc('affects') != 'N/A')
                         _InfoRow(
-                          label: _showSetswana ? 'E amana le' : 'Affects',
+                          label: _t('ui.diag.affects'),
                           value: loc('affects'),
                         ),
                       if (loc('spreads_by').isNotEmpty && loc('spreads_by') != 'N/A')
                         _InfoRow(
-                          label: _showSetswana ? 'E anamela ka' : 'Spreads by',
+                          label: _t('ui.diag.spreads_by'),
                           value: loc('spreads_by'),
                         ),
                       if (loc('visual_symptoms').isNotEmpty)
                         _InfoRow(
-                          label: _showSetswana ? 'Go bonala' : 'Visual signs',
+                          label: _t('ui.diag.visual_signs'),
                           value: loc('visual_symptoms'),
                           multiline: true,
                         ),
@@ -884,7 +875,7 @@ class _DiagnosisScreenState extends State<DiagnosisScreen> {
 
           if (recommendationText.isNotEmpty)
             _ActionCard(
-              title: _showSetswana ? 'Se o tshwanetse go se dira jaanong' : 'What to do now',
+              title: _t('ui.diag.what_to_do'),
               content: recommendationText,
               isHigh: isHigh,
             ),
@@ -895,17 +886,15 @@ class _DiagnosisScreenState extends State<DiagnosisScreen> {
             child: Column(
               children: [
                 _ExpandableSection(
-                  label: _showSetswana ? 'Kalafi' : 'Treatment',
+                  label: _t('ui.diag.treatment'),
                   content: loc('treatment'),
                 ),
                 _ExpandableSection(
-                  label: _showSetswana ? 'Thibelo' : 'Prevention',
+                  label: _t('ui.diag.prevention'),
                   content: loc('prevention'),
                 ),
                 _ExpandableSection(
-                  label: _showSetswana
-                      ? 'Leng o tshwanetse go leletsa ngaka'
-                      : 'When to call a vet',
+                  label: _t('ui.diag.when_to_call_vet'),
                   content: loc('when_to_call_vet'),
                   isLast: true,
                   highlight: isHigh,
@@ -916,7 +905,7 @@ class _DiagnosisScreenState extends State<DiagnosisScreen> {
 
           const SizedBox(height: 12),
 
-          if (r.answers.isNotEmpty) _buildAnswerSummary(lang),
+          if (r.answers.isNotEmpty) _buildAnswerSummary(),
 
           const SizedBox(height: 16),
 
@@ -934,7 +923,7 @@ class _DiagnosisScreenState extends State<DiagnosisScreen> {
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
             ),
             child: Text(
-              _showSetswana ? 'Tshwara supego e nngwe' : 'Diagnose again',
+              _t('ui.diag.diagnose_again'),
               style: TextStyle(color: _C.inkSoft),
             ),
           ),
@@ -943,7 +932,7 @@ class _DiagnosisScreenState extends State<DiagnosisScreen> {
     );
   }
 
-  Widget _buildAnswerSummary(String lang) {
+  Widget _buildAnswerSummary() {
     return _GlassCard(
       child: Padding(
         padding: const EdgeInsets.all(16),
@@ -951,7 +940,7 @@ class _DiagnosisScreenState extends State<DiagnosisScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              _showSetswana ? 'Dikarabo tsa gago' : 'Your responses',
+              _t('ui.diag.your_responses'),
               style: TextStyle(
                 fontSize: 13,
                 fontWeight: FontWeight.w600,
@@ -965,21 +954,9 @@ class _DiagnosisScreenState extends State<DiagnosisScreen> {
               final answer = _answers[id];
               if (answer == null) return const SizedBox.shrink();
 
-              final qText =
-                  (q['question'] as Map<String, dynamic>?)?[lang]?.toString() ??
-                  (q['question'] as Map<String, dynamic>?)?['en']?.toString() ??
-                  '';
-
-              final optionsEn =
-                  ((q['options'] as Map<String, dynamic>?)?['en'] as List?)
-                      ?.cast<String>() ?? [];
-              final optionsTn =
-                  ((q['options'] as Map<String, dynamic>?)?['tn'] as List?)
-                      ?.cast<String>() ?? [];
-              final idx = optionsEn.indexOf(answer);
-              final displayAnswer = (_showSetswana && idx >= 0 && idx < optionsTn.length)
-                  ? optionsTn[idx]
-                  : answer;
+              final qText = _questionText(q);
+              final idx = _optionsEn(q).indexOf(answer);
+              final displayAnswer = idx >= 0 ? _optionText(q, idx) : answer;
 
               return Padding(
                 padding: const EdgeInsets.only(bottom: 8),
@@ -1186,6 +1163,7 @@ class _TypeToggle extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final i18n = context.watch<LanguageProvider>();
     return _GlassCard(
       child: Padding(
         padding: const EdgeInsets.all(5),
@@ -1194,7 +1172,7 @@ class _TypeToggle extends StatelessWidget {
             Expanded(
               child: _TypeSegment(
                 icon: Icons.pets_rounded,
-                label: 'Animal',
+                label: i18n.t('ui.diag.animal'),
                 selected: selected == DiagnosisType.animal,
                 onTap: () => onSelect(DiagnosisType.animal),
               ),
@@ -1202,7 +1180,7 @@ class _TypeToggle extends StatelessWidget {
             Expanded(
               child: _TypeSegment(
                 icon: Icons.eco_rounded,
-                label: 'Plant',
+                label: i18n.t('ui.diag.plant'),
                 selected: selected == DiagnosisType.plant,
                 onTap: () => onSelect(DiagnosisType.plant),
               ),
@@ -1295,58 +1273,68 @@ class _ConfidenceBar extends StatelessWidget {
   }
 }
 
-class _LangToggle extends StatelessWidget {
-  final bool showSetswana;
-  final ValueChanged<bool> onToggle;
-  const _LangToggle({required this.showSetswana, required this.onToggle});
+/// Shows the current language and lets the farmer switch on the spot.
+/// It changes the same app-wide setting as Settings → Language.
+class _LanguageChip extends StatelessWidget {
+  /// true when shown on the light page background (result view),
+  /// false on the dark header.
+  final bool onLight;
+  const _LanguageChip({this.onLight = false});
 
   @override
   Widget build(BuildContext context) {
-    return _GlassCard(
-      child: Padding(
-        padding: const EdgeInsets.all(3),
+    final i18n = context.watch<LanguageProvider>();
+    final fg = onLight ? _C.matchaDark : _C.almond;
+    return GestureDetector(
+      onTap: () => _pick(context, i18n),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+        decoration: BoxDecoration(
+          color: onLight
+              ? _C.matchaTint.withOpacity(0.7)
+              : Colors.white.withOpacity(0.16),
+          borderRadius: BorderRadius.circular(999),
+        ),
         child: Row(
+          mainAxisSize: MainAxisSize.min,
           children: [
-            Expanded(
-              child: GestureDetector(
-                onTap: () => onToggle(false),
-                child: _LangBtn(label: 'English', active: !showSetswana),
-              ),
+            Icon(Icons.translate_rounded, size: 14, color: fg),
+            const SizedBox(width: 5),
+            Text(
+              i18n.language.nativeName,
+              style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: fg),
             ),
-            Expanded(
-              child: GestureDetector(
-                onTap: () => onToggle(true),
-                child: _LangBtn(label: 'Setswana', active: showSetswana),
-              ),
-            ),
+            Icon(Icons.arrow_drop_down_rounded, size: 18, color: fg),
           ],
         ),
       ),
     );
   }
-}
 
-class _LangBtn extends StatelessWidget {
-  final String label;
-  final bool active;
-  const _LangBtn({required this.label, required this.active});
-
-  @override
-  Widget build(BuildContext context) {
-    return AnimatedContainer(
-      duration: const Duration(milliseconds: 200),
-      padding: const EdgeInsets.symmetric(vertical: 8),
-      decoration: BoxDecoration(
-        color: active ? _C.matchaHeader : Colors.transparent,
-        borderRadius: BorderRadius.circular(10),
+  void _pick(BuildContext context, LanguageProvider i18n) {
+    showModalBottomSheet<void>(
+      context: context,
+      backgroundColor: _C.almond,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
-      child: Text(
-        label,
-        textAlign: TextAlign.center,
-        style: TextStyle(
-          fontSize: 13,
-          fontWeight: FontWeight.w500,
-          color: active ? _C.almond : _C.inkSoft,
+      builder: (sheetContext) => SafeArea(
+        child: ListView(
+          shrinkWrap: true,
+          padding: const EdgeInsets.symmetric(vertical: 12),
+          children: [
+            for (final lang in i18n.languages)
+              ListTile(
+                title: Text(lang.label, style: const TextStyle(color: _C.ink)),
+                trailing: lang.code == i18n.code
+                    ? const Icon(Icons.check_circle, color: _C.rust)
+                    : null,
+                onTap: () {
+                  i18n.setLanguage(lang.code);
+                  Navigator.pop(sheetContext);
+                },
+              ),
+          ],
         ),
       ),
     );
@@ -1427,13 +1415,13 @@ class _UploadZone extends StatelessWidget {
               Icon(Icons.add_photo_alternate_outlined, size: 36, color: _C.matchaHeader),
               const SizedBox(height: 10),
               Text(
-                'Take a photo or upload from your gallery',
+                context.watch<LanguageProvider>().t('ui.diag.upload_prompt'),
                 textAlign: TextAlign.center,
                 style: TextStyle(fontSize: 13, color: _C.ink),
               ),
               const SizedBox(height: 4),
               Text(
-                'Best results: clear lighting, close up of affected area',
+                context.watch<LanguageProvider>().t('ui.diag.upload_tip'),
                 textAlign: TextAlign.center,
                 style: TextStyle(fontSize: 11, color: _C.inkSoft),
               ),

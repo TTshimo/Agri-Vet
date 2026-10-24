@@ -54,7 +54,7 @@ flutter:
     - assets/data/plant_classes.json
     - assets/data/disease_info.json
     - assets/data/disease_knowledge_base.json
-    - assets/translation/setswana.json
+    - assets/i18n/
 
 flutter_launcher_icons:
   android: true
