@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 import 'login_screen.dart';
+import '../services/google_auth.dart';
 import '../services/notification_service.dart';
 import 'profile_social_menu.dart';
 import '../theme/palette.dart';
@@ -39,6 +40,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   Future<void> _logout() async {
     await NotificationService.instance.stop();
+    await GoogleAuth.signOut();
     await FirebaseAuth.instance.signOut();
     if (!mounted) return;
     Navigator.of(context).pushAndRemoveUntil(

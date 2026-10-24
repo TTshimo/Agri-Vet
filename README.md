@@ -103,6 +103,25 @@ Collections: `users` (+ `private`), `posts` (+ `comments`), `diagnoses`, `news`,
 Deleting an account (Settings → Delete account) removes the login; the
 `cleanUpDeletedUser` function then deletes everything that user created.
 
+## Sign in with Google
+
+The login screen offers **Continue with Google** (email + password still
+works). First-time Google users get a profile automatically; they can add
+farm details later. One-time Firebase setup:
+
+1. Firebase console → **Authentication → Sign-in method** → enable **Google**
+   (pick a support email).
+2. Get the app's signing fingerprints: `cd android && ./gradlew signingReport`
+   (Windows: `gradlew signingReport`). Copy the **SHA-1** and **SHA-256** of
+   the `debug` variant (and of your release key when you have one).
+3. Firebase console → **Project settings → Your apps → Android** → *Add
+   fingerprint* for each.
+4. Download the new `google-services.json` and replace
+   `android/app/google-services.json` (it now contains an `oauth_client`).
+5. iOS: add `GoogleService-Info.plist` to `ios/Runner` and its
+   `REVERSED_CLIENT_ID` as a URL scheme in `Info.plist` (see the
+   google_sign_in package docs). Not set up yet.
+
 ## News scraper
 
 The workflow needs a repository secret named `FIREBASE_SERVICE_ACCOUNT`

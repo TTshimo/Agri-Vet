@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-import 'home_screen.dart';
+import 'shell_screen.dart';
 import '../theme/palette.dart';
 
 class _FieldWavesPainter extends CustomPainter {
@@ -323,7 +323,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
       }
       if (!mounted) return;
       Navigator.of(context).pushAndRemoveUntil(
-        MaterialPageRoute(builder: (_) => const HomeScreen()),
+        MaterialPageRoute(builder: (_) => const ShellScreen()),
         (route) => false,
       );
     } on FirebaseAuthException catch (e) {

@@ -8,6 +8,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
+import '../services/google_auth.dart';
 import '../services/notification_service.dart';
 import '../providers/theme_provider.dart';
 import '../providers/language_provider.dart';
@@ -384,6 +385,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             style: ElevatedButton.styleFrom(backgroundColor: Bg.danger),
             onPressed: () async {
               await NotificationService.instance.stop();
+              await GoogleAuth.signOut();
               await FirebaseAuth.instance.signOut();
               if (context.mounted) {
                 Navigator.of(context).pushNamedAndRemoveUntil(
@@ -435,7 +437,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
     if (user == null) return;
 
     final email = user.email;
-    if (email != null && email.isNotEmpty) {
+    if (GoogleAuth.usesGoogle(user)) {
+      try {
+        if (!await GoogleAuth.reauthenticate(user)) return; // cancelled
+      } catch (_) {
+        if (context.mounted) _showSnack(context, 'Could not confirm your Google account.');
+        return;
+      }
+    } else if (email != null && email.isNotEmpty) {
       final password = await _askPassword(context);
       if (password == null) return;
       try {
@@ -451,6 +460,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     try {
       await NotificationService.instance.stop();
       await user.delete();
+      await GoogleAuth.signOut();
       if (context.mounted) {
         Navigator.of(context).pushNamedAndRemoveUntil('/login', (route) => false);
       }

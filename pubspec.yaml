@@ -23,6 +23,7 @@ dependencies:
   cloud_firestore: ^4.15.9
   firebase_storage: ^11.6.10
   firebase_messaging: ^14.9.4
+  google_sign_in: ^6.1.0
 
   # Notifications shown while the app is open (Android)
   flutter_local_notifications: ^18.0.1

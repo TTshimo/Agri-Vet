@@ -1,7 +1,8 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'home_screen.dart';
+import 'shell_screen.dart';
+import '../services/google_auth.dart';
 import 'register_screen.dart';
 import 'forgot_password_screen.dart';
 import '../theme/palette.dart';
@@ -126,7 +127,32 @@ class _LoginScreenState extends State<LoginScreen> {
   final _passCtrl = TextEditingController();
   bool _obscure = true;
   bool _loading = false;
+  bool _googleLoading = false;
   String? _error;
+
+  Future<void> _signInWithGoogle() async {
+    setState(() {
+      _googleLoading = true;
+      _error = null;
+    });
+    try {
+      final user = await GoogleAuth.signIn();
+      if (user == null || !mounted) return; // picker closed
+      Navigator.of(context).pushAndRemoveUntil(
+        MaterialPageRoute(builder: (_) => const ShellScreen()),
+        (route) => false,
+      );
+    } on FirebaseAuthException catch (e) {
+      setState(() => _error = e.code == 'account-exists-with-different-credential'
+          ? 'This email already has an AgroLens password. Log in with your password.'
+          : 'Google sign-in failed. Try again.');
+    } catch (e) {
+      debugPrint('Google sign-in failed: $e');
+      setState(() => _error = 'Google sign-in failed. Try again.');
+    } finally {
+      if (mounted) setState(() => _googleLoading = false);
+    }
+  }
 
   @override
   void dispose() {
@@ -153,7 +179,8 @@ class _LoginScreenState extends State<LoginScreen> {
       );
       if (!mounted) return;
       Navigator.of(context).pushAndRemoveUntil(
-        MaterialPageRoute(builder: (_) => const HomeScreen()),
+        // The full app (bottom navigation, notifications), same as on launch.
+        MaterialPageRoute(builder: (_) => const ShellScreen()),
         (route) => false,
       );
     } on FirebaseAuthException catch (e) {
@@ -315,12 +342,11 @@ class _LoginScreenState extends State<LoginScreen> {
                     ],
                   ),
                   const SizedBox(height: 14),
-                  Row(
-                    children: [
-                      Expanded(child: _SocialButton(icon: Icons.g_mobiledata, label: 'Google', onTap: () {})),
-                      const SizedBox(width: 10),
-                      Expanded(child: _SocialButton(icon: Icons.phone_outlined, label: 'Phone', onTap: () {})),
-                    ],
+                  _SocialButton(
+                    icon: Icons.g_mobiledata,
+                    label: 'Continue with Google',
+                    loading: _googleLoading,
+                    onTap: _loading || _googleLoading ? null : _signInWithGoogle,
                   ),
                   const SizedBox(height: 22),
                   Center(
@@ -353,11 +379,17 @@ class _LoginScreenState extends State<LoginScreen> {
 }
 
 class _SocialButton extends StatelessWidget {
-  const _SocialButton({required this.icon, required this.label, required this.onTap});
+  const _SocialButton({
+    required this.icon,
+    required this.label,
+    required this.onTap,
+    this.loading = false,
+  });
 
   final IconData icon;
   final String label;
-  final VoidCallback onTap;
+  final VoidCallback? onTap;
+  final bool loading;
 
   @override
   Widget build(BuildContext context) {
@@ -374,9 +406,18 @@ class _SocialButton extends StatelessWidget {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(icon, size: 18, color: Fg.almond),
+            if (loading)
+              SizedBox(
+                width: 16,
+                height: 16,
+                child: CircularProgressIndicator(strokeWidth: 2, color: Fg.almond),
+              )
+            else
+              Icon(icon, size: 22, color: Fg.almond),
             const SizedBox(width: 6),
-            Text(label, style: TextStyle(color: Fg.almond, fontSize: 12.5)),
+            Text(label,
+                style: TextStyle(
+                    color: Fg.almond, fontSize: 13.5, fontWeight: FontWeight.w500)),
           ],
         ),
       ),
