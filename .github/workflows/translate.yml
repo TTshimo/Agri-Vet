@@ -2,7 +2,8 @@ name: Translate content
 
 # Re-generates assets/i18n/<code>.json with NLLB whenever the English source,
 # the language list, the human overrides or the script change, then commits
-# the result back to the same branch. Only changed strings are re-translated.
+# the result back to the same branch. Each language runs as its own job in
+# parallel; only new or changed English strings are re-translated.
 on:
   pull_request:
     paths:
@@ -22,11 +23,27 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  translate:
+  languages:
     # Commits back to the PR branch, so only run for branches in this repo.
     if: github.event_name == 'workflow_dispatch' || github.event.pull_request.head.repo.full_name == github.repository
     runs-on: ubuntu-latest
-    timeout-minutes: 90
+    outputs:
+      codes: ${{ steps.list.outputs.codes }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref || github.ref_name }}
+      - id: list
+        run: echo "codes=$(jq -c '[.[] | select(.code != "en") | .code]' assets/i18n/languages.json)" >> "$GITHUB_OUTPUT"
+
+  translate:
+    needs: languages
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    strategy:
+      fail-fast: false
+      matrix:
+        code: ${{ fromJson(needs.languages.outputs.codes) }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -49,17 +66,44 @@ jobs:
           path: ~/.cache/huggingface
           key: hf-nllb-200-distilled-600M
 
-      - name: Translate
-        run: python scripts/translate.py
+      - name: Translate ${{ matrix.code }}
+        run: python scripts/translate.py --only ${{ matrix.code }}
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: i18n-${{ matrix.code }}
+          path: |
+            assets/i18n/${{ matrix.code }}.json
+            scripts/i18n_cache/${{ matrix.code }}.json
+          if-no-files-found: ignore
+
+  commit:
+    needs: translate
+    if: always() && needs.translate.result != 'cancelled'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref || github.ref_name }}
+
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: i18n-*
+          path: translated
+          merge-multiple: true
 
       - name: Commit translations
         run: |
+          if [ -d translated/assets ]; then cp -r translated/assets/i18n/. assets/i18n/; fi
+          if [ -d translated/scripts ]; then cp -r translated/scripts/i18n_cache/. scripts/i18n_cache/; fi
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add assets/i18n scripts/i18n_cache
           if git diff --cached --quiet; then
             echo "Translations already up to date."
-          else
-            git commit -m "Update machine translations (NLLB)"
-            git push
+            exit 0
           fi
+          git commit -m "Update machine translations (NLLB)"
+          # Someone may have pushed while we were translating.
+          git pull --rebase origin "${{ github.head_ref || github.ref_name }}"
+          git push origin HEAD:"${{ github.head_ref || github.ref_name }}"
