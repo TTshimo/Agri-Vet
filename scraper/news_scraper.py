@@ -64,7 +64,7 @@ CATEGORY_KEYWORDS = {
     "livestock": [
         "cattle", "livestock", "poultry", "herd", "dairy", "beef", "sheep", "goat",
         "foot and mouth", "fmd", "avian influenza", "bird flu", "vaccination",
-        "veterinary", "abattoir", "disease outbreak", "anthrax", "rabies", "disease", "insert"
+        "veterinary", "abattoir", "disease outbreak", "anthrax", "rabies", "disease",
     ],
     "weather": [
         "rainfall", "rain", "drought", "forecast", "flood", "flooding", "climate",
@@ -74,6 +74,14 @@ CATEGORY_KEYWORDS = {
         "harvest", "crop", "maize", "sorghum", "wheat", "irrigation", "planting",
         "seed", "fertilizer", "pest", "locust", "yield", "tomato", "potato"
     ],
+}
+
+# Whole-word matching (with an optional plural "s"), so "rain" doesn't match
+# "Ukraine"/"train", "pest" doesn't match "Budapest", "herd" doesn't match
+# "shepherd", etc. Multi-word keywords like "foot and mouth" still work.
+_CATEGORY_PATTERNS = {
+    cat: re.compile(r"\b(?:" + "|".join(re.escape(kw) for kw in keywords) + r")s?\b")
+    for cat, keywords in CATEGORY_KEYWORDS.items()
 }
 
 
@@ -104,7 +112,7 @@ def classify(title: str, summary: str) -> list:
     Returns an empty list if nothing matches — callers decide what to do with that,
     rather than this function inventing a fallback 'general' bucket."""
     text = f"{title} {summary}".lower()
-    return [cat for cat, keywords in CATEGORY_KEYWORDS.items() if any(kw in text for kw in keywords)]
+    return [cat for cat, pattern in _CATEGORY_PATTERNS.items() if pattern.search(text)]
 
 
 def test_feeds():
