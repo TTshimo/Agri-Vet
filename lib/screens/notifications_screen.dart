@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:intl/intl.dart';
+import 'chat_screen.dart';
 import 'user_profile_screen.dart';
 
 /// AgroLens palette — matcha green / almond / white, light module variant.
@@ -46,6 +47,7 @@ enum NotificationType {
   palAccept,
   msgRequest,
   msgAccept,
+  message,
   unknown,
 }
 
@@ -65,6 +67,8 @@ NotificationType _typeFromString(String? raw) {
       return NotificationType.msgRequest;
     case 'msg_accept':
       return NotificationType.msgAccept;
+    case 'message':
+      return NotificationType.message;
     default:
       return NotificationType.unknown;
   }
@@ -153,10 +157,19 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
 
       case NotificationType.msgRequest:
       case NotificationType.msgAccept:
+      case NotificationType.message:
+        final conversationId = data['conversationId'] as String?;
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (_) => UserProfileScreen(profileUid: fromUid),
+            builder: (_) => conversationId != null
+                ? ChatScreen(
+                    conversationId: conversationId,
+                    currentUid: _uid,
+                    otherUid: fromUid,
+                    otherName: (data['fromName'] as String?) ?? 'Farmer',
+                  )
+                : UserProfileScreen(profileUid: fromUid),
           ),
         );
         break;
@@ -182,6 +195,8 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
         return Icons.mark_email_unread_rounded;
       case NotificationType.msgAccept:
         return Icons.check_circle_rounded;
+      case NotificationType.message:
+        return Icons.chat_rounded;
       case NotificationType.unknown:
         return Icons.notifications_rounded;
     }
@@ -196,13 +211,15 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
         return _C.matcha;
       case NotificationType.msgRequest:
       case NotificationType.msgAccept:
+      case NotificationType.message:
         return _C.rust;
       default:
         return _C.inkSoft;
     }
   }
 
-  String _messageFor(NotificationType type, String fromName) {
+  String _messageFor(NotificationType type, String fromName,
+      [Map<String, dynamic>? data]) {
     switch (type) {
       case NotificationType.like:
         return '$fromName liked your post';
@@ -218,6 +235,11 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
         return '$fromName sent you a message request';
       case NotificationType.msgAccept:
         return '$fromName accepted your message request';
+      case NotificationType.message:
+        final preview = (data?['preview'] as String?) ?? '';
+        return preview.isEmpty
+            ? '$fromName sent you a message'
+            : '$fromName: $preview';
       case NotificationType.unknown:
         return 'New notification';
     }
@@ -412,7 +434,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                                 const SizedBox(width: 12),
                                 Expanded(
                                   child: Text(
-                                    _messageFor(type, fromName),
+                                    _messageFor(type, fromName, data),
                                     style: TextStyle(
                                       fontSize: 13.5,
                                       fontWeight: isRead

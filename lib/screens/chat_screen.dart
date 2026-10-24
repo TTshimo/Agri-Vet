@@ -87,6 +87,44 @@ class _ChatScreenState extends State<ChatScreen> {
         .collection('conversations')
         .doc(widget.conversationId)
         .update({'unreadCounts.${widget.currentUid}': 0});
+    // Clear this chat's entry in the notification bell, if there is one.
+    try {
+      await FirebaseFirestore.instance
+          .collection('notifications')
+          .doc(widget.currentUid)
+          .collection('items')
+          .doc('msg_${widget.conversationId}')
+          .update({'read': true});
+    } catch (_) {
+      // No unread message notification for this chat.
+    }
+  }
+
+  /// One notification per conversation (doc id msg_<conversationId>),
+  /// overwritten by each new message so the bell shows the latest one
+  /// instead of filling up. Also triggers the push notification.
+  Future<void> _notifyRecipient(String text) async {
+    try {
+      final fs = FirebaseFirestore.instance;
+      final meDoc = await fs.collection('users').doc(widget.currentUid).get();
+      await fs
+          .collection('notifications')
+          .doc(widget.otherUid)
+          .collection('items')
+          .doc('msg_${widget.conversationId}')
+          .set({
+        'type': 'message',
+        'fromUid': widget.currentUid,
+        'fromName': meDoc.data()?['name'] ?? 'Farmer',
+        'conversationId': widget.conversationId,
+        'preview': text.length > 120 ? '${text.substring(0, 117)}...' : text,
+        'read': false,
+        'createdAt': FieldValue.serverTimestamp(),
+        'updatedAt': FieldValue.serverTimestamp(),
+      });
+    } catch (e) {
+      debugPrint('Message notification not sent: $e');
+    }
   }
 
   Future<void> _acceptRequest() async {
@@ -216,6 +254,7 @@ class _ChatScreenState extends State<ChatScreen> {
         );
 
         await batch.commit();
+        _notifyRecipient(text);
 
         setState(() {
           _replyToId = null;

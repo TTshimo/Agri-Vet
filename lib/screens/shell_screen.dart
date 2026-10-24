@@ -6,6 +6,8 @@ import 'diagnosis_screen.dart';
 import 'community_screen.dart';
 import 'learn_screen.dart';
 import 'profile_screen.dart';
+import 'notifications_screen.dart';
+import '../services/notification_service.dart';
 
 /// AgroLens palette — matcha green / almond / white, light module variant.
 class _C {
@@ -26,6 +28,20 @@ class ShellScreen extends StatefulWidget {
 
 class _ShellScreenState extends State<ShellScreen> {
   int _currentIndex = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    // Signed in from here on: register this phone for push notifications.
+    // A tapped notification opens the in-app notification list.
+    NotificationService.instance.openNotifications = () {
+      if (!mounted) return;
+      Navigator.of(context).push(
+        MaterialPageRoute(builder: (_) => const NotificationsScreen()),
+      );
+    };
+    NotificationService.instance.start();
+  }
 
   final List<Widget> _screens = const [
     HomeScreen(),

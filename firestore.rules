@@ -43,7 +43,13 @@ service cloud.firestore {
       allow read: if isSignedIn();
       allow create: if isOwner(uid);
       allow update: if isOwner(uid);
-      allow delete: if false;
+      allow delete: if false; // done by the cleanUpDeletedUser function
+
+      // Owner-only: push tokens and notification switches (read by the
+      // pushNotification Cloud Function, which bypasses these rules).
+      match /private/{docId} {
+        allow read, write: if isOwner(uid);
+      }
     }
 
     // ── diagnoses ───────────────────────────────────────────────────────
@@ -187,11 +193,21 @@ service cloud.firestore {
     // Locked to create-only so no one can read, edit, or delete another
     // user's notifications.
 
+    // Chat messages use ONE doc per conversation (msg_<conversationId>)
+    // that the sender overwrites with each new message, so the bell shows
+    // the latest message instead of filling up. Only the original sender
+    // of that doc may overwrite it, and only as a 'message' notification.
+
     match /notifications/{uid}/items/{itemId} {
       allow read: if isOwner(uid);
       allow create: if isSignedIn() && request.resource.data.fromUid == request.auth.uid;
-      allow update: if isOwner(uid) &&
-        request.resource.data.diff(resource.data).affectedKeys().hasOnly(['read']);
+      allow update: if (isOwner(uid) &&
+          request.resource.data.diff(resource.data).affectedKeys().hasOnly(['read'])) ||
+        (isSignedIn() &&
+          itemId.matches('msg_.*') &&
+          resource.data.fromUid == request.auth.uid &&
+          request.resource.data.fromUid == request.auth.uid &&
+          request.resource.data.type == 'message');
       allow delete: if isOwner(uid);
     }
   }

@@ -22,6 +22,10 @@ dependencies:
   firebase_auth: ^4.17.9
   cloud_firestore: ^4.15.9
   firebase_storage: ^11.6.10
+  firebase_messaging: ^14.9.4
+
+  # Notifications shown while the app is open (Android)
+  flutter_local_notifications: ^18.0.1
 
   # UI
   google_fonts: ^6.2.1
@@ -34,6 +38,7 @@ dependencies:
   uuid: ^4.3.3
   url_launcher: ^6.2.5
   http: ^1.2.0
+  share_plus: ^10.1.4
 
   provider: ^6.1.2
 
