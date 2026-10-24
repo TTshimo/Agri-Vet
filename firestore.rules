@@ -46,6 +46,18 @@ service cloud.firestore {
       allow delete: if false;
     }
 
+    // ── diagnoses ───────────────────────────────────────────────────────
+    // One doc per completed diagnosis, written by DiagnosisScreen and read
+    // back by the Profile stats card and "My diagnoses". Private to the
+    // farmer who ran it; history is immutable once saved.
+
+    match /diagnoses/{diagnosisId} {
+      allow read: if isOwner(resource.data.uid);
+      allow create: if isOwner(request.resource.data.uid);
+      allow update: if false;
+      allow delete: if isOwner(resource.data.uid);
+    }
+
     // ── posts ────────────────────────────────────────────────────────────
 
     match /posts/{postId} {
@@ -137,7 +149,8 @@ service cloud.firestore {
       // unreadCounts.*, status (accept), archivedBy (arrayUnion/Remove
       // of their own uid only — enforced loosely here, tightened by the
       // fact that the client only ever writes its own uid).
-      allow update: if isParticipant(resource.data.participants);
+      allow update: if isParticipant(resource.data.participants) &&
+        request.resource.data.participants == resource.data.participants;
 
       allow delete: if isSignedIn() &&
         resource.data.status == 'pending' &&
