@@ -225,7 +225,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           child: StreamBuilder<QuerySnapshot>(
             stream: FirebaseFirestore.instance
                 .collection('posts')
-                .where('authorId', isEqualTo: uid)
+                .where('uid', isEqualTo: uid)
                 .snapshots(),
             builder: (context, snap) =>
                 _StatCard(value: '${snap.data?.docs.length ?? 0}', label: 'Posts'),

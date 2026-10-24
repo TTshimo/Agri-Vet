@@ -53,7 +53,7 @@ class TranslationService extends ChangeNotifier {
     if (_loaded) return;
 
     final raw = await rootBundle
-        .loadString('assets/translations/setswana.json');
+        .loadString('assets/translation/setswana.json');
     _setswanaStrings = json.decode(raw) as Map<String, dynamic>;
 
     final prefs = await SharedPreferences.getInstance();

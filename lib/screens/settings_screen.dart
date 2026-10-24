@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:provider/provider.dart';
-import '../../providers/theme_provider.dart';
-import '../../providers/language_provider.dart';
+import '../providers/theme_provider.dart';
+import '../providers/language_provider.dart';
 
 /// AgroLens palette — matcha green / almond / white, light module variant.
 class _C {

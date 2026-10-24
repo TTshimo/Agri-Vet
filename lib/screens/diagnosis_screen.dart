@@ -8,8 +8,8 @@ import 'package:image/image.dart' as img;
 import 'package:tflite_flutter/tflite_flutter.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import '../../services/translation_service.dart';
-import '../../services/behavioural_score.dart';
+import '../services/translation_service.dart';
+import '../services/behavioural_score.dart';
 
 // Self-contained palette for the redesign — matcha green / almond / rust.
 // Matches the palette used across the other redesigned screens. Fold into
