@@ -70,4 +70,6 @@ flutter_launcher_icons:
   image_path: "assets/icon/app_icon.png"
   min_sdk_android: 21
   adaptive_icon_background: "#1B5E3A"
-  adaptive_icon_foreground: "assets/icon/app_icon.png"
+  # Leaf only, at 46% of the canvas so launchers that crop to a circle or
+  # squircle keep it inside the safe zone (the full app_icon.png is too big).
+  adaptive_icon_foreground: "assets/icon/app_icon_foreground.png"
