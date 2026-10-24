@@ -1,8 +1,229 @@
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import '../../main.dart';
-import 'shell_screen.dart';
+
+import 'home_screen.dart';
+
+class _C {
+  static const bgDark = Color(0xFF1F2A1A);
+  static const waveDark = Color(0xFF2C3A23);
+  static const waveDarkSoft = Color(0xFF374530);
+  static const almond = Color(0xFFF6EFE2);
+  static const almondSoft = Color(0xFFB9C4A6);
+  static const almondMuted = Color(0xFF8E9A7C);
+  static const rust = Color(0xFFC1703E);
+  static const ink = Color(0xFF2B2820);
+  static const glassFill = Color(0x14FFFFFF);
+  static const glassBorder = Color(0x2EFFFFFF);
+  static const fieldFill = Color(0x1EFFFFFF);
+  static const fieldBorder = Color(0x33FFFFFF);
+}
+
+class _FieldWavesPainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    final p1 = Path()
+      ..moveTo(0, size.height * 0.18)
+      ..cubicTo(
+        size.width * 0.28, size.height * 0.36,
+        size.width * 0.58, size.height * -0.02,
+        size.width * 0.82, size.height * 0.16,
+      )
+      ..cubicTo(
+        size.width * 0.94, size.height * 0.23,
+        size.width, size.height * 0.18,
+        size.width, size.height * 0.12,
+      )
+      ..lineTo(size.width, 0)
+      ..lineTo(0, 0)
+      ..close();
+    canvas.drawPath(p1, Paint()..color = _C.waveDark);
+
+    final p2 = Path()
+      ..moveTo(0, size.height * 0.30)
+      ..cubicTo(
+        size.width * 0.32, size.height * 0.45,
+        size.width * 0.64, size.height * 0.16,
+        size.width, size.height * 0.28,
+      )
+      ..lineTo(size.width, 0)
+      ..lineTo(0, 0)
+      ..close();
+    canvas.drawPath(p2, Paint()..color = _C.waveDarkSoft.withOpacity(0.7));
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+}
+
+class _GlassCard extends StatelessWidget {
+  const _GlassCard({required this.child, this.padding = const EdgeInsets.all(18)});
+
+  final Widget child;
+  final EdgeInsets padding;
+
+  @override
+  Widget build(BuildContext context) {
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(20),
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 18, sigmaY: 18),
+        child: Container(
+          padding: padding,
+          decoration: BoxDecoration(
+            color: _C.glassFill,
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(color: _C.glassBorder, width: 0.8),
+          ),
+          child: child,
+        ),
+      ),
+    );
+  }
+}
+
+class _FieldLabel extends StatelessWidget {
+  const _FieldLabel(this.text);
+  final String text;
+
+  @override
+  Widget build(BuildContext context) {
+    return Text(text,
+        style: const TextStyle(color: _C.almond, fontSize: 12.5, fontWeight: FontWeight.w600));
+  }
+}
+
+class _HelperText extends StatelessWidget {
+  const _HelperText(this.text);
+  final String text;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(top: 4, bottom: 14),
+      child: Text(text, style: TextStyle(color: _C.almondMuted, fontSize: 11, height: 1.4)),
+    );
+  }
+}
+
+class _AuthField extends StatelessWidget {
+  const _AuthField({
+    required this.controller,
+    required this.hint,
+    this.icon,
+    this.obscure = false,
+    this.suffix,
+    this.keyboardType,
+    this.onChanged,
+  });
+
+  final TextEditingController controller;
+  final String hint;
+  final IconData? icon;
+  final bool obscure;
+  final Widget? suffix;
+  final TextInputType? keyboardType;
+  final ValueChanged<String>? onChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.only(top: 6),
+      decoration: BoxDecoration(
+        color: _C.fieldFill,
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: _C.fieldBorder, width: 0.8),
+      ),
+      child: TextField(
+        controller: controller,
+        obscureText: obscure,
+        keyboardType: keyboardType,
+        onChanged: onChanged,
+        style: const TextStyle(color: _C.almond, fontSize: 14),
+        decoration: InputDecoration(
+          hintText: hint,
+          hintStyle: TextStyle(color: _C.almondMuted.withOpacity(0.8), fontSize: 13.5),
+          prefixIcon: icon == null ? null : Icon(icon, size: 18, color: _C.almondSoft),
+          suffixIcon: suffix,
+          border: InputBorder.none,
+          contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
+        ),
+      ),
+    );
+  }
+}
+
+class _Chip extends StatelessWidget {
+  const _Chip({required this.label, required this.selected, required this.onTap});
+
+  final String label;
+  final bool selected;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 9, horizontal: 14),
+        decoration: BoxDecoration(
+          color: selected ? _C.rust : _C.fieldFill,
+          borderRadius: BorderRadius.circular(999),
+          border: Border.all(
+            color: selected ? _C.rust : _C.fieldBorder,
+            width: 0.8,
+          ),
+        ),
+        child: Text(
+          label,
+          textAlign: TextAlign.center,
+          style: TextStyle(
+            color: selected ? _C.ink : _C.almond,
+            fontSize: 12,
+            fontWeight: selected ? FontWeight.w600 : FontWeight.w400,
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _FieldDropdown extends StatelessWidget {
+  const _FieldDropdown({required this.value, required this.items, required this.onChanged});
+
+  final String value;
+  final List<String> items;
+  final ValueChanged<String?> onChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.only(top: 6),
+      padding: const EdgeInsets.symmetric(horizontal: 14),
+      decoration: BoxDecoration(
+        color: _C.fieldFill,
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: _C.fieldBorder, width: 0.8),
+      ),
+      child: DropdownButtonHideUnderline(
+        child: DropdownButton<String>(
+          value: value,
+          isExpanded: true,
+          dropdownColor: _C.waveDarkSoft,
+          style: const TextStyle(color: _C.almond, fontSize: 14),
+          icon: const Icon(Icons.keyboard_arrow_down, color: _C.almondSoft, size: 18),
+          items: items
+              .map((e) => DropdownMenuItem(value: e, child: Text(e)))
+              .toList(),
+          onChanged: onChanged,
+        ),
+      ),
+    );
+  }
+}
+
+enum _AnimalType { livestock, crops, both }
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
@@ -12,551 +233,527 @@ class RegisterScreen extends StatefulWidget {
 }
 
 class _RegisterScreenState extends State<RegisterScreen> {
-  final _formKey = GlobalKey<FormState>();
-  final _nameController = TextEditingController();
-  final _emailController = TextEditingController();
-  final _passwordController = TextEditingController();
-  final _confirmPasswordController = TextEditingController();
-  final _farmNameController = TextEditingController();
-  final _locationController = TextEditingController();
-
+  int _step = 0;
   bool _loading = false;
-  bool _obscurePassword = true;
-  bool _obscureConfirmPassword = true;
-  String? _errorMessage;
+  String? _error;
 
-  int _step = 1;
+  final _nameCtrl = TextEditingController();
+  final _emailCtrl = TextEditingController();
+  final _phoneCtrl = TextEditingController();
+  final _passCtrl = TextEditingController();
+  final _confirmCtrl = TextEditingController();
+  bool _obscurePass = true;
+  bool _agreedToTerms = false;
+  _AnimalType _farmerType = _AnimalType.livestock;
+  double _passwordStrength = 0;
 
-  @override
-  void initState() {
-    super.initState();
-    _passwordController.addListener(() => setState(() {}));
-  }
+  final _farmNameCtrl = TextEditingController();
+  final _locationCtrl = TextEditingController();
+  final _yearsCtrl = TextEditingController();
+  final Set<String> _animalsKept = {};
+  String _soilType = 'Sandy';
+  String _waterSource = 'Borehole';
 
   @override
   void dispose() {
-    _nameController.dispose();
-    _emailController.dispose();
-    _passwordController.dispose();
-    _confirmPasswordController.dispose();
-    _farmNameController.dispose();
-    _locationController.dispose();
+    _nameCtrl.dispose();
+    _emailCtrl.dispose();
+    _phoneCtrl.dispose();
+    _passCtrl.dispose();
+    _confirmCtrl.dispose();
+    _farmNameCtrl.dispose();
+    _locationCtrl.dispose();
+    _yearsCtrl.dispose();
     super.dispose();
   }
 
-  Future<void> _register() async {
-    if (!_formKey.currentState!.validate()) return;
+  void _scorePassword(String value) {
+    double score = 0;
+    if (value.length >= 8) score += 1;
+    if (RegExp(r'[0-9]').hasMatch(value)) score += 1;
+    if (RegExp(r'[A-Z]').hasMatch(value)) score += 1;
+    setState(() => _passwordStrength = score);
+  }
 
+  bool _validateStep1() {
+    if (_nameCtrl.text.trim().isEmpty) {
+      setState(() => _error = 'Enter your full name.');
+      return false;
+    }
+    if (!_emailCtrl.text.contains('@')) {
+      setState(() => _error = 'Enter a valid email address.');
+      return false;
+    }
+    if (_passCtrl.text.length < 8) {
+      setState(() => _error = 'Password needs at least 8 characters.');
+      return false;
+    }
+    if (_passCtrl.text != _confirmCtrl.text) {
+      setState(() => _error = "Passwords don't match.");
+      return false;
+    }
+    if (!_agreedToTerms) {
+      setState(() => _error = 'Please accept the terms to continue.');
+      return false;
+    }
+    setState(() => _error = null);
+    return true;
+  }
+
+  void _goToStep2() {
+    if (_validateStep1()) setState(() => _step = 1);
+  }
+
+  Future<void> _completeRegistration({bool skipFarmDetails = false}) async {
     setState(() {
       _loading = true;
-      _errorMessage = null;
+      _error = null;
     });
-
     try {
-      final credential = await FirebaseAuth.instance
-          .createUserWithEmailAndPassword(
-        email: _emailController.text.trim(),
-        password: _passwordController.text,
+      final credential = await FirebaseAuth.instance.createUserWithEmailAndPassword(
+        email: _emailCtrl.text.trim(),
+        password: _passCtrl.text,
       );
-
-      await credential.user?.updateDisplayName(_nameController.text.trim());
-
-      await FirebaseFirestore.instance
-          .collection('users')
-          .doc(credential.user!.uid)
-          .set({
-        'name': _nameController.text.trim(),
-        'email': _emailController.text.trim(),
-        'farmName': _farmNameController.text.trim(),
-        'location': _locationController.text.trim(),
-        'diagnosisCount': 0,
-        'postCount': 0,
-        'createdAt': FieldValue.serverTimestamp(),
-      });
-
-      if (mounted) {
-        Navigator.of(context).pushReplacement(
-          MaterialPageRoute(builder: (_) => const ShellScreen()),
-        );
+      final uid = credential.user?.uid;
+      if (uid != null) {
+        await FirebaseFirestore.instance.collection('users').doc(uid).set({
+          'name': _nameCtrl.text.trim(),
+          'email': _emailCtrl.text.trim(),
+          'phone': _phoneCtrl.text.trim(),
+          'farmerType': _farmerType.name,
+          'farmName': skipFarmDetails ? '' : _farmNameCtrl.text.trim(),
+          'location': skipFarmDetails ? '' : _locationCtrl.text.trim(),
+          'animalsKept': skipFarmDetails ? <String>[] : _animalsKept.toList(),
+          'soilType': skipFarmDetails ? '' : _soilType,
+          'waterSource': skipFarmDetails ? '' : _waterSource,
+          'yearsFarming': skipFarmDetails ? '' : _yearsCtrl.text.trim(),
+          'createdAt': FieldValue.serverTimestamp(),
+        });
       }
+      if (!mounted) return;
+      Navigator.of(context).pushAndRemoveUntil(
+        MaterialPageRoute(builder: (_) => const HomeScreen()),
+        (route) => false,
+      );
     } on FirebaseAuthException catch (e) {
       setState(() {
-        _errorMessage = _mapError(e.code);
-        _step = 1;
+        _step = 0;
+        _error = _authErrorMessage(e);
       });
+    } catch (e) {
+      setState(() => _error = 'Something went wrong creating your account.');
     } finally {
       if (mounted) setState(() => _loading = false);
     }
   }
 
-  String _mapError(String code) {
-    switch (code) {
+  String _authErrorMessage(FirebaseAuthException e) {
+    switch (e.code) {
       case 'email-already-in-use':
-        return 'An account with this email already exists.';
+        return 'An account with that email already exists.';
       case 'invalid-email':
-        return 'Please enter a valid email address.';
+        return 'Invalid email address.';
       case 'weak-password':
-        return 'Password must be at least 8 characters.';
+        return 'Choose a stronger password.';
       default:
-        return 'Registration failed. Please try again.';
-    }
-  }
-
-  void _nextStep() {
-    if (_step == 1) {
-      final nameValid = _nameController.text.trim().isNotEmpty;
-      final emailValid = _emailController.text.contains('@');
-      final passValid = _passwordController.text.length >= 8;
-
-      if (!nameValid || !emailValid || !passValid) {
-        _formKey.currentState!.validate();
-        return;
-      }
-      setState(() => _step = 2);
+        return e.message ?? 'Could not create your account. Try again.';
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.greenDark,
-      body: SafeArea(
-        child: Column(
-          children: [
-            // Top section
-            Padding(
-              padding: const EdgeInsets.fromLTRB(24, 32, 24, 32),
+      backgroundColor: _C.bgDark,
+      body: Stack(
+        children: [
+          Positioned(
+            top: 0,
+            left: 0,
+            right: 0,
+            height: 220,
+            child: CustomPaint(painter: _FieldWavesPainter()),
+          ),
+          SafeArea(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.fromLTRB(20, 20, 20, 28),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Row(
                     children: [
-                      GestureDetector(
-                        onTap: _step == 2
-                            ? () => setState(() => _step = 1)
-                            : () => Navigator.of(context).pop(),
+                      InkWell(
+                        onTap: () {
+                          if (_step == 1) {
+                            setState(() => _step = 0);
+                          } else {
+                            Navigator.of(context).pop();
+                          }
+                        },
+                        borderRadius: BorderRadius.circular(17),
                         child: Container(
-                          width: 40,
-                          height: 40,
-                          decoration: BoxDecoration(
-                            color: Colors.white.withOpacity(0.1),
-                            borderRadius: BorderRadius.circular(12),
+                          width: 34,
+                          height: 34,
+                          decoration: const BoxDecoration(
+                            color: _C.fieldFill,
+                            shape: BoxShape.circle,
                           ),
-                          child: const Icon(
-                            Icons.arrow_back_rounded,
-                            color: Colors.white,
-                            size: 20,
-                          ),
+                          child: const Icon(Icons.arrow_back, size: 16, color: _C.almond),
                         ),
                       ),
                       const Spacer(),
-                      _StepIndicator(current: _step, total: 2),
+                      Text('Step ${_step + 1} of 2',
+                          style: TextStyle(color: _C.almondSoft, fontSize: 12)),
                     ],
                   ),
-                  const SizedBox(height: 24),
+                  const SizedBox(height: 18),
                   Text(
-                    _step == 1 ? 'Create account' : 'Your farm',
+                    _step == 0 ? 'Create your account' : 'Tell us about your farm',
                     style: const TextStyle(
-                      fontSize: 26,
-                      fontWeight: FontWeight.w600,
-                      color: Colors.white,
-                      letterSpacing: -0.5,
-                    ),
+                        color: _C.almond, fontSize: 22, fontWeight: FontWeight.w600),
                   ),
-                  const SizedBox(height: 6),
+                  const SizedBox(height: 4),
                   Text(
-                    _step == 1
-                        ? 'Set up your AgroLens account'
-                        : 'Tell us about your farm (optional)',
-                    style: const TextStyle(
-                      fontSize: 14,
-                      color: AppColors.greenHint,
-                    ),
+                    _step == 0
+                        ? 'Tell us a bit about you so AgroLens can tailor diagnosis and alerts to your farm.'
+                        : 'This tunes which disease guides, questions and alerts you see — you can edit it later from your profile.',
+                    style: TextStyle(color: _C.almondSoft, fontSize: 13, height: 1.5),
                   ),
-                ],
-              ),
-            ),
-
-            // Form section
-            Expanded(
-              child: Container(
-                decoration: const BoxDecoration(
-                  color: AppColors.background,
-                  borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
-                ),
-                child: SingleChildScrollView(
-                  padding: const EdgeInsets.all(24),
-                  child: Form(
-                    key: _formKey,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                  const SizedBox(height: 18),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Container(height: 4, decoration: BoxDecoration(
+                            color: _C.rust, borderRadius: BorderRadius.circular(999))),
+                      ),
+                      const SizedBox(width: 6),
+                      Expanded(
+                        child: Container(
+                          height: 4,
+                          decoration: BoxDecoration(
+                            color: _step == 1 ? _C.rust : _C.fieldBorder,
+                            borderRadius: BorderRadius.circular(999),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 18),
+                  _GlassCard(
+                    child: _step == 0 ? _buildStep1() : _buildStep2(),
+                  ),
+                  if (_step == 0) ...[
+                    const SizedBox(height: 18),
+                    Row(
                       children: [
-                        const SizedBox(height: 8),
-
-                        // Error banner
-                        if (_errorMessage != null) ...[
-                          Container(
-                            padding: const EdgeInsets.all(14),
-                            decoration: BoxDecoration(
-                              color: AppColors.redLight,
-                              borderRadius: BorderRadius.circular(12),
-                              border: Border.all(
-                                color: AppColors.red.withOpacity(0.3),
-                              ),
-                            ),
-                            child: Text(
-                              _errorMessage!,
-                              style: const TextStyle(
-                                color: AppColors.red,
-                                fontSize: 13,
-                              ),
-                            ),
-                          ),
-                          const SizedBox(height: 20),
-                        ],
-
-                        // Account 
-                        if (_step == 1) ...[
-                          const _FieldLabel(label: 'Full name'),
-                          const SizedBox(height: 6),
-                          TextFormField(
-                            controller: _nameController,
-                            textInputAction: TextInputAction.next,
-                            textCapitalization: TextCapitalization.words,
-                            validator: (v) => v == null || v.trim().isEmpty
-                                ? 'Please enter your name'
-                                : null,
-                            decoration: const InputDecoration(
-                              hintText: 'Enter Your Full Name',
-                              prefixIcon: Icon(Icons.person_outline_rounded),
-                            ),
-                          ),
-                          const SizedBox(height: 18),
-
-                          const _FieldLabel(label: 'Email address'),
-                          const SizedBox(height: 6),
-                          TextFormField(
-                            controller: _emailController,
-                            keyboardType: TextInputType.emailAddress,
-                            textInputAction: TextInputAction.next,
-                            autocorrect: false,
-                            validator: (v) {
-                              if (v == null || v.trim().isEmpty) {
-                                return 'Please enter your email';
-                              }
-                              if (!v.contains('@')) {
-                                return 'Please enter a valid email';
-                              }
-                              return null;
-                            },
-                            decoration: const InputDecoration(
-                              hintText: 'Enter Your Email',
-                              prefixIcon: Icon(Icons.mail_outline_rounded),
-                            ),
-                          ),
-                          const SizedBox(height: 18),
-
-                          const _FieldLabel(label: 'Password'),
-                          const SizedBox(height: 6),
-                          TextFormField(
-                            controller: _passwordController,
-                            obscureText: _obscurePassword,
-                            textInputAction: TextInputAction.next,
-                            validator: (v) {
-                              if (v == null || v.isEmpty) {
-                                return 'Please enter a password';
-                              }
-                              if (v.length < 8) {
-                                return 'At least 8 characters required';
-                              }
-                              if (!v.contains(RegExp(r'[A-Z]'))) {
-                                return 'Include at least one uppercase letter';
-                              }
-                              if (!v.contains(RegExp(r'[0-9]'))) {
-                                return 'Include at least one number';
-                              }
-                              if (!v.contains(
-                                  RegExp(r'[!@#\$%^&*(),.?":{}|<>]'))) {
-                                return 'Include at least one special character';
-                              }
-                              return null;
-                            },
-                            decoration: InputDecoration(
-                              hintText: 'Enter Your Password',
-                              prefixIcon: const Icon(Icons.lock_outline_rounded),
-                              suffixIcon: IconButton(
-                                icon: Icon(
-                                  _obscurePassword
-                                      ? Icons.visibility_off_outlined
-                                      : Icons.visibility_outlined,
-                                ),
-                                onPressed: () => setState(
-                                    () => _obscurePassword = !_obscurePassword),
-                              ),
-                            ),
-                          ),
-                          const SizedBox(height: 10),
-
-                          _PasswordStrengthBar(
-                              password: _passwordController.text),
-                          const SizedBox(height: 18),
-
-                          const _FieldLabel(label: 'Confirm password'),
-                          const SizedBox(height: 6),
-                          TextFormField(
-                            controller: _confirmPasswordController,
-                            obscureText: _obscureConfirmPassword,
-                            textInputAction: TextInputAction.done,
-                            validator: (v) {
-                              if (v == null || v.isEmpty) {
-                                return 'Please confirm your password';
-                              }
-                              if (v != _passwordController.text) {
-                                return 'Passwords do not match';
-                              }
-                              return null;
-                            },
-                            decoration: InputDecoration(
-                              hintText: 'Confirm Your Password',
-                              prefixIcon: const Icon(Icons.lock_outline_rounded),
-                              suffixIcon: IconButton(
-                                icon: Icon(
-                                  _obscureConfirmPassword
-                                      ? Icons.visibility_off_outlined
-                                      : Icons.visibility_outlined,
-                                ),
-                                onPressed: () => setState(() =>
-                                    _obscureConfirmPassword =
-                                        !_obscureConfirmPassword),
-                              ),
-                            ),
-                          ),
-                          const SizedBox(height: 28),
-
-                          SizedBox(
-                            width: double.infinity,
-                            child: ElevatedButton(
-                              onPressed: _nextStep,
-                              child: const Text('Continue'),
-                            ),
-                          ),
-                        ],
-
-                        // Farm details 
-                        if (_step == 2) ...[
-                          const _FieldLabel(label: 'Farm name'),
-                          const SizedBox(height: 6),
-                          TextFormField(
-                            controller: _farmNameController,
-                            textInputAction: TextInputAction.next,
-                            textCapitalization: TextCapitalization.words,
-                            decoration: const InputDecoration(
-                              hintText: 'Tshimologo Farm',
-                              prefixIcon: Icon(Icons.home_work_outlined),
-                            ),
-                          ),
-                          const SizedBox(height: 18),
-
-                          const _FieldLabel(label: 'Location'),
-                          const SizedBox(height: 6),
-                          TextFormField(
-                            controller: _locationController,
-                            textInputAction: TextInputAction.done,
-                            textCapitalization: TextCapitalization.words,
-                            decoration: const InputDecoration(
-                              hintText: 'e.g. Gaborone South',
-                              prefixIcon: Icon(Icons.location_on_outlined),
-                            ),
-                          ),
-                          const SizedBox(height: 12),
-
-                          const Text(
-                            'You can update these details later from your profile.',
-                            style: TextStyle(
-                              fontSize: 12,
-                              color: AppColors.textSecondary,
-                            ),
-                          ),
-                          const SizedBox(height: 28),
-
-                          SizedBox(
-                            width: double.infinity,
-                            child: ElevatedButton(
-                              onPressed: _loading ? null : _register,
-                              child: _loading
-                                  ? const SizedBox(
-                                      height: 20,
-                                      width: 20,
-                                      child: CircularProgressIndicator(
-                                        strokeWidth: 2,
-                                        color: Colors.white,
-                                      ),
-                                    )
-                                  : const Text('Create account'),
-                            ),
-                          ),
-                        ],
-
-                        const SizedBox(height: 20),
-
-                        // Login link (step 1 only)
-                        if (_step == 1)
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
+                        Expanded(child: Divider(color: _C.fieldBorder, height: 0.8)),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 10),
+                          child: Text('or continue with',
+                              style: TextStyle(color: _C.almondMuted, fontSize: 11)),
+                        ),
+                        Expanded(child: Divider(color: _C.fieldBorder, height: 0.8)),
+                      ],
+                    ),
+                    const SizedBox(height: 14),
+                    Row(
+                      children: [
+                        Expanded(child: _SocialButton(icon: Icons.g_mobiledata, label: 'Google', onTap: () {})),
+                        const SizedBox(width: 10),
+                        Expanded(child: _SocialButton(icon: Icons.phone_outlined, label: 'Phone', onTap: () {})),
+                      ],
+                    ),
+                    const SizedBox(height: 20),
+                    Center(
+                      child: GestureDetector(
+                        onTap: () => Navigator.of(context).pop(),
+                        child: RichText(
+                          text: TextSpan(
+                            style: TextStyle(color: _C.almondSoft, fontSize: 12.5),
                             children: [
-                              const Text(
-                                'Already have an account? ',
-                                style: TextStyle(
-                                  color: AppColors.textSecondary,
-                                  fontSize: 14,
-                                ),
-                              ),
-                              GestureDetector(
-                                onTap: () => Navigator.of(context).pop(),
-                                child: const Text(
-                                  'Sign in',
-                                  style: TextStyle(
-                                    color: AppColors.greenDark,
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                ),
+                              const TextSpan(text: 'Already have an account? '),
+                              TextSpan(
+                                text: 'Log in',
+                                style: const TextStyle(color: _C.almond, fontWeight: FontWeight.w600),
                               ),
                             ],
                           ),
-
-                        const SizedBox(height: 24),
-                      ],
+                        ),
+                      ),
                     ),
-                  ),
-                ),
+                  ],
+                ],
               ),
             ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class _FieldLabel extends StatelessWidget {
-  final String label;
-  const _FieldLabel({required this.label});
-
-  @override
-  Widget build(BuildContext context) {
-    return Text(
-      label,
-      style: const TextStyle(
-        fontSize: 13,
-        fontWeight: FontWeight.w500,
-        color: AppColors.textPrimary,
-      ),
-    );
-  }
-}
-
-class _StepIndicator extends StatelessWidget {
-  final int current;
-  final int total;
-  const _StepIndicator({required this.current, required this.total});
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      children: List.generate(total, (i) {
-        final active = i + 1 == current;
-        return Container(
-          margin: const EdgeInsets.only(left: 6),
-          width: active ? 24 : 8,
-          height: 8,
-          decoration: BoxDecoration(
-            color: active
-                ? AppColors.greenMid
-                : Colors.white.withOpacity(0.3),
-            borderRadius: BorderRadius.circular(4),
           ),
-        );
-      }),
+        ],
+      ),
     );
   }
-}
 
-class _PasswordStrengthBar extends StatelessWidget {
-  final String password;
-  const _PasswordStrengthBar({required this.password});
-
-  int get _strength {
-    int score = 0;
-    if (password.length >= 8) score++;
-    if (password.contains(RegExp(r'[A-Z]'))) score++;
-    if (password.contains(RegExp(r'[0-9]'))) score++;
-    if (password.contains(RegExp(r'[!@#\$%^&*(),.?":{}|<>]'))) score++;
-    return score;
-  }
-
-  Color get _color {
-    switch (_strength) {
-      case 1:
-        return AppColors.red;
-      case 2:
-        return AppColors.amber;
-      case 3:
-        return Colors.orange;
-      case 4:
-        return AppColors.greenMid;
-      default:
-        return AppColors.border;
-    }
-  }
-
-  String get _label {
-    switch (_strength) {
-      case 1:
-        return 'Weak';
-      case 2:
-        return 'Fair';
-      case 3:
-        return 'Good';
-      case 4:
-        return 'Strong';
-      default:
-        return '';
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    if (password.isEmpty) return const SizedBox.shrink();
+  Widget _buildStep1() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        const _FieldLabel('Full name'),
+        _AuthField(controller: _nameCtrl, hint: 'Jane Doe', icon: Icons.person_outline),
+   
+        const _FieldLabel('Email address'),
+        _AuthField(
+          controller: _emailCtrl,
+          hint: 'name@email.com',
+          icon: Icons.mail_outline,
+          keyboardType: TextInputType.emailAddress,
+        ),
+
+        const _FieldLabel('Phone number'),
+        _AuthField(
+          controller: _phoneCtrl,
+          hint: '+267 71 234 567',
+          icon: Icons.phone_outlined,
+          keyboardType: TextInputType.phone,
+        ),
+        const _HelperText('Optional.'),
+
+        const _FieldLabel('Password'),
+        _AuthField(
+          controller: _passCtrl,
+          hint: 'Create a password',
+          icon: Icons.lock_outline,
+          obscure: _obscurePass,
+          onChanged: _scorePassword,
+          suffix: IconButton(
+            icon: Icon(
+              _obscurePass ? Icons.visibility_outlined : Icons.visibility_off_outlined,
+              size: 18,
+              color: _C.almondSoft,
+            ),
+            onPressed: () => setState(() => _obscurePass = !_obscurePass),
+          ),
+        ),
+        const SizedBox(height: 6),
         Row(
-          children: List.generate(4, (i) {
+          children: List.generate(3, (i) {
+            final filled = i < _passwordStrength;
             return Expanded(
               child: Container(
-                margin: const EdgeInsets.only(right: 4),
-                height: 4,
+                margin: EdgeInsets.only(right: i == 2 ? 0 : 4),
+                height: 3,
                 decoration: BoxDecoration(
-                  color: i < _strength ? _color : AppColors.border,
-                  borderRadius: BorderRadius.circular(2),
+                  color: filled ? _C.rust : _C.fieldBorder,
+                  borderRadius: BorderRadius.circular(999),
                 ),
               ),
             );
           }),
         ),
-        if (_label.isNotEmpty) ...[
-          const SizedBox(height: 4),
-          Text(
-            _label,
-            style: TextStyle(
-              fontSize: 12,
-              color: _color,
-              fontWeight: FontWeight.w500,
+        _HelperText(
+          _passwordStrength <= 1
+              ? 'At least 8 characters, 1 number. Strength: weak.'
+              : _passwordStrength == 2
+                  ? 'At least 8 characters, 1 number. Strength: fair.'
+                  : 'At least 8 characters, 1 number. Strength: strong.',
+        ),
+
+        const _FieldLabel('Confirm password'),
+        _AuthField(controller: _confirmCtrl, hint: 'Repeat your password', icon: Icons.lock_outline, obscure: true),
+        const SizedBox(height: 14),
+
+        const _FieldLabel('I farm'),
+        const SizedBox(height: 8),
+        Row(
+          children: [
+            Expanded(
+              child: _Chip(
+                label: 'Livestock',
+                selected: _farmerType == _AnimalType.livestock,
+                onTap: () => setState(() => _farmerType = _AnimalType.livestock),
+              ),
             ),
-          ),
+            const SizedBox(width: 8),
+            Expanded(
+              child: _Chip(
+                label: 'Crops',
+                selected: _farmerType == _AnimalType.crops,
+                onTap: () => setState(() => _farmerType = _AnimalType.crops),
+              ),
+            ),
+            const SizedBox(width: 8),
+            Expanded(
+              child: _Chip(
+                label: 'Both',
+                selected: _farmerType == _AnimalType.both,
+                onTap: () => setState(() => _farmerType = _AnimalType.both),
+              ),
+            ),
+          ],
+        ),
+        const _HelperText("Sets which disease guides and questions you'll see first."),
+
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            SizedBox(
+              width: 22,
+              height: 22,
+              child: Checkbox(
+                value: _agreedToTerms,
+                onChanged: (v) => setState(() => _agreedToTerms = v ?? false),
+                fillColor: WidgetStateProperty.resolveWith(
+                  (states) => states.contains(WidgetState.selected) ? _C.rust : _C.fieldFill,
+                ),
+                side: const BorderSide(color: _C.fieldBorder, width: 0.8),
+              ),
+            ),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Text(
+                'I agree to the Terms of Service and Privacy Policy, and to receive farm alerts by email.',
+                style: TextStyle(color: _C.almondSoft, fontSize: 11.5, height: 1.5),
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 16),
+        if (_error != null) ...[
+          Text(_error!, style: const TextStyle(color: Color(0xFFE2A07A), fontSize: 12)),
+          const SizedBox(height: 8),
         ],
+        SizedBox(
+          width: double.infinity,
+          child: ElevatedButton(
+            onPressed: _goToStep2,
+            style: ElevatedButton.styleFrom(
+              backgroundColor: _C.rust,
+              foregroundColor: _C.ink,
+              padding: const EdgeInsets.symmetric(vertical: 14),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            ),
+            child: const Text('Continue', style: TextStyle(fontWeight: FontWeight.w600)),
+          ),
+        ),
       ],
+    );
+  }
+
+  Widget _buildStep2() {
+    const animalOptions = ['Cattle', 'Goats', 'Poultry', 'Sheep'];
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const _FieldLabel('Farm name'),
+        _AuthField(controller: _farmNameCtrl, hint: 'Tshimologo Farm', icon: Icons.home_work_outlined),
+        const _HelperText('Optional. Shown on your profile, not searchable by others.'),
+
+        const _FieldLabel('Location'),
+        _AuthField(controller: _locationCtrl, hint: 'Maun, Botswana', icon: Icons.location_on_outlined),
+        const _HelperText('Matches you to nearby outbreak alerts and farmers.'),
+
+        const _FieldLabel('Animals kept'),
+        const SizedBox(height: 8),
+        Wrap(
+          spacing: 8,
+          runSpacing: 8,
+          children: animalOptions.map((a) {
+            final selected = _animalsKept.contains(a);
+            return _Chip(
+              label: a,
+              selected: selected,
+              onTap: () => setState(() {
+                selected ? _animalsKept.remove(a) : _animalsKept.add(a);
+              }),
+            );
+          }).toList(),
+        ),
+        const _HelperText('Select any that apply. Sharpens your diagnosis suggestions.'),
+
+        const _FieldLabel('Soil type'),
+        _FieldDropdown(
+          value: _soilType,
+          items: const ['Sandy', 'Clay', 'Loam', 'Not sure'],
+          onChanged: (v) => setState(() => _soilType = v ?? _soilType),
+        ),
+        const _HelperText('Helps flag crop risks common to your soil.'),
+
+        const _FieldLabel('Water source'),
+        _FieldDropdown(
+          value: _waterSource,
+          items: const ['Borehole', 'River or dam', 'Municipal', 'Rain-fed only'],
+          onChanged: (v) => setState(() => _waterSource = v ?? _waterSource),
+        ),
+        const _HelperText('Some diseases spread fastest through shared water.'),
+
+        const _FieldLabel('Years farming'),
+        _AuthField(
+          controller: _yearsCtrl,
+          hint: 'e.g. 5',
+          icon: Icons.calendar_today_outlined,
+          keyboardType: TextInputType.number,
+        ),
+        const _HelperText("Optional. Just helps us calibrate guidance for beginners vs veterans."),
+
+        if (_error != null) ...[
+          Text(_error!, style: const TextStyle(color: Color(0xFFE2A07A), fontSize: 12)),
+          const SizedBox(height: 8),
+        ],
+        SizedBox(
+          width: double.infinity,
+          child: ElevatedButton(
+            onPressed: _loading ? null : () => _completeRegistration(),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: _C.rust,
+              foregroundColor: _C.ink,
+              padding: const EdgeInsets.symmetric(vertical: 14),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            ),
+            child: _loading
+                ? const SizedBox(
+                    height: 18, width: 18,
+                    child: CircularProgressIndicator(strokeWidth: 2, color: _C.ink),
+                  )
+                : const Text('Finish setting up', style: TextStyle(fontWeight: FontWeight.w600)),
+          ),
+        ),
+        const SizedBox(height: 6),
+        Center(
+          child: TextButton(
+            onPressed: _loading ? null : () => _completeRegistration(skipFarmDetails: true),
+            child: Text("Skip for now, I'll fill this in later",
+                style: TextStyle(color: _C.almondSoft, fontSize: 12.5)),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _SocialButton extends StatelessWidget {
+  const _SocialButton({required this.icon, required this.label, required this.onTap});
+
+  final IconData icon;
+  final String label;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(12),
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 12),
+        decoration: BoxDecoration(
+          color: _C.fieldFill,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: _C.fieldBorder, width: 0.8),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(icon, size: 18, color: _C.almond),
+            const SizedBox(width: 6),
+            Text(label, style: TextStyle(color: _C.almond, fontSize: 12.5)),
+          ],
+        ),
+      ),
     );
   }
 }

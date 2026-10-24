@@ -1,13 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import '../main.dart';
 import 'make_pal_screen.dart';
 import 'pal_requests_screen.dart';
 import 'pals_screen.dart';
 import 'blocked_list_screen.dart';
 import 'notifications_screen.dart';
 import 'messaging_screen.dart';
+
+/// Matcha accent used for icons and badge fills — restyled from the
+/// original AppColors.greenDark to match the new palette.
+class _C {
+  static const matcha = Color(0xFF5C7148);
+  static const rust = Color(0xFFC1703E);
+  static const almond = Color(0xFFF6EFE2);
+  static const ink = Color(0xFF2B2820);
+  static const inkSoft = Color(0xFF726C5C);
+}
 
 class ProfileSocialMenu extends StatelessWidget {
   final Color cardColor;
@@ -27,7 +36,7 @@ class ProfileSocialMenu extends StatelessWidget {
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       decoration: BoxDecoration(
         color: cardColor,
-        borderRadius: BorderRadius.circular(AppRadius.card),
+        borderRadius: BorderRadius.circular(16),
         border: Border.all(color: borderColor),
       ),
       child: Column(
@@ -154,7 +163,7 @@ class _MenuRow extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
         child: Row(
           children: [
-            Icon(icon, size: 20, color: AppColors.greenDark),
+            Icon(icon, size: 20, color: _C.matcha),
             const SizedBox(width: 16),
             Expanded(
               child: Text(
@@ -162,7 +171,7 @@ class _MenuRow extends StatelessWidget {
                 style: const TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.w500,
-                  color: AppColors.textPrimary,
+                  color: _C.ink,
                 ),
               ),
             ),
@@ -173,7 +182,7 @@ class _MenuRow extends StatelessWidget {
                   final count = snap.data ?? 0;
                   if (count == 0 && !showCountAlways) {
                     return const Icon(Icons.chevron_right_rounded,
-                        color: AppColors.textSecondary, size: 20);
+                        color: _C.inkSoft, size: 20);
                   }
                   return Row(
                     mainAxisSize: MainAxisSize.min,
@@ -184,7 +193,7 @@ class _MenuRow extends StatelessWidget {
                         decoration: BoxDecoration(
                           color: showCountAlways
                               ? borderColor.withOpacity(0.5)
-                              : AppColors.greenDark,
+                              : _C.rust,
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: Text(
@@ -192,22 +201,20 @@ class _MenuRow extends StatelessWidget {
                           style: TextStyle(
                             fontSize: 12,
                             fontWeight: FontWeight.w600,
-                            color: showCountAlways
-                                ? AppColors.textSecondary
-                                : Colors.white,
+                            color: showCountAlways ? _C.inkSoft : _C.almond,
                           ),
                         ),
                       ),
                       const SizedBox(width: 6),
                       const Icon(Icons.chevron_right_rounded,
-                          color: AppColors.textSecondary, size: 20),
+                          color: _C.inkSoft, size: 20),
                     ],
                   );
                 },
               )
             else
               const Icon(Icons.chevron_right_rounded,
-                  color: AppColors.textSecondary, size: 20),
+                  color: _C.inkSoft, size: 20),
           ],
         ),
       ),

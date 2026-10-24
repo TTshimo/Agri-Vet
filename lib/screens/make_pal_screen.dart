@@ -1,8 +1,40 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import '../main.dart';
 import 'user_profile_screen.dart';
+
+/// AgroLens palette — matcha green / almond / white, light module variant.
+class _C {
+  static const matchaDark = Color(0xFF374530);
+  static const matcha = Color(0xFF5C7148);
+  static const matchaLight = Color(0xFFD6E0C4);
+  static const almond = Color(0xFFF6EFE2);
+  static const ink = Color(0xFF2B2820);
+  static const inkSoft = Color(0xFF726C5C);
+  static const rust = Color(0xFFC1703E);
+  static const hairline = Color(0xFFEDE6D6);
+}
+
+/// Bottom wave finishing off the dark matcha header band — same shape
+/// used across the other restyled screens for a consistent silhouette.
+class _HeaderWaveClipper extends CustomClipper<Path> {
+  @override
+  Path getClip(Size size) {
+    final path = Path()
+      ..lineTo(0, size.height * 0.68)
+      ..cubicTo(
+        size.width * 0.32, size.height,
+        size.width * 0.66, size.height * 0.44,
+        size.width, size.height * 0.72,
+      )
+      ..lineTo(size.width, 0)
+      ..close();
+    return path;
+  }
+
+  @override
+  bool shouldReclip(covariant CustomClipper<Path> oldClipper) => false;
+}
 
 enum _RowState {
   loading,
@@ -39,86 +71,85 @@ class _MakePalScreenState extends State<MakePalScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: _C.almond,
       body: CustomScrollView(
         slivers: [
           SliverToBoxAdapter(
-            child: Container(
-              color: AppColors.greenDark,
-              padding: EdgeInsets.fromLTRB(
-                16,
-                MediaQuery.of(context).padding.top + 8,
-                16,
-                16,
-              ),
-              child: Column(
-                children: [
-                  Row(
-                    children: [
-                      IconButton(
-                        icon: const Icon(Icons.arrow_back_ios_new_rounded,
-                            color: Colors.white, size: 20),
-                        onPressed: () => Navigator.pop(context),
-                      ),
-                      const Expanded(
-                        child: Text(
-                          'Make a Pal',
-                          style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.w600,
-                            color: Colors.white,
+            child: ClipPath(
+              clipper: _HeaderWaveClipper(),
+              child: Container(
+                color: _C.matchaDark,
+                padding: EdgeInsets.fromLTRB(
+                  16,
+                  MediaQuery.of(context).padding.top + 8,
+                  16,
+                  36,
+                ),
+                child: Column(
+                  children: [
+                    Row(
+                      children: [
+                        IconButton(
+                          padding: EdgeInsets.zero,
+                          icon: Icon(Icons.arrow_back_ios_new_rounded,
+                              color: _C.almond, size: 18),
+                          onPressed: () => Navigator.pop(context),
+                        ),
+                        Expanded(
+                          child: Text(
+                            'Make a pal',
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              fontSize: 17,
+                              fontWeight: FontWeight.w600,
+                              color: _C.almond,
+                            ),
                           ),
                         ),
-                      ),
-                      const SizedBox(width: 40), // balance the back button
-                    ],
-                  ),
-                  const SizedBox(height: 4),
-                  const Padding(
-                    padding: EdgeInsets.only(left: 4, bottom: 12),
-                    child: Align(
-                      alignment: Alignment.centerLeft,
+                        const SizedBox(width: 34),
+                      ],
+                    ),
+                    const SizedBox(height: 4),
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: 12),
                       child: Text(
                         'Find other farmers to connect with',
-                        style: TextStyle(
-                          fontSize: 13,
-                          color: AppColors.greenHint,
+                        style: TextStyle(fontSize: 12.5, color: _C.matchaLight),
+                      ),
+                    ),
+                    TextField(
+                      controller: _searchController,
+                      style: TextStyle(color: _C.almond, fontSize: 14),
+                      decoration: InputDecoration(
+                        hintText: 'Search farmers...',
+                        hintStyle: TextStyle(
+                            color: _C.almond.withOpacity(0.5), fontSize: 14),
+                        prefixIcon: Icon(Icons.search,
+                            color: _C.almond.withOpacity(0.6), size: 20),
+                        suffixIcon: _query.isNotEmpty
+                            ? GestureDetector(
+                                onTap: () {
+                                  _searchController.clear();
+                                  setState(() => _query = '');
+                                },
+                                child: Icon(Icons.close,
+                                    color: _C.almond.withOpacity(0.6),
+                                    size: 18),
+                              )
+                            : null,
+                        filled: true,
+                        fillColor: Colors.white.withOpacity(0.12),
+                        contentPadding: const EdgeInsets.symmetric(
+                            horizontal: 14, vertical: 10),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: BorderSide.none,
                         ),
                       ),
+                      onChanged: (v) => setState(() => _query = v),
                     ),
-                  ),
-                  TextField(
-                    controller: _searchController,
-                    style: const TextStyle(color: Colors.white, fontSize: 14),
-                    decoration: InputDecoration(
-                      hintText: 'Search farmers...',
-                      hintStyle: TextStyle(
-                          color: Colors.white.withOpacity(0.5), fontSize: 14),
-                      prefixIcon: Icon(Icons.search,
-                          color: Colors.white.withOpacity(0.6), size: 20),
-                      suffixIcon: _query.isNotEmpty
-                          ? GestureDetector(
-                              onTap: () {
-                                _searchController.clear();
-                                setState(() => _query = '');
-                              },
-                              child: Icon(Icons.close,
-                                  color: Colors.white.withOpacity(0.6),
-                                  size: 18),
-                            )
-                          : null,
-                      filled: true,
-                      fillColor: Colors.white.withOpacity(0.12),
-                      contentPadding: const EdgeInsets.symmetric(
-                          horizontal: 14, vertical: 10),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(10),
-                        borderSide: BorderSide.none,
-                      ),
-                    ),
-                    onChanged: (v) => setState(() => _query = v),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
           ),
@@ -140,10 +171,9 @@ class _MakePalScreenState extends State<MakePalScreen> {
                     .snapshots(),
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
-                    return const SliverFillRemaining(
+                    return SliverFillRemaining(
                       child: Center(
-                        child: CircularProgressIndicator(
-                            color: AppColors.greenDark),
+                        child: CircularProgressIndicator(color: _C.matcha),
                       ),
                     );
                   }
@@ -166,18 +196,28 @@ class _MakePalScreenState extends State<MakePalScreen> {
                         child: Column(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            Icon(
-                              Icons.people_outline_rounded,
-                              size: 48,
-                              color: AppColors.textSecondary.withOpacity(0.4),
+                            Container(
+                              width: 64,
+                              height: 64,
+                              decoration: BoxDecoration(
+                                color: _C.matchaLight.withOpacity(0.5),
+                                shape: BoxShape.circle,
+                              ),
+                              child: Icon(
+                                Icons.people_outline_rounded,
+                                size: 26,
+                                color: _C.matcha.withOpacity(0.7),
+                              ),
                             ),
-                            const SizedBox(height: 12),
+                            const SizedBox(height: 14),
                             Text(
                               _query.isNotEmpty
                                   ? 'No farmers found'
                                   : 'No other farmers yet',
-                              style: const TextStyle(
-                                  fontSize: 15, color: AppColors.textSecondary),
+                              style: TextStyle(
+                                  fontSize: 15,
+                                  fontWeight: FontWeight.w500,
+                                  color: _C.ink),
                             ),
                           ],
                         ),
@@ -185,20 +225,23 @@ class _MakePalScreenState extends State<MakePalScreen> {
                     );
                   }
 
-                  return SliverList(
-                    delegate: SliverChildBuilderDelegate(
-                      (context, i) {
-                        final doc = filtered[i];
-                        final data = doc.data() as Map<String, dynamic>;
-                        return _PalRow(
-                          uid: doc.id,
-                          currentUid: _uid,
-                          name: data['name'] ?? 'Farmer',
-                          location: data['location'] ?? '',
-                          initials: _initials(data['name'] ?? 'Farmer'),
-                        );
-                      },
-                      childCount: filtered.length,
+                  return SliverPadding(
+                    padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+                    sliver: SliverList(
+                      delegate: SliverChildBuilderDelegate(
+                        (context, i) {
+                          final doc = filtered[i];
+                          final data = doc.data() as Map<String, dynamic>;
+                          return _PalRow(
+                            uid: doc.id,
+                            currentUid: _uid,
+                            name: data['name'] ?? 'Farmer',
+                            location: data['location'] ?? '',
+                            initials: _initials(data['name'] ?? 'Farmer'),
+                          );
+                        },
+                        childCount: filtered.length,
+                      ),
                     ),
                   );
                 },
@@ -411,70 +454,70 @@ class _PalRowState extends State<_PalRow> {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        InkWell(
-          onTap: _openProfile,
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-            child: Row(
-              children: [
-                CircleAvatar(
-                  radius: 22,
-                  backgroundColor: AppColors.greenLight,
-                  child: Text(
-                    widget.initials,
-                    style: const TextStyle(
-                      fontSize: 13,
-                      fontWeight: FontWeight.w600,
-                      color: AppColors.greenDeep,
-                    ),
+    return Container(
+      margin: const EdgeInsets.only(bottom: 10),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(16),
+        onTap: _openProfile,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+          child: Row(
+            children: [
+              CircleAvatar(
+                radius: 20,
+                backgroundColor: _C.matchaLight,
+                child: Text(
+                  widget.initials,
+                  style: TextStyle(
+                    fontSize: 12.5,
+                    fontWeight: FontWeight.w600,
+                    color: _C.matchaDark,
                   ),
                 ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        widget.name,
-                        style: const TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w500,
-                          color: AppColors.textPrimary,
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      widget.name,
+                      style: TextStyle(
+                        fontSize: 13.5,
+                        fontWeight: FontWeight.w500,
+                        color: _C.ink,
+                      ),
+                    ),
+                    if (widget.location.isNotEmpty)
+                      Padding(
+                        padding: const EdgeInsets.only(top: 2),
+                        child: Text(
+                          widget.location,
+                          style: TextStyle(fontSize: 11.5, color: _C.inkSoft),
                         ),
                       ),
-                      if (widget.location.isNotEmpty)
-                        Padding(
-                          padding: const EdgeInsets.only(top: 2),
-                          child: Text(
-                            widget.location,
-                            style: const TextStyle(
-                              fontSize: 12,
-                              color: AppColors.textSecondary,
-                            ),
-                          ),
-                        ),
-                    ],
-                  ),
+                  ],
                 ),
-                const SizedBox(width: 8),
-                _buildButtons(),
-              ],
-            ),
+              ),
+              const SizedBox(width: 8),
+              _buildButtons(),
+            ],
           ),
         ),
-        const Divider(height: 1, color: AppColors.border, indent: 64),
-      ],
+      ),
     );
   }
 
   Widget _buildButtons() {
     if (_state == _RowState.loading) {
-      return const SizedBox(
-        width: 20,
-        height: 20,
-        child: CircularProgressIndicator(strokeWidth: 2),
+      return SizedBox(
+        width: 18,
+        height: 18,
+        child: CircularProgressIndicator(strokeWidth: 2, color: _C.matcha),
       );
     }
 
@@ -538,11 +581,9 @@ class _SmallButton extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
         decoration: BoxDecoration(
-          color: filled ? AppColors.greenDark : AppColors.background2,
-          borderRadius: BorderRadius.circular(AppRadius.chip),
-          border: filled
-              ? null
-              : Border.all(color: AppColors.border),
+          color: filled ? _C.rust : _C.almond,
+          borderRadius: BorderRadius.circular(999),
+          border: filled ? null : Border.all(color: _C.hairline),
         ),
         child: loading
             ? SizedBox(
@@ -550,7 +591,7 @@ class _SmallButton extends StatelessWidget {
                 height: 12,
                 child: CircularProgressIndicator(
                   strokeWidth: 2,
-                  color: filled ? Colors.white : AppColors.textSecondary,
+                  color: filled ? _C.almond : _C.inkSoft,
                 ),
               )
             : Text(
@@ -558,7 +599,7 @@ class _SmallButton extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 12,
                   fontWeight: FontWeight.w500,
-                  color: filled ? Colors.white : AppColors.textSecondary,
+                  color: filled ? _C.almond : _C.inkSoft,
                 ),
               ),
       ),
@@ -580,20 +621,20 @@ class _SmallTag extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
         decoration: BoxDecoration(
-          color: AppColors.greenLight,
-          borderRadius: BorderRadius.circular(AppRadius.chip),
+          color: _C.matchaLight,
+          borderRadius: BorderRadius.circular(999),
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(icon, size: 12, color: AppColors.greenDeep),
+            Icon(icon, size: 12, color: _C.matchaDark),
             const SizedBox(width: 4),
             Text(
               label,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 11,
                 fontWeight: FontWeight.w500,
-                color: AppColors.greenDeep,
+                color: _C.matchaDark,
               ),
             ),
           ],

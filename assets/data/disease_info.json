@@ -118,5 +118,95 @@
     "what_to_do": "Your plant appears healthy. Continue regular monitoring and good crop management.",
     "symptoms": "No disease symptoms detected.",
     "prevention": "Maintain crop rotation, control pests, ensure proper irrigation."
+  },
+  "african swine fever": {
+    "display_name": "African Swine Fever",
+    "risk_level": "high",
+    "symptoms": "High fever, loss of appetite, red or purple blotching on skin, vomiting, diarrhea, sudden death.",
+    "affects": "Pigs (domestic and wild).",
+    "spreads_by": "Direct contact with infected pigs, contaminated feed or equipment, ticks (soft ticks of the Ornithodoros genus), and swill feeding.",
+    "what_to_do": "Report immediately to a state veterinarian — this is a notifiable disease. There is no cure or approved vaccine, so affected herds are typically quarantined and culled to stop spread.",
+    "prevention": "Avoid swill feeding, control pig movement, disinfect equipment and vehicles between farms, and report sick or dead pigs promptly."
+  },
+  "newcastle disease": {
+    "display_name": "Newcastle Disease",
+    "risk_level": "high",
+    "symptoms": "Respiratory distress, greenish diarrhea, twisted neck or paralysis, drop in egg production, sudden death in severe outbreaks.",
+    "affects": "Poultry — chickens are most susceptible; also affects other birds.",
+    "spreads_by": "Direct contact with infected birds, contaminated droppings, equipment, feed, water, and airborne transmission over short distances.",
+    "what_to_do": "Isolate sick birds immediately and contact a veterinarian. There is no treatment; vaccination is the primary control measure once an outbreak is confirmed.",
+    "prevention": "Vaccinate flocks on schedule, restrict visitor access to poultry housing, disinfect equipment, and quarantine new birds before introducing them to the flock."
+  },
+  "brucellosis": {
+    "display_name": "Brucellosis",
+    "risk_level": "high",
+    "symptoms": "Abortion in late pregnancy, retained placenta, reduced fertility, swollen joints; often no obvious symptoms outside pregnancy.",
+    "affects": "Cattle, goats, sheep, and pigs. Can also infect humans (zoonotic) through contact with infected animals, birth fluids, or unpasteurized milk.",
+    "spreads_by": "Contact with aborted fetuses, placenta, and birth fluids; contaminated milk; breeding with infected animals.",
+    "what_to_do": "Isolate aborting animals, avoid handling birth material with bare hands, and contact a veterinarian for testing. Infected animals are usually culled as part of control programs.",
+    "prevention": "Vaccinate calves/kids where a national program is in place, test and remove infected animals, and pasteurize milk before consumption."
+  },
+  "anthrax": {
+    "display_name": "Anthrax",
+    "risk_level": "high",
+    "symptoms": "Sudden death is often the first sign; also fever, difficulty breathing, staggering, and bleeding from body openings (nose, mouth, anus) after death.",
+    "affects": "Cattle, sheep, goats, and other grazing livestock. Zoonotic — can infect humans through contact with infected carcasses or products.",
+    "spreads_by": "Ingestion of spores from contaminated soil or pasture, especially after soil disturbance or flooding in endemic areas.",
+    "what_to_do": "Do NOT open or perform a post-mortem on a carcass suspected of anthrax — this releases spores. Report immediately to a veterinarian for confirmation and safe carcass disposal (burning or deep burial with lime).",
+    "prevention": "Vaccinate livestock in known endemic areas, avoid grazing on land with a history of anthrax deaths, and dispose of carcasses safely and promptly."
+  },
+  "blackleg": {
+    "display_name": "Blackleg",
+    "risk_level": "high",
+    "symptoms": "Sudden lameness, swelling in the hindquarters or shoulder that crackles under the skin (gas under the skin), high fever, sudden death, often in well-conditioned young cattle.",
+    "affects": "Young cattle (6 months to 2 years) primarily; occasionally sheep.",
+    "spreads_by": "Caused by soil-borne Clostridium bacteria that enter through wounds or are ingested; spores can survive in soil for years.",
+    "what_to_do": "Contact a veterinarian promptly — antibiotics may help if caught very early, but the disease progresses rapidly and is often fatal. Vaccination of the remaining herd is recommended after an outbreak.",
+    "prevention": "Vaccinate young cattle annually in areas with a history of blackleg, and avoid grazing on land where previous cases have occurred."
+  },
+  "heartwater": {
+    "display_name": "Heartwater",
+    "risk_level": "medium",
+    "symptoms": "High fever, loss of appetite, nervous signs including circling, high-stepping gait, and convulsions; fluid buildup around the heart and lungs.",
+    "affects": "Cattle, sheep, and goats.",
+    "spreads_by": "Bite of infected bont ticks (Amblyomma species).",
+    "what_to_do": "Contact a veterinarian for antibiotic treatment (tetracyclines) as soon as symptoms appear — early treatment improves survival chances significantly.",
+    "prevention": "Regular tick control through dipping or acaricide treatment, and pasture management to reduce tick populations."
+  },
+  "maize streak virus": {
+    "display_name": "Maize Streak Virus",
+    "risk_level": "medium",
+    "symptoms": "Narrow, broken yellow-white streaks running parallel to leaf veins; stunted growth and poor cob development in severe cases.",
+    "affects": "Maize, and to a lesser extent other cereal grasses.",
+    "spreads_by": "Leafhoppers (Cicadulina species), which pick up the virus from infected plants and spread it as they feed on healthy ones.",
+    "what_to_do": "Remove and destroy severely infected plants where practical. There is no cure once a plant is infected — focus shifts to protecting the rest of the field.",
+    "prevention": "Plant resistant or tolerant maize varieties, control leafhopper populations, and avoid staggered planting near older infected maize fields."
+  },
+  "groundnut rosette": {
+    "display_name": "Groundnut Rosette",
+    "risk_level": "high",
+    "symptoms": "Stunted, bushy plants with distorted growing shoots; yellowing or mottling of leaves; little to no pod formation if infected while young.",
+    "affects": "Groundnuts (peanuts).",
+    "spreads_by": "Aphids (Aphis craccivora), which transmit the virus complex as they feed; can spread rapidly through a field within weeks.",
+    "what_to_do": "Remove and destroy infected plants early to slow spread. There is no chemical cure once a plant is infected.",
+    "prevention": "Plant early and at higher density (aphids prefer sparse, late-planted crops), use resistant varieties where available, and control aphid populations with appropriate insecticides."
+  },
+  "cassava mosaic disease": {
+    "display_name": "Cassava Mosaic Disease",
+    "risk_level": "high",
+    "symptoms": "Yellow-green mosaic pattern on leaves, leaf distortion and curling, stunted plant growth, reduced tuber (root) yield.",
+    "affects": "Cassava.",
+    "spreads_by": "Whiteflies (Bemisia tabaci) and the use of infected cuttings for planting.",
+    "what_to_do": "Remove and destroy infected plants. Always source planting material (cuttings) from certified disease-free stock rather than an infected field.",
+    "prevention": "Plant resistant varieties, use clean/certified cuttings, and control whitefly populations."
+  },
+  "sorghum anthracnose": {
+    "display_name": "Sorghum Anthracnose",
+    "risk_level": "medium",
+    "symptoms": "Small red, tan, or black spots on leaves that enlarge and merge; reddish discoloration on stalks; grain mold on infected heads in humid conditions.",
+    "affects": "Sorghum.",
+    "spreads_by": "Fungal spores spread by wind, rain splash, and infected crop residue left in the field.",
+    "what_to_do": "Remove and destroy infected crop residue after harvest. Fungicide treatment can help in severe outbreaks — consult an extension officer for locally approved products.",
+    "prevention": "Plant resistant varieties, rotate crops away from sorghum for a season, and avoid dense planting that keeps foliage wet for longer periods."
   }
 }

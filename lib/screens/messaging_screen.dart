@@ -2,8 +2,40 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:intl/intl.dart';
-import '../main.dart';
 import 'chat_screen.dart';
+
+/// AgroLens palette — matcha green / almond / white, light module variant.
+class _C {
+  static const matchaDark = Color(0xFF374530);
+  static const matcha = Color(0xFF5C7148);
+  static const matchaLight = Color(0xFFD6E0C4);
+  static const almond = Color(0xFFF6EFE2);
+  static const ink = Color(0xFF2B2820);
+  static const inkSoft = Color(0xFF726C5C);
+  static const rust = Color(0xFFC1703E);
+  static const hairline = Color(0xFFEDE6D6);
+}
+
+/// Bottom wave finishing off the dark matcha header band — same shape
+/// used across the other restyled screens for a consistent silhouette.
+class _HeaderWaveClipper extends CustomClipper<Path> {
+  @override
+  Path getClip(Size size) {
+    final path = Path()
+      ..lineTo(0, size.height * 0.62)
+      ..cubicTo(
+        size.width * 0.32, size.height,
+        size.width * 0.66, size.height * 0.4,
+        size.width, size.height * 0.68,
+      )
+      ..lineTo(size.width, 0)
+      ..close();
+    return path;
+  }
+
+  @override
+  bool shouldReclip(covariant CustomClipper<Path> oldClipper) => false;
+}
 
 class MessagingScreen extends StatefulWidget {
   const MessagingScreen({super.key});
@@ -44,71 +76,74 @@ class _MessagingScreenState extends State<MessagingScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: _C.almond,
       body: CustomScrollView(
         slivers: [
           // Header
           SliverToBoxAdapter(
-            child: Container(
-              color: AppColors.greenDark,
-              padding: EdgeInsets.fromLTRB(
-                20,
-                MediaQuery.of(context).padding.top + 16,
-                20,
-                20,
-              ),
-              child: Row(
-                children: [
-                  const Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Messages',
-                          style: TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.w600,
-                            color: Colors.white,
-                          ),
-                        ),
-                        SizedBox(height: 2),
-                        Text(
-                          'Direct messages with other farmers',
-                          style: TextStyle(
-                            fontSize: 13,
-                            color: AppColors.greenHint,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  GestureDetector(
-                    onTap: _startNewConversation,
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 14, vertical: 8),
-                      decoration: BoxDecoration(
-                        color: AppColors.greenMid,
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      child: const Row(
+            child: ClipPath(
+              clipper: _HeaderWaveClipper(),
+              child: Container(
+                color: _C.matchaDark,
+                padding: EdgeInsets.fromLTRB(
+                  20,
+                  MediaQuery.of(context).padding.top + 16,
+                  20,
+                  36,
+                ),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Icon(Icons.edit_outlined,
-                              color: Colors.white, size: 16),
-                          SizedBox(width: 4),
                           Text(
-                            'New',
+                            'Messages',
                             style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 13,
-                              fontWeight: FontWeight.w500,
+                              fontSize: 20,
+                              fontWeight: FontWeight.w600,
+                              color: _C.almond,
+                            ),
+                          ),
+                          const SizedBox(height: 2),
+                          Text(
+                            'Direct messages with other farmers',
+                            style: TextStyle(
+                              fontSize: 12.5,
+                              color: _C.matchaLight,
                             ),
                           ),
                         ],
                       ),
                     ),
-                  ),
-                ],
+                    GestureDetector(
+                      onTap: _startNewConversation,
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 14, vertical: 8),
+                        decoration: BoxDecoration(
+                          color: _C.rust,
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        child: Row(
+                          children: [
+                            Icon(Icons.edit_outlined,
+                                color: _C.almond, size: 16),
+                            const SizedBox(width: 4),
+                            Text(
+                              'New',
+                              style: TextStyle(
+                                color: _C.almond,
+                                fontSize: 13,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
           ),
@@ -122,9 +157,9 @@ class _MessagingScreenState extends State<MessagingScreen> {
                 .snapshots(),
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {
-                return const SliverFillRemaining(
+                return SliverFillRemaining(
                   child: Center(
-                    child: CircularProgressIndicator(color: AppColors.greenDark),
+                    child: CircularProgressIndicator(color: _C.matcha),
                   ),
                 );
               }
@@ -137,22 +172,31 @@ class _MessagingScreenState extends State<MessagingScreen> {
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Icon(
-                          Icons.chat_bubble_outline_rounded,
-                          size: 48,
-                          color: AppColors.textSecondary.withOpacity(0.4),
+                        Container(
+                          width: 64,
+                          height: 64,
+                          decoration: BoxDecoration(
+                            color: _C.matchaLight.withOpacity(0.5),
+                            shape: BoxShape.circle,
+                          ),
+                          child: Icon(
+                            Icons.chat_bubble_outline_rounded,
+                            size: 26,
+                            color: _C.matcha.withOpacity(0.7),
+                          ),
                         ),
-                        const SizedBox(height: 12),
-                        const Text(
+                        const SizedBox(height: 14),
+                        Text(
                           'No messages yet',
                           style: TextStyle(
-                              fontSize: 15, color: AppColors.textSecondary),
+                              fontSize: 15,
+                              fontWeight: FontWeight.w500,
+                              color: _C.ink),
                         ),
                         const SizedBox(height: 4),
-                        const Text(
+                        Text(
                           'Tap New to start a conversation.',
-                          style: TextStyle(
-                              fontSize: 13, color: AppColors.textSecondary),
+                          style: TextStyle(fontSize: 13, color: _C.inkSoft),
                         ),
                         const SizedBox(height: 20),
                         GestureDetector(
@@ -161,13 +205,13 @@ class _MessagingScreenState extends State<MessagingScreen> {
                             padding: const EdgeInsets.symmetric(
                                 horizontal: 20, vertical: 10),
                             decoration: BoxDecoration(
-                              color: AppColors.greenDark,
+                              color: _C.rust,
                               borderRadius: BorderRadius.circular(20),
                             ),
-                            child: const Text(
+                            child: Text(
                               'Start a conversation',
                               style: TextStyle(
-                                color: Colors.white,
+                                color: _C.almond,
                                 fontSize: 14,
                                 fontWeight: FontWeight.w500,
                               ),
@@ -180,38 +224,44 @@ class _MessagingScreenState extends State<MessagingScreen> {
                 );
               }
 
-              return SliverList(
-                delegate: SliverChildBuilderDelegate(
-                  (context, i) {
-                    final doc = docs[i];
-                    final data = doc.data() as Map<String, dynamic>;
+              return SliverPadding(
+                padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+                sliver: SliverList(
+                  delegate: SliverChildBuilderDelegate(
+                    (context, i) {
+                      final doc = docs[i];
+                      final data = doc.data() as Map<String, dynamic>;
 
-                    // Figure out the other participant
-                    final participants =
-                        List<String>.from(data['participants'] ?? []);
-                    final otherUid =
-                        participants.firstWhere((id) => id != _uid, orElse: () => '');
-                    final unreadCount =
-                        (data['unreadCounts'] as Map<String, dynamic>?)?[_uid] ?? 0;
+                      // Figure out the other participant
+                      final participants =
+                          List<String>.from(data['participants'] ?? []);
+                      final otherUid = participants.firstWhere(
+                          (id) => id != _uid,
+                          orElse: () => '');
+                      final unreadCount =
+                          (data['unreadCounts'] as Map<String, dynamic>?)?[_uid] ??
+                              0;
 
-                    return FutureBuilder<DocumentSnapshot>(
-                      future: FirebaseFirestore.instance
-                          .collection('users')
-                          .doc(otherUid)
-                          .get(),
-                      builder: (_, snap) {
-                        final otherName =
-                            snap.data?.data() != null
-                                ? (snap.data!.data()
-                                        as Map<String, dynamic>)['name'] ??
-                                    'Farmer'
-                                : 'Farmer';
+                      return FutureBuilder<DocumentSnapshot>(
+                        future: FirebaseFirestore.instance
+                            .collection('users')
+                            .doc(otherUid)
+                            .get(),
+                        builder: (_, snap) {
+                          final otherName = snap.data?.data() != null
+                              ? (snap.data!.data()
+                                      as Map<String, dynamic>)['name'] ??
+                                  'Farmer'
+                              : 'Farmer';
 
-                        return Column(
-                          children: [
-                            if (i == 0)
-                              const Divider(height: 1, color: AppColors.border),
-                            InkWell(
+                          return Container(
+                            margin: const EdgeInsets.only(bottom: 10),
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(16),
+                            ),
+                            child: InkWell(
+                              borderRadius: BorderRadius.circular(16),
                               onTap: () {
                                 Navigator.push(
                                   context,
@@ -227,19 +277,18 @@ class _MessagingScreenState extends State<MessagingScreen> {
                               },
                               child: Padding(
                                 padding: const EdgeInsets.symmetric(
-                                    horizontal: 16, vertical: 12),
+                                    horizontal: 14, vertical: 12),
                                 child: Row(
                                   children: [
-                                    // Avatar
                                     CircleAvatar(
-                                      radius: 24,
-                                      backgroundColor: AppColors.greenLight,
+                                      radius: 22,
+                                      backgroundColor: _C.matchaLight,
                                       child: Text(
                                         _initials(otherName),
-                                        style: const TextStyle(
-                                          fontSize: 14,
+                                        style: TextStyle(
+                                          fontSize: 13,
                                           fontWeight: FontWeight.w600,
-                                          color: AppColors.greenDeep,
+                                          color: _C.matchaDark,
                                         ),
                                       ),
                                     ),
@@ -255,11 +304,11 @@ class _MessagingScreenState extends State<MessagingScreen> {
                                                 child: Text(
                                                   otherName,
                                                   style: TextStyle(
-                                                    fontSize: 15,
+                                                    fontSize: 14,
                                                     fontWeight: unreadCount > 0
                                                         ? FontWeight.w600
                                                         : FontWeight.w500,
-                                                    color: AppColors.textPrimary,
+                                                    color: _C.ink,
                                                   ),
                                                 ),
                                               ),
@@ -267,10 +316,10 @@ class _MessagingScreenState extends State<MessagingScreen> {
                                                 _timeAgo(data['lastMessageAt']
                                                     as Timestamp?),
                                                 style: TextStyle(
-                                                  fontSize: 12,
+                                                  fontSize: 11.5,
                                                   color: unreadCount > 0
-                                                      ? AppColors.greenDark
-                                                      : AppColors.textSecondary,
+                                                      ? _C.rust
+                                                      : _C.inkSoft,
                                                   fontWeight: unreadCount > 0
                                                       ? FontWeight.w600
                                                       : FontWeight.w400,
@@ -288,10 +337,10 @@ class _MessagingScreenState extends State<MessagingScreen> {
                                                   overflow:
                                                       TextOverflow.ellipsis,
                                                   style: TextStyle(
-                                                    fontSize: 13,
+                                                    fontSize: 12.5,
                                                     color: unreadCount > 0
-                                                        ? AppColors.textPrimary
-                                                        : AppColors.textSecondary,
+                                                        ? _C.ink
+                                                        : _C.inkSoft,
                                                     fontWeight: unreadCount > 0
                                                         ? FontWeight.w500
                                                         : FontWeight.w400,
@@ -307,17 +356,18 @@ class _MessagingScreenState extends State<MessagingScreen> {
                                                           horizontal: 7,
                                                           vertical: 2),
                                                   decoration: BoxDecoration(
-                                                    color: AppColors.greenDark,
+                                                    color: _C.rust,
                                                     borderRadius:
                                                         BorderRadius.circular(
                                                             10),
                                                   ),
                                                   child: Text(
                                                     '$unreadCount',
-                                                    style: const TextStyle(
+                                                    style: TextStyle(
                                                       fontSize: 11,
-                                                      color: Colors.white,
-                                                      fontWeight: FontWeight.w600,
+                                                      color: _C.almond,
+                                                      fontWeight:
+                                                          FontWeight.w600,
                                                     ),
                                                   ),
                                                 ),
@@ -330,16 +380,12 @@ class _MessagingScreenState extends State<MessagingScreen> {
                                 ),
                               ),
                             ),
-                            const Divider(
-                                height: 1,
-                                color: AppColors.border,
-                                indent: 72),
-                          ],
-                        );
-                      },
-                    );
-                  },
-                  childCount: docs.length,
+                          );
+                        },
+                      );
+                    },
+                    childCount: docs.length,
+                  ),
                 ),
               );
             },
@@ -421,9 +467,9 @@ class _NewConversationSheetState extends State<_NewConversationSheet> {
       height: MediaQuery.of(context).size.height * 0.75,
       padding:
           EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
-      decoration: const BoxDecoration(
-        color: AppColors.background,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      decoration: BoxDecoration(
+        color: _C.almond,
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
       ),
       child: Column(
         children: [
@@ -433,7 +479,7 @@ class _NewConversationSheetState extends State<_NewConversationSheet> {
             width: 36,
             height: 4,
             decoration: BoxDecoration(
-              color: AppColors.border,
+              color: _C.hairline,
               borderRadius: BorderRadius.circular(2),
             ),
           ),
@@ -443,20 +489,19 @@ class _NewConversationSheetState extends State<_NewConversationSheet> {
             padding: const EdgeInsets.symmetric(horizontal: 20),
             child: Row(
               children: [
-                const Expanded(
+                Expanded(
                   child: Text(
                     'New message',
                     style: TextStyle(
                       fontSize: 17,
                       fontWeight: FontWeight.w600,
-                      color: AppColors.textPrimary,
+                      color: _C.ink,
                     ),
                   ),
                 ),
                 GestureDetector(
                   onTap: () => Navigator.pop(context),
-                  child: const Icon(Icons.close_rounded,
-                      color: AppColors.textSecondary),
+                  child: Icon(Icons.close_rounded, color: _C.inkSoft),
                 ),
               ],
             ),
@@ -469,12 +514,20 @@ class _NewConversationSheetState extends State<_NewConversationSheet> {
             child: TextField(
               controller: _searchController,
               autofocus: true,
+              style: TextStyle(color: _C.ink, fontSize: 14),
               decoration: InputDecoration(
                 hintText: 'Search farmers...',
-                prefixIcon: const Icon(Icons.search, size: 20),
+                hintStyle: TextStyle(color: _C.inkSoft, fontSize: 14),
+                prefixIcon: Icon(Icons.search, size: 20, color: _C.inkSoft),
+                filled: true,
+                fillColor: Colors.white,
                 border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(10),
-                  borderSide: const BorderSide(color: AppColors.border),
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide(color: _C.hairline),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide(color: _C.hairline),
                 ),
                 contentPadding:
                     const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
@@ -509,16 +562,15 @@ class _NewConversationSheetState extends State<_NewConversationSheet> {
                       _query.isNotEmpty
                           ? 'No farmers found'
                           : 'No other users yet',
-                      style: const TextStyle(
-                          fontSize: 14, color: AppColors.textSecondary),
+                      style: TextStyle(fontSize: 14, color: _C.inkSoft),
                     ),
                   );
                 }
 
                 return ListView.separated(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
                   itemCount: filtered.length,
-                  separatorBuilder: (_, __) => const Divider(
-                      height: 1, color: AppColors.border, indent: 64),
+                  separatorBuilder: (_, __) => const SizedBox(height: 4),
                   itemBuilder: (context, i) {
                     final data =
                         filtered[i].data() as Map<String, dynamic>;
@@ -526,31 +578,30 @@ class _NewConversationSheetState extends State<_NewConversationSheet> {
                     final uid = filtered[i].id;
 
                     return ListTile(
+                      contentPadding: EdgeInsets.zero,
                       leading: CircleAvatar(
-                        backgroundColor: AppColors.greenLight,
+                        backgroundColor: _C.matchaLight,
                         child: Text(
                           _initials(name),
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 13,
                             fontWeight: FontWeight.w600,
-                            color: AppColors.greenDeep,
+                            color: _C.matchaDark,
                           ),
                         ),
                       ),
                       title: Text(
                         name,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.w500,
-                          color: AppColors.textPrimary,
+                          color: _C.ink,
                         ),
                       ),
                       subtitle: data['location'] != null
                           ? Text(
                               data['location'],
-                              style: const TextStyle(
-                                  fontSize: 12,
-                                  color: AppColors.textSecondary),
+                              style: TextStyle(fontSize: 12, color: _C.inkSoft),
                             )
                           : null,
                       onTap: () =>

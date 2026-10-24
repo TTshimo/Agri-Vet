@@ -1,8 +1,42 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import '../main.dart';
 import 'chat_screen.dart';
+
+/// AgroLens palette — matcha green / almond / white, light module variant.
+class _C {
+  static const matchaDark = Color(0xFF374530);
+  static const matcha = Color(0xFF5C7148);
+  static const matchaLight = Color(0xFFD6E0C4);
+  static const almond = Color(0xFFF6EFE2);
+  static const ink = Color(0xFF2B2820);
+  static const inkSoft = Color(0xFF726C5C);
+  static const rust = Color(0xFFC1703E);
+  static const rustBg = Color(0xFFF1DECB);
+  static const hairline = Color(0xFFEDE6D6);
+  static const danger = Color(0xFFC94C3F);
+}
+
+/// Bottom wave finishing off the dark matcha header band — same shape
+/// used across the other restyled screens for a consistent silhouette.
+class _HeaderWaveClipper extends CustomClipper<Path> {
+  @override
+  Path getClip(Size size) {
+    final path = Path()
+      ..lineTo(0, size.height * 0.62)
+      ..cubicTo(
+        size.width * 0.32, size.height,
+        size.width * 0.66, size.height * 0.4,
+        size.width, size.height * 0.68,
+      )
+      ..lineTo(size.width, 0)
+      ..close();
+    return path;
+  }
+
+  @override
+  bool shouldReclip(covariant CustomClipper<Path> oldClipper) => false;
+}
 
 enum _PalState {
   loading,
@@ -264,7 +298,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
               child: const Text('Cancel')),
           TextButton(
             onPressed: () => Navigator.pop(context, true),
-            style: TextButton.styleFrom(foregroundColor: AppColors.red),
+            style: TextButton.styleFrom(foregroundColor: _C.danger),
             child: const Text('Block'),
           ),
         ],
@@ -405,7 +439,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: _C.almond,
       body: FutureBuilder<DocumentSnapshot>(
         future: FirebaseFirestore.instance
             .collection('users')
@@ -413,8 +447,8 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
             .get(),
         builder: (context, snap) {
           if (!snap.hasData) {
-            return const Center(
-              child: CircularProgressIndicator(color: AppColors.greenDark),
+            return Center(
+              child: CircularProgressIndicator(color: _C.matcha),
             );
           }
           final data = snap.data!.data() as Map<String, dynamic>? ?? {};
@@ -426,94 +460,96 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
           return CustomScrollView(
             slivers: [
               SliverToBoxAdapter(
-                child: Container(
-                  color: AppColors.greenDark,
-                  padding: EdgeInsets.fromLTRB(
-                    16,
-                    MediaQuery.of(context).padding.top + 8,
-                    16,
-                    20,
-                  ),
-                  child: Column(
-                    children: [
-                      Row(
-                        children: [
-                          IconButton(
-                            icon: const Icon(Icons.arrow_back_ios_new_rounded,
-                                color: Colors.white, size: 20),
-                            onPressed: () => Navigator.pop(context),
-                          ),
-                          const Spacer(),
-                        ],
-                      ),
-                      const SizedBox(height: 4),
-                      CircleAvatar(
-                        radius: 36,
-                        backgroundColor: AppColors.greenMid,
-                        child: Text(
-                          _initials(name),
-                          style: const TextStyle(
-                            fontSize: 24,
-                            fontWeight: FontWeight.w600,
-                            color: Colors.white,
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 12),
-                      Text(
-                        name,
-                        style: const TextStyle(
-                          fontSize: 19,
-                          fontWeight: FontWeight.w600,
-                          color: Colors.white,
-                        ),
-                      ),
-                      if (location.toString().isNotEmpty) ...[
-                        const SizedBox(height: 4),
+                child: ClipPath(
+                  clipper: _HeaderWaveClipper(),
+                  child: Container(
+                    color: _C.matchaDark,
+                    padding: EdgeInsets.fromLTRB(
+                      16,
+                      MediaQuery.of(context).padding.top + 8,
+                      16,
+                      36,
+                    ),
+                    child: Column(
+                      children: [
                         Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Icon(Icons.location_on_outlined,
-                                size: 14,
-                                color: Colors.white.withOpacity(0.7)),
-                            const SizedBox(width: 4),
-                            Text(
-                              location,
-                              style: TextStyle(
-                                fontSize: 13,
-                                color: Colors.white.withOpacity(0.7),
-                              ),
+                            IconButton(
+                              icon: Icon(Icons.arrow_back_ios_new_rounded,
+                                  color: _C.almond, size: 18),
+                              onPressed: () => Navigator.pop(context),
                             ),
+                            const Spacer(),
                           ],
                         ),
-                      ],
-                      if (bio.toString().isNotEmpty) ...[
-                        const SizedBox(height: 10),
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 24),
+                        const SizedBox(height: 4),
+                        CircleAvatar(
+                          radius: 36,
+                          backgroundColor: _C.matcha,
                           child: Text(
-                            bio,
-                            textAlign: TextAlign.center,
+                            _initials(name),
                             style: TextStyle(
-                              fontSize: 13,
-                              color: Colors.white.withOpacity(0.85),
-                              height: 1.4,
+                              fontSize: 24,
+                              fontWeight: FontWeight.w600,
+                              color: _C.almond,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+                        Text(
+                          name,
+                          style: TextStyle(
+                            fontSize: 19,
+                            fontWeight: FontWeight.w600,
+                            color: _C.almond,
+                          ),
+                        ),
+                        if (location.toString().isNotEmpty) ...[
+                          const SizedBox(height: 4),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(Icons.location_on_outlined,
+                                  size: 14, color: _C.matchaLight),
+                              const SizedBox(width: 4),
+                              Text(
+                                location,
+                                style: TextStyle(
+                                  fontSize: 13,
+                                  color: _C.matchaLight,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                        if (bio.toString().isNotEmpty) ...[
+                          const SizedBox(height: 10),
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 24),
+                            child: Text(
+                              bio,
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                fontSize: 13,
+                                color: _C.almond.withOpacity(0.85),
+                                height: 1.4,
+                              ),
+                            ),
+                          ),
+                        ],
+                        const SizedBox(height: 4),
+                        Padding(
+                          padding: const EdgeInsets.only(top: 6),
+                          child: Text(
+                            '$postCount ${postCount == 1 ? 'post' : 'posts'}',
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: _C.matchaLight,
                             ),
                           ),
                         ),
                       ],
-                      const SizedBox(height: 4),
-                      Padding(
-                        padding: const EdgeInsets.only(top: 6),
-                        child: Text(
-                          '$postCount ${postCount == 1 ? 'post' : 'posts'}',
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: Colors.white.withOpacity(0.6),
-                          ),
-                        ),
-                      ),
-                    ],
+                    ),
                   ),
                 ),
               ),
@@ -525,15 +561,15 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                 ),
               ),
 
-              const SliverToBoxAdapter(
+              SliverToBoxAdapter(
                 child: Padding(
-                  padding: EdgeInsets.fromLTRB(16, 8, 16, 8),
+                  padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
                   child: Text(
                     'Posts',
                     style: TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.w600,
-                      color: AppColors.textPrimary,
+                      color: _C.ink,
                     ),
                   ),
                 ),
@@ -551,13 +587,13 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
 
   Widget _buildActionArea() {
     if (_loadingRelationship) {
-      return const Padding(
-        padding: EdgeInsets.symmetric(vertical: 8),
+      return Padding(
+        padding: const EdgeInsets.symmetric(vertical: 8),
         child: Center(
           child: SizedBox(
             width: 20,
             height: 20,
-            child: CircularProgressIndicator(strokeWidth: 2),
+            child: CircularProgressIndicator(strokeWidth: 2, color: _C.matcha),
           ),
         ),
       );
@@ -768,14 +804,13 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
         }
         final docs = snapshot.data!.docs;
         if (docs.isEmpty) {
-          return const SliverToBoxAdapter(
+          return SliverToBoxAdapter(
             child: Padding(
-              padding: EdgeInsets.symmetric(vertical: 24),
+              padding: const EdgeInsets.symmetric(vertical: 24),
               child: Center(
                 child: Text(
                   'No posts yet',
-                  style:
-                      TextStyle(fontSize: 13, color: AppColors.textSecondary),
+                  style: TextStyle(fontSize: 13, color: _C.inkSoft),
                 ),
               ),
             ),
@@ -791,14 +826,13 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                   padding: const EdgeInsets.all(14),
                   decoration: BoxDecoration(
                     color: Colors.white,
-                    borderRadius: BorderRadius.circular(AppRadius.card),
-                    border: Border.all(color: AppColors.border),
+                    borderRadius: BorderRadius.circular(16),
                   ),
                   child: Text(
                     data['content'] ?? '',
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 14,
-                      color: AppColors.textPrimary,
+                      color: _C.ink,
                       height: 1.4,
                     ),
                   ),
@@ -830,7 +864,7 @@ class _ActionButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final color = danger ? AppColors.red : AppColors.greenDark;
+    final color = danger ? _C.danger : _C.rust;
     return SizedBox(
       height: 42,
       child: filled
@@ -838,8 +872,9 @@ class _ActionButton extends StatelessWidget {
               onPressed: loading ? null : onTap,
               style: ElevatedButton.styleFrom(
                 backgroundColor: color,
+                foregroundColor: _C.almond,
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(AppRadius.button),
+                  borderRadius: BorderRadius.circular(12),
                 ),
               ),
               child: loading
@@ -857,7 +892,7 @@ class _ActionButton extends StatelessWidget {
                 foregroundColor: color,
                 side: BorderSide(color: color),
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(AppRadius.button),
+                  borderRadius: BorderRadius.circular(12),
                 ),
               ),
               child: loading
@@ -885,17 +920,17 @@ class _InfoBanner extends StatelessWidget {
       width: double.infinity,
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
       decoration: BoxDecoration(
-        color: AppColors.amberLight,
-        borderRadius: BorderRadius.circular(AppRadius.button),
+        color: _C.rustBg,
+        borderRadius: BorderRadius.circular(12),
       ),
       child: Row(
         children: [
-          Icon(icon, size: 16, color: AppColors.amberText),
+          Icon(icon, size: 16, color: _C.rust),
           const SizedBox(width: 8),
           Expanded(
             child: Text(
               text,
-              style: const TextStyle(fontSize: 12, color: AppColors.amberText),
+              style: TextStyle(fontSize: 12, color: _C.rust),
             ),
           ),
         ],

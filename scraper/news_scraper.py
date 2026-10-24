@@ -21,13 +21,45 @@ FEEDS = [
     {"url": "https://www.fao.org/news/rss-feed/en/", "source": "FAO"},
     {"url": "https://reliefweb.int/updates/rss.xml?primary_country=72&source=0&theme=0", "source": "ReliefWeb"},
     {"url": "https://allafrica.com/tools/headlines/rdf/botswana/headlines.rdf", "source": "AllAfrica"},
-    {"url": "https://www.farmer.co.zw/feed/", "source": "Farmer's Weekly"},
+    {"url": "https://www.farmer.co.zw/feed/", "source": "Farmer's Weekly Zimbabwe"},
     {"url": "https://www.agriculture.gov.bw/rss", "source": "Botswana Agriculture"},
     {"url": "https://www.woah.org/en/news/feed/", "source": "WOAH"},
     {"url": "https://www.sabcnews.com/sabcnews/feed/", "source": "SABC News"},
     {"url": "https://www.dailynews.gov.bw/feed", "source": "Botswana Daily News"},
+    {"url": "https://www.bizcommunity.com/rss/29/741.html", "source": "Bizcommunity Agribusiness Botswana"},
+    {"url": "https://www.bizcommunity.com/rss/416/741.html", "source": "Bizcommunity Agribusiness Southern Africa"},
+    {"url": "https://www.farmersweekly.co.za/feed", "source": "Farmer's Weekly South Africa"},
+    {"url": "https://agrifocusafrica.com/feed", "source": "AgriFocus Africa"},
 ]
 
+# Sources whose feeds are agriculture-specific end-to-end (a dedicated agri
+# publication, or an org/feed already pre-filtered to agribusiness, like
+# FAO/WOAH or Bizcommunity's Agribusiness verticals). Everything from these
+# is trusted without needing a keyword match.
+ALWAYS_IN_SCOPE_SOURCES = {
+    "FAO",
+    "WOAH",
+    "Botswana Agriculture",
+    "Farmer's Weekly Zimbabwe",
+    "Farmer's Weekly South Africa",
+    "Bizcommunity Agribusiness Botswana",
+    "Bizcommunity Agribusiness Southern Africa",
+    "AgriFocus Africa",
+}
+
+# Sources whose feeds are GENERAL national news (politics, sports, war,
+# crime, etc.) mixed in with the occasional agri story. Every entry from
+# these MUST pass the keyword classifier below, or it gets dropped.
+GENERAL_NEWS_SOURCES = {"AllAfrica", "SABC News", "Botswana Daily News", "ReliefWeb"}
+
+# Restricted to agriculture (livestock + crop) and weather only, per scope
+# decision — 'policy' and 'alert' keyword buckets have been removed, so
+# trade/regulation/emergency-only articles with no agri or weather keyword
+# hit are dropped rather than classified. Note: the Flutter app still has
+# 'Alerts' and 'Policy' tabs (home_screen.dart _categories) — with no
+# scraper output landing in those categories, those tabs will show empty.
+# Remove them from the UI, or reintroduce a keyword bucket, if that's not
+# what you want.
 CATEGORY_KEYWORDS = {
     "livestock": [
         "cattle", "livestock", "poultry", "herd", "dairy", "beef", "sheep", "goat",
@@ -38,17 +70,9 @@ CATEGORY_KEYWORDS = {
         "rainfall", "rain", "drought", "forecast", "flood", "flooding", "climate",
         "temperature", "heatwave", "cyclone", "storm", "el nino", "la nina", "monsoon",
     ],
-    "policy": [
-        "subsidy", "subsidies", "regulation", "ministry", "policy", "tariff",
-        "trade agreement", "extension services", "bill", "legislation", "budget",
-        "import ban", "export ban", "quota",
-    ],
     "crop": [
         "harvest", "crop", "maize", "sorghum", "wheat", "irrigation", "planting",
         "seed", "fertilizer", "pest", "locust", "yield", "tomato", "potato"
-    ],
-    "alert": [
-        "emergency", "outbreak", "warning", "advisory", "disaster", "famine", "food insecurity",
     ],
 }
 
@@ -76,10 +100,11 @@ def parse_date(entry) -> datetime:
 
 
 def classify(title: str, summary: str) -> list:
-    """Return all matching categories based on keyword hits in title+summary."""
+    """Return all matching agri categories based on keyword hits in title+summary.
+    Returns an empty list if nothing matches — callers decide what to do with that,
+    rather than this function inventing a fallback 'general' bucket."""
     text = f"{title} {summary}".lower()
-    matches = [cat for cat, keywords in CATEGORY_KEYWORDS.items() if any(kw in text for kw in keywords)]
-    return matches if matches else ["general"]
+    return [cat for cat, keywords in CATEGORY_KEYWORDS.items() if any(kw in text for kw in keywords)]
 
 
 def test_feeds():
@@ -95,9 +120,11 @@ def test_feeds():
         if feed.entries:
             print(f"    sample title: {feed.entries[0].get('title', '')[:80]}")
 
+
 def scrape():
     batch = db.batch()
     count = 0
+    skipped = 0
 
     for feed_config in FEEDS:
         source = feed_config["source"]
@@ -112,7 +139,7 @@ def scrape():
                 print(f"  No entries found for {source} — feed URL may be wrong or empty.")
                 continue
 
-            for entry in feed.entries[:20]: 
+            for entry in feed.entries[:20]:
                 url = entry.get("link", "")
                 if not url:
                     continue
@@ -120,6 +147,20 @@ def scrape():
                 title = strip_html(entry.get("title", ""))
                 summary = strip_html(entry.get("summary", ""))[:300]
                 categories = classify(title, summary)
+
+                # Only ALWAYS_IN_SCOPE_SOURCES get a free pass when nothing
+                # matches (tagged 'crop' as a safe generic-agriculture
+                # default, since these sources are dedicated agri
+                # publications end-to-end). Everything else — especially
+                # GENERAL_NEWS_SOURCES — is dropped outright if it doesn't
+                # hit an agri/weather keyword, so war, politics, sports,
+                # trade/regulation-only stories, etc. never reach Firestore.
+                if not categories:
+                    if source in ALWAYS_IN_SCOPE_SOURCES:
+                        categories = ["crop"]
+                    else:
+                        skipped += 1
+                        continue
 
                 doc_id = make_id(url)
                 ref = db.collection("news").document(doc_id)
@@ -129,8 +170,8 @@ def scrape():
                     "summary": summary,
                     "url": url,
                     "source": source,
-                    "categories": categories,       
-                    "category": categories[0],       
+                    "categories": categories,
+                    "category": categories[0],
                     "publishedAt": parse_date(entry),
                 }
 
@@ -141,7 +182,7 @@ def scrape():
             print(f"Error fetching {source}: {e}")
 
     batch.commit()
-    print(f"Written {count} articles to Firestore.")
+    print(f"Written {count} articles to Firestore. Skipped {skipped} off-topic articles.")
 
 
 if __name__ == "__main__":

@@ -1,9 +1,37 @@
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:intl/intl.dart';
-import '../main.dart';
 import 'make_pal_screen.dart';
+
+// Self-contained palette for the redesign — matcha green / almond / rust.
+// Matches the palette used across the other redesigned screens. Fold into
+// a shared AppColors in main.dart later if you want it app-wide.
+class _C {
+  static const matchaDark = Color(0xFF374530);
+  static const matchaHeader = Color(0xFF4A5B41);
+  static const matcha = Color(0xFF5C7148);
+  static const matchaTint = Color(0xFFD6E0C4);
+  static const almond = Color(0xFFF6EFE2);
+  static const ink = Color(0xFF2B2820);
+  static const inkSoft = Color(0xFF726C5C);
+  static const rust = Color(0xFFC1703E);
+  static const rustBg = Color(0xFFF1DECB);
+}
+
+/// FMD/Livestock read as urgent (rust), Crops/General/anything else reads
+/// calm (matcha) — same two-tone accent logic used on every other screen.
+bool _isUrgentTag(String tag) => tag == 'FMD' || tag == 'Livestock';
+
+/// Alternates avatar color by uid so the feed doesn't look monotone,
+/// without needing any real per-user color data.
+({Color bg, Color fg}) _avatarColors(String uid) {
+  final even = uid.isEmpty || uid.hashCode.isEven;
+  return even
+      ? (bg: _C.matchaTint, fg: _C.matchaDark)
+      : (bg: _C.rustBg, fg: _C.rust);
+}
 
 class CommunityScreen extends StatefulWidget {
   const CommunityScreen({super.key});
@@ -53,14 +81,12 @@ class _CommunityScreenState extends State<CommunityScreen> {
   List<QueryDocumentSnapshot> _filtered(List<QueryDocumentSnapshot> docs) {
     return docs.where((doc) {
       final data = doc.data() as Map<String, dynamic>;
-      final content =
-          (data['content'] ?? '').toString().toLowerCase();
+      final content = (data['content'] ?? '').toString().toLowerCase();
       final tag = (data['tag'] ?? '').toString();
 
-      final matchesSearch = _searchQuery.isEmpty ||
-          content.contains(_searchQuery.toLowerCase());
-      final matchesTag =
-          _filterTag.isEmpty || tag == _filterTag;
+      final matchesSearch =
+          _searchQuery.isEmpty || content.contains(_searchQuery.toLowerCase());
+      final matchesTag = _filterTag.isEmpty || tag == _filterTag;
 
       return matchesSearch && matchesTag;
     }).toList();
@@ -71,268 +97,414 @@ class _CommunityScreenState extends State<CommunityScreen> {
     const tags = ['FMD', 'Crops', 'Livestock', 'General'];
 
     return Scaffold(
-      backgroundColor: AppColors.background,
-      body: CustomScrollView(
-        slivers: [
-          SliverToBoxAdapter(
-            child: Container(
-              color: AppColors.greenDark,
-              padding: EdgeInsets.fromLTRB(
-                20,
-                MediaQuery.of(context).padding.top + 16,
-                20,
-                16,
+      backgroundColor: _C.almond,
+      body: Stack(
+        children: [
+          Positioned.fill(
+            child: CustomPaint(painter: _BottomFieldWavePainter()),
+          ),
+          CustomScrollView(
+            slivers: [
+              SliverToBoxAdapter(
+                child: _WavyHeader(
+                  height: MediaQuery.of(context).padding.top + 96,
+                  child: Padding(
+                    padding: EdgeInsets.fromLTRB(
+                      20,
+                      MediaQuery.of(context).padding.top + 20,
+                      20,
+                      0,
+                    ),
+                    child: const Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Community',
+                          style: TextStyle(
+                            fontSize: 22,
+                            fontWeight: FontWeight.w600,
+                            color: _C.almond,
+                          ),
+                        ),
+                        SizedBox(height: 6),
+                        Text(
+                          'Share knowledge with other farmers',
+                          style: TextStyle(fontSize: 12, color: _C.matchaTint),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
               ),
-              child: Column(
-                children: [
-                  Row(
+
+              SliverPadding(
+                padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
+                sliver: SliverToBoxAdapter(
+                  child: _GlassCard(
+                    child: Row(
+                      children: [
+                        Icon(Icons.search_rounded, color: _C.inkSoft, size: 18),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: TextField(
+                            controller: _searchController,
+                            style: TextStyle(color: _C.ink, fontSize: 13),
+                            decoration: InputDecoration(
+                              isDense: true,
+                              border: InputBorder.none,
+                              hintText: 'Search posts...',
+                              hintStyle: TextStyle(color: _C.inkSoft, fontSize: 13),
+                            ),
+                            onChanged: (v) => setState(() => _searchQuery = v),
+                          ),
+                        ),
+                        if (_searchQuery.isNotEmpty)
+                          GestureDetector(
+                            onTap: () {
+                              _searchController.clear();
+                              setState(() => _searchQuery = '');
+                            },
+                            child: Icon(Icons.close_rounded, color: _C.inkSoft, size: 16),
+                          ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+
+              SliverPadding(
+                padding: const EdgeInsets.fromLTRB(16, 10, 16, 4),
+                sliver: SliverToBoxAdapter(
+                  child: Row(
                     children: [
-                      const Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'Community',
-                              style: TextStyle(
-                                fontSize: 20,
-                                fontWeight: FontWeight.w600,
-                                color: Colors.white,
-                              ),
-                            ),
-                            SizedBox(height: 2),
-                            Text(
-                              'Share knowledge with other farmers',
-                              style: TextStyle(
-                                fontSize: 13,
-                                color: AppColors.greenHint,
-                              ),
-                            ),
-                          ],
+                      Expanded(
+                        child: _TagFilterChip(
+                          label: 'All',
+                          selected: _filterTag.isEmpty,
+                          onTap: () => setState(() => _filterTag = ''),
                         ),
                       ),
-                      GestureDetector(
-                        onTap: _openMakePal,
-                        child: Container(
-                          margin: const EdgeInsets.only(right: 8),
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 14, vertical: 8),
-                          decoration: BoxDecoration(
-                            color: Colors.white.withOpacity(0.15),
-                            borderRadius: BorderRadius.circular(20),
-                          ),
-                          child: const Row(
-                            children: [
-                              Icon(Icons.group_add_rounded,
-                                  color: Colors.white, size: 16),
-                              SizedBox(width: 4),
-                              Text(
-                                'Make a Pal',
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 13,
-                                  fontWeight: FontWeight.w500,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                      GestureDetector(
-                        onTap: _showNewPost,
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 14, vertical: 8),
-                          decoration: BoxDecoration(
-                            color: AppColors.greenMid,
-                            borderRadius: BorderRadius.circular(20),
-                          ),
-                          child: const Row(
-                            children: [
-                              Icon(Icons.add, color: Colors.white, size: 16),
-                              SizedBox(width: 4),
-                              Text(
-                                'Post',
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 13,
-                                  fontWeight: FontWeight.w500,
-                                ),
-                              ),
-                            ],
+                      ...tags.map(
+                        (t) => Expanded(
+                          child: Padding(
+                            padding: const EdgeInsets.only(left: 6),
+                            child: _TagFilterChip(
+                              label: t,
+                              selected: _filterTag == t,
+                              onTap: () =>
+                                  setState(() => _filterTag = _filterTag == t ? '' : t),
+                            ),
                           ),
                         ),
                       ),
                     ],
                   ),
-                  const SizedBox(height: 12),
-
-                  TextField(
-                    controller: _searchController,
-                    style: const TextStyle(color: Colors.white, fontSize: 14),
-                    decoration: InputDecoration(
-                      hintText: 'Search posts...',
-                      hintStyle: TextStyle(
-                          color: Colors.white.withOpacity(0.5), fontSize: 14),
-                      prefixIcon: Icon(Icons.search,
-                          color: Colors.white.withOpacity(0.6), size: 20),
-                      suffixIcon: _searchQuery.isNotEmpty
-                          ? GestureDetector(
-                              onTap: () {
-                                _searchController.clear();
-                                setState(() => _searchQuery = '');
-                              },
-                              child: Icon(Icons.close,
-                                  color: Colors.white.withOpacity(0.6),
-                                  size: 18),
-                            )
-                          : null,
-                      filled: true,
-                      fillColor: Colors.white.withOpacity(0.12),
-                      contentPadding: const EdgeInsets.symmetric(
-                          horizontal: 14, vertical: 10),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(10),
-                        borderSide: BorderSide.none,
-                      ),
-                    ),
-                    onChanged: (v) => setState(() => _searchQuery = v),
-                  ),
-                  const SizedBox(height: 10),
-
-                  SingleChildScrollView(
-                    scrollDirection: Axis.horizontal,
-                    child: Row(
-                      children: [
-                        _FilterChip(
-                          label: 'All',
-                          selected: _filterTag.isEmpty,
-                          onTap: () => setState(() => _filterTag = ''),
-                        ),
-                        ...tags.map((t) => _FilterChip(
-                              label: t,
-                              selected: _filterTag == t,
-                              onTap: () => setState(
-                                  () => _filterTag = _filterTag == t ? '' : t),
-                            )),
-                      ],
-                    ),
-                  ),
-                ],
+                ),
               ),
-            ),
-          ),
 
-          // ── Feed ──
-          StreamBuilder<QuerySnapshot>(
-            stream: FirebaseFirestore.instance
-                .collection('posts')
-                .orderBy('createdAt', descending: true)
-                .limit(50)
-                .snapshots(),
-            builder: (context, snapshot) {
-              if (snapshot.connectionState == ConnectionState.waiting) {
-                return const SliverFillRemaining(
-                  child: Center(
-                    child: CircularProgressIndicator(color: AppColors.greenDark),
-                  ),
-                );
-              }
-
-              final allDocs = snapshot.data?.docs ?? [];
-              final docs = _filtered(allDocs);
-
-              if (docs.isEmpty) {
-                return SliverFillRemaining(
-                  child: Center(
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(
-                          _searchQuery.isNotEmpty || _filterTag.isNotEmpty
-                              ? Icons.search_off_rounded
-                              : Icons.people_outline_rounded,
-                          size: 48,
-                          color: AppColors.textSecondary.withOpacity(0.4),
-                        ),
-                        const SizedBox(height: 12),
-                        Text(
-                          _searchQuery.isNotEmpty || _filterTag.isNotEmpty
-                              ? 'No posts match your search'
-                              : 'No posts yet',
-                          style: const TextStyle(
-                            fontSize: 15,
-                            color: AppColors.textSecondary,
-                          ),
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          _searchQuery.isNotEmpty || _filterTag.isNotEmpty
-                              ? 'Try a different keyword or tag'
-                              : 'Be the first to share something.',
-                          style: const TextStyle(
-                            fontSize: 13,
-                            color: AppColors.textSecondary,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                );
-              }
-
-              return SliverList(
-                delegate: SliverChildBuilderDelegate(
-                  (context, i) {
-                    final doc = docs[i];
-                    final data = doc.data() as Map<String, dynamic>;
-                    return Padding(
-                      padding: EdgeInsets.fromLTRB(16, i == 0 ? 16 : 0, 16, 12),
-                      child: _PostCard(
-                        postId: doc.id,
-                        data: data,
-                        uid: _uid,
-                        getName: _getDisplayName,
+              // ── Feed ──
+              StreamBuilder<QuerySnapshot>(
+                stream: FirebaseFirestore.instance
+                    .collection('posts')
+                    .orderBy('createdAt', descending: true)
+                    .limit(50)
+                    .snapshots(),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return SliverFillRemaining(
+                      child: Center(
+                        child: CircularProgressIndicator(color: _C.matcha),
                       ),
                     );
-                  },
-                  childCount: docs.length,
-                ),
-              );
-            },
+                  }
+
+                  final allDocs = snapshot.data?.docs ?? [];
+                  final docs = _filtered(allDocs);
+
+                  if (docs.isEmpty) {
+                    return SliverFillRemaining(
+                      child: Center(
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(
+                              _searchQuery.isNotEmpty || _filterTag.isNotEmpty
+                                  ? Icons.search_off_rounded
+                                  : Icons.people_outline_rounded,
+                              size: 44,
+                              color: _C.inkSoft.withOpacity(0.5),
+                            ),
+                            const SizedBox(height: 12),
+                            Text(
+                              _searchQuery.isNotEmpty || _filterTag.isNotEmpty
+                                  ? 'No posts match your search'
+                                  : 'No posts yet',
+                              style: TextStyle(fontSize: 15, color: _C.inkSoft),
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              _searchQuery.isNotEmpty || _filterTag.isNotEmpty
+                                  ? 'Try a different keyword or tag'
+                                  : 'Be the first to share something.',
+                              style: TextStyle(fontSize: 13, color: _C.inkSoft),
+                            ),
+                          ],
+                        ),
+                      ),
+                    );
+                  }
+
+                  return SliverList(
+                    delegate: SliverChildBuilderDelegate(
+                      (context, i) {
+                        final doc = docs[i];
+                        final data = doc.data() as Map<String, dynamic>;
+                        return Padding(
+                          padding: EdgeInsets.fromLTRB(16, i == 0 ? 10 : 0, 16, 12),
+                          child: _PostCard(
+                            postId: doc.id,
+                            data: data,
+                            uid: _uid,
+                            getName: _getDisplayName,
+                          ),
+                        );
+                      },
+                      childCount: docs.length,
+                    ),
+                  );
+                },
+              ),
+
+              const SliverToBoxAdapter(child: SizedBox(height: 100)),
+            ],
           ),
 
-          const SliverToBoxAdapter(child: SizedBox(height: 24)),
+          // Stacked floating buttons, WhatsApp-style: smaller secondary
+          // action above the larger primary one.
+          Positioned(
+            right: 18,
+            bottom: 20,
+            child: Column(
+              children: [
+                _CircleFab(
+                  size: 44,
+                  background: _C.almond,
+                  border: Colors.white.withOpacity(0.9),
+                  icon: Icons.group_add_rounded,
+                  iconColor: _C.matchaDark,
+                  onTap: _openMakePal,
+                ),
+                const SizedBox(height: 12),
+                _CircleFab(
+                  size: 56,
+                  background: _C.rust,
+                  icon: Icons.add_rounded,
+                  iconColor: _C.rustBg,
+                  iconSize: 24,
+                  onTap: _showNewPost,
+                ),
+              ],
+            ),
+          ),
         ],
       ),
     );
   }
 }
 
-class _FilterChip extends StatelessWidget {
+/// Header with a soft wavy bottom edge instead of a hard rectangle, so it
+/// blends into the field-wave background. Shared shape with the other
+/// redesigned screens.
+class _WavyHeader extends StatelessWidget {
+  const _WavyHeader({required this.height, required this.child});
+
+  final double height;
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      height: height,
+      child: Stack(
+        fit: StackFit.expand,
+        children: [
+          ClipPath(
+            clipper: _WavyHeaderClipper(),
+            child: Container(color: _C.matchaHeader.withOpacity(0.88)),
+          ),
+          child,
+        ],
+      ),
+    );
+  }
+}
+
+class _WavyHeaderClipper extends CustomClipper<Path> {
+  @override
+  Path getClip(Size size) {
+    final w = size.width;
+    final h = size.height;
+    return Path()
+      ..moveTo(0, 0)
+      ..lineTo(w, 0)
+      ..lineTo(w, h * 0.774)
+      ..cubicTo(w * 0.806, h * 0.955, w * 0.639, h * 0.697, w * 0.458, h * 0.839)
+      ..cubicTo(w * 0.292, h * 0.968, w * 0.153, h * 0.903, 0, h * 0.968)
+      ..close();
+  }
+
+  @override
+  bool shouldReclip(covariant CustomClipper<Path> oldClipper) => false;
+}
+
+/// Single soft horizon wash at the bottom of the screen.
+class _BottomFieldWavePainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()..color = _C.matchaTint.withOpacity(0.5);
+    final path = Path()
+      ..moveTo(0, size.height * 0.82)
+      ..cubicTo(size.width * 0.17, size.height * 0.76, size.width * 0.36,
+          size.height * 0.86, size.width * 0.56, size.height * 0.79)
+      ..cubicTo(size.width * 0.72, size.height * 0.74, size.width * 0.86,
+          size.height * 0.78, size.width, size.height * 0.76)
+      ..lineTo(size.width, size.height)
+      ..lineTo(0, size.height)
+      ..close();
+    canvas.drawPath(path, paint);
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+}
+
+/// Frosted glass surface with a glossy highlight band across the top.
+class _GlassCard extends StatelessWidget {
+  const _GlassCard({
+    required this.child,
+    this.borderColor,
+    this.glossTint,
+    this.padding = const EdgeInsets.all(13),
+    this.borderRadius = 16,
+  });
+
+  final Widget child;
+  final Color? borderColor;
+  final Color? glossTint;
+  final EdgeInsets padding;
+  final double borderRadius;
+
+  @override
+  Widget build(BuildContext context) {
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(borderRadius),
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 18, sigmaY: 18),
+        child: Container(
+          decoration: BoxDecoration(
+            color: Colors.white.withOpacity(0.5),
+            borderRadius: BorderRadius.circular(borderRadius),
+            border: Border.all(
+              color: borderColor ?? Colors.white.withOpacity(0.85),
+              width: 0.8,
+            ),
+          ),
+          child: Stack(
+            children: [
+              Positioned(
+                top: 0,
+                left: 0,
+                right: 0,
+                child: FractionallySizedBox(
+                  heightFactor: 0.44,
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: (glossTint ?? Colors.white).withOpacity(0.4),
+                      borderRadius: BorderRadius.vertical(
+                        top: Radius.circular(borderRadius),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              Padding(padding: padding, child: child),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _CircleFab extends StatelessWidget {
+  final double size;
+  final Color background;
+  final Color? border;
+  final IconData icon;
+  final Color iconColor;
+  final double iconSize;
+  final VoidCallback onTap;
+
+  const _CircleFab({
+    required this.size,
+    required this.background,
+    required this.icon,
+    required this.iconColor,
+    required this.onTap,
+    this.border,
+    this.iconSize = 18,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: Colors.transparent,
+      shape: const CircleBorder(),
+      child: InkWell(
+        onTap: onTap,
+        customBorder: const CircleBorder(),
+        child: Container(
+          width: size,
+          height: size,
+          decoration: BoxDecoration(
+            color: background,
+            shape: BoxShape.circle,
+            border: border != null ? Border.all(color: border!, width: 0.8) : null,
+          ),
+          child: Icon(icon, color: iconColor, size: iconSize),
+        ),
+      ),
+    );
+  }
+}
+
+class _TagFilterChip extends StatelessWidget {
   final String label;
   final bool selected;
   final VoidCallback onTap;
 
-  const _FilterChip(
+  const _TagFilterChip(
       {required this.label, required this.selected, required this.onTap});
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: onTap,
-      child: Container(
-        margin: const EdgeInsets.only(right: 6),
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 150),
+        padding: const EdgeInsets.symmetric(vertical: 8),
         decoration: BoxDecoration(
-          color: selected ? Colors.white : Colors.white.withOpacity(0.12),
-          borderRadius: BorderRadius.circular(20),
+          color: selected ? _C.matchaHeader : Colors.white.withOpacity(0.5),
+          borderRadius: BorderRadius.circular(999),
+          border: selected ? null : Border.all(color: Colors.white.withOpacity(0.85)),
         ),
         child: Text(
           label,
+          textAlign: TextAlign.center,
           style: TextStyle(
-            fontSize: 12,
+            fontSize: 11.5,
             fontWeight: FontWeight.w500,
-            color: selected ? AppColors.greenDark : Colors.white,
+            color: selected ? _C.almond : _C.ink,
           ),
         ),
       ),
@@ -385,17 +557,19 @@ class _PostCardState extends State<_PostCard> {
         'read': false,
         'createdAt': FieldValue.serverTimestamp(),
       });
-    } catch (_) {
-    }
+    } catch (_) {}
   }
 
   Future<void> _toggleLike() async {
-    final ref =
-        FirebaseFirestore.instance.collection('posts').doc(widget.postId);
+    final ref = FirebaseFirestore.instance.collection('posts').doc(widget.postId);
     if (_isLiked) {
-      await ref.update({'likes': FieldValue.arrayRemove([widget.uid])});
+      await ref.update({
+        'likes': FieldValue.arrayRemove([widget.uid])
+      });
     } else {
-      await ref.update({'likes': FieldValue.arrayUnion([widget.uid])});
+      await ref.update({
+        'likes': FieldValue.arrayUnion([widget.uid])
+      });
       await _notifyAuthor('like');
     }
   }
@@ -413,7 +587,7 @@ class _PostCardState extends State<_PostCard> {
               child: const Text('Cancel')),
           TextButton(
             onPressed: () => Navigator.pop(context, true),
-            style: TextButton.styleFrom(foregroundColor: AppColors.red),
+            style: TextButton.styleFrom(foregroundColor: _C.rust),
             child: const Text('Delete'),
           ),
         ],
@@ -421,7 +595,6 @@ class _PostCardState extends State<_PostCard> {
     );
     if (confirmed != true) return;
 
-    // Delete comments subcollection first
     final commentsSnap = await FirebaseFirestore.instance
         .collection('posts')
         .doc(widget.postId)
@@ -432,8 +605,7 @@ class _PostCardState extends State<_PostCard> {
     for (final doc in commentsSnap.docs) {
       batch.delete(doc.reference);
     }
-    batch.delete(
-        FirebaseFirestore.instance.collection('posts').doc(widget.postId));
+    batch.delete(FirebaseFirestore.instance.collection('posts').doc(widget.postId));
     await batch.commit();
 
     await FirebaseFirestore.instance
@@ -467,11 +639,7 @@ class _PostCardState extends State<_PostCard> {
   }
 
   String _initials(String name) {
-    final parts = name
-        .trim()
-        .split(' ')
-        .where((p) => p.isNotEmpty)
-        .toList();
+    final parts = name.trim().split(' ').where((p) => p.isNotEmpty).toList();
     if (parts.length >= 2) return '${parts[0][0]}${parts[1][0]}'.toUpperCase();
     if (parts.isNotEmpty) return parts[0][0].toUpperCase();
     return '?';
@@ -484,29 +652,11 @@ class _PostCardState extends State<_PostCard> {
     final tag = widget.data['tag'] ?? '';
     final ts = widget.data['createdAt'] as Timestamp?;
     final authorUid = widget.data['uid'] ?? '';
+    final accent = _isUrgentTag(tag) ? _C.rust : _C.matcha;
+    final avatar = _avatarColors(authorUid);
 
-    Color tagColor;
-    Color tagBg;
-    switch (tag) {
-      case 'FMD':
-        tagColor = AppColors.red;
-        tagBg = AppColors.redLight;
-        break;
-      case 'Crops':
-        tagColor = AppColors.greenText;
-        tagBg = AppColors.greenLight;
-        break;
-      default:
-        tagColor = AppColors.amberText;
-        tagBg = AppColors.amberLight;
-    }
-
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(AppRadius.card),
-        border: Border.all(color: AppColors.border),
-      ),
+    return _GlassCard(
+      padding: EdgeInsets.zero,
       child: Column(
         children: [
           Padding(
@@ -514,7 +664,6 @@ class _PostCardState extends State<_PostCard> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Author row
                 Row(
                   children: [
                     FutureBuilder<String>(
@@ -524,14 +673,14 @@ class _PostCardState extends State<_PostCard> {
                         return Row(
                           children: [
                             CircleAvatar(
-                              radius: 18,
-                              backgroundColor: AppColors.greenLight,
+                              radius: 17,
+                              backgroundColor: avatar.bg,
                               child: Text(
                                 _initials(name),
-                                style: const TextStyle(
+                                style: TextStyle(
                                   fontSize: 12,
                                   fontWeight: FontWeight.w600,
-                                  color: AppColors.greenDeep,
+                                  color: avatar.fg,
                                 ),
                               ),
                             ),
@@ -541,18 +690,14 @@ class _PostCardState extends State<_PostCard> {
                               children: [
                                 Text(
                                   name,
-                                  style: const TextStyle(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w500,
-                                    color: AppColors.textPrimary,
+                                  style: TextStyle(
+                                    fontSize: 13.5,
+                                    color: _C.ink,
                                   ),
                                 ),
                                 Text(
                                   '${widget.data['location'] ?? ''} · ${_timeAgo(ts)}',
-                                  style: const TextStyle(
-                                    fontSize: 11,
-                                    color: AppColors.textSecondary,
-                                  ),
+                                  style: TextStyle(fontSize: 10.5, color: _C.inkSoft),
                                 ),
                               ],
                             ),
@@ -563,33 +708,30 @@ class _PostCardState extends State<_PostCard> {
                     const Spacer(),
                     if (tag.isNotEmpty)
                       Container(
-                        margin: const EdgeInsets.only(right: 8),
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 10, vertical: 3),
+                        margin: const EdgeInsets.only(right: 4),
+                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
                         decoration: BoxDecoration(
-                          color: tagBg,
-                          borderRadius: BorderRadius.circular(AppRadius.chip),
+                          color: accent.withOpacity(0.18),
+                          borderRadius: BorderRadius.circular(999),
                         ),
                         child: Text(
                           tag,
                           style: TextStyle(
-                            fontSize: 11,
+                            fontSize: 10,
                             fontWeight: FontWeight.w500,
-                            color: tagColor,
+                            color: accent,
                           ),
                         ),
                       ),
-
                     if (_isOwner)
                       PopupMenuButton<String>(
-                        icon: const Icon(Icons.more_vert,
-                            size: 18, color: AppColors.textSecondary),
+                        icon: Icon(Icons.more_vert, size: 18, color: _C.inkSoft),
                         onSelected: (value) {
                           if (value == 'edit') _editPost(context);
                           if (value == 'delete') _deletePost(context);
                         },
-                        itemBuilder: (_) => const [
-                          PopupMenuItem(
+                        itemBuilder: (_) => [
+                          const PopupMenuItem(
                             value: 'edit',
                             child: Row(
                               children: [
@@ -603,11 +745,9 @@ class _PostCardState extends State<_PostCard> {
                             value: 'delete',
                             child: Row(
                               children: [
-                                Icon(Icons.delete_outline,
-                                    size: 16, color: AppColors.red),
-                                SizedBox(width: 8),
-                                Text('Delete post',
-                                    style: TextStyle(color: AppColors.red)),
+                                Icon(Icons.delete_outline, size: 16, color: _C.rust),
+                                const SizedBox(width: 8),
+                                Text('Delete post', style: TextStyle(color: _C.rust)),
                               ],
                             ),
                           ),
@@ -616,33 +756,19 @@ class _PostCardState extends State<_PostCard> {
                   ],
                 ),
                 const SizedBox(height: 10),
-
-                // Content
                 Text(
                   widget.data['content'] ?? '',
-                  style: const TextStyle(
-                    fontSize: 14,
-                    color: AppColors.textPrimary,
-                    height: 1.5,
-                  ),
+                  style: TextStyle(fontSize: 13.5, color: _C.ink, height: 1.5),
                 ),
-
-                // Edited label
                 if (widget.data['edited'] == true)
-                  const Padding(
-                    padding: EdgeInsets.only(top: 4),
-                    child: Text(
-                      'edited',
-                      style: TextStyle(
-                          fontSize: 11, color: AppColors.textSecondary),
-                    ),
+                  Padding(
+                    padding: const EdgeInsets.only(top: 4),
+                    child: Text('edited',
+                        style: TextStyle(fontSize: 11, color: _C.inkSoft)),
                   ),
-
                 const SizedBox(height: 12),
-                const Divider(height: 1, color: AppColors.border),
+                Divider(height: 1, color: Colors.white.withOpacity(0.7)),
                 const SizedBox(height: 10),
-
-                // Like + Comment actions
                 Row(
                   children: [
                     GestureDetector(
@@ -650,43 +776,26 @@ class _PostCardState extends State<_PostCard> {
                       child: Row(
                         children: [
                           Icon(
-                            _isLiked
-                                ? Icons.favorite_rounded
-                                : Icons.favorite_border_rounded,
-                            size: 18,
-                            color: _isLiked
-                                ? AppColors.red
-                                : AppColors.textSecondary,
+                            _isLiked ? Icons.favorite_rounded : Icons.favorite_border_rounded,
+                            size: 17,
+                            color: _isLiked ? _C.rust : _C.inkSoft,
                           ),
                           const SizedBox(width: 4),
-                          Text(
-                            '${likes.length}',
-                            style: const TextStyle(
-                              fontSize: 13,
-                              color: AppColors.textSecondary,
-                            ),
-                          ),
+                          Text('${likes.length}',
+                              style: TextStyle(fontSize: 12.5, color: _C.inkSoft)),
                         ],
                       ),
                     ),
                     const SizedBox(width: 16),
                     GestureDetector(
-                      onTap: () =>
-                          setState(() => _showComments = !_showComments),
+                      onTap: () => setState(() => _showComments = !_showComments),
                       child: Row(
                         children: [
-                          const Icon(
-                            Icons.chat_bubble_outline_rounded,
-                            size: 18,
-                            color: AppColors.textSecondary,
-                          ),
+                          Icon(Icons.chat_bubble_outline_rounded, size: 17, color: _C.inkSoft),
                           const SizedBox(width: 4),
                           Text(
                             '$commentCount ${commentCount == 1 ? 'reply' : 'replies'}',
-                            style: const TextStyle(
-                              fontSize: 13,
-                              color: AppColors.textSecondary,
-                            ),
+                            style: TextStyle(fontSize: 12.5, color: _C.inkSoft),
                           ),
                         ],
                       ),
@@ -696,8 +805,6 @@ class _PostCardState extends State<_PostCard> {
               ],
             ),
           ),
-
-          // Comments section
           if (_showComments)
             _CommentsSection(
               postId: widget.postId,
@@ -758,9 +865,7 @@ class _CommentsSectionState extends State<_CommentsSection> {
         'read': false,
         'createdAt': FieldValue.serverTimestamp(),
       });
-    } catch (_) {
-      // Best-effort only.
-    }
+    } catch (_) {}
   }
 
   Future<void> _submitComment() async {
@@ -770,7 +875,6 @@ class _CommentsSectionState extends State<_CommentsSection> {
 
     try {
       if (_editingCommentId != null) {
-
         final commentRef = FirebaseFirestore.instance
             .collection('posts')
             .doc(widget.postId)
@@ -793,9 +897,7 @@ class _CommentsSectionState extends State<_CommentsSection> {
           'content': text,
           'createdAt': FieldValue.serverTimestamp(),
         });
-        final postRef = FirebaseFirestore.instance
-            .collection('posts')
-            .doc(widget.postId);
+        final postRef = FirebaseFirestore.instance.collection('posts').doc(widget.postId);
         batch.update(postRef, {'commentCount': FieldValue.increment(1)});
         await batch.commit();
 
@@ -860,11 +962,9 @@ class _CommentsSectionState extends State<_CommentsSection> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      decoration: const BoxDecoration(
-        color: AppColors.background,
-        border: Border(top: BorderSide(color: AppColors.border)),
-        borderRadius:
-            BorderRadius.vertical(bottom: Radius.circular(AppRadius.card)),
+      decoration: BoxDecoration(
+        color: Colors.white.withOpacity(0.25),
+        border: Border(top: BorderSide(color: Colors.white.withOpacity(0.7))),
       ),
       child: Column(
         children: [
@@ -887,12 +987,10 @@ class _CommentsSectionState extends State<_CommentsSection> {
               }
 
               if (docs.isEmpty) {
-                return const Padding(
-                  padding: EdgeInsets.all(14),
-                  child: Text(
-                    'No replies yet. Be the first!',
-                    style: TextStyle(fontSize: 13, color: AppColors.textSecondary),
-                  ),
+                return Padding(
+                  padding: const EdgeInsets.all(14),
+                  child: Text('No replies yet. Be the first!',
+                      style: TextStyle(fontSize: 13, color: _C.inkSoft)),
                 );
               }
               return Column(
@@ -914,67 +1012,58 @@ class _CommentsSectionState extends State<_CommentsSection> {
               );
             },
           ),
-
           if (_editingCommentId != null || _replyingToCommentId != null)
             Container(
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
-              color: AppColors.amberLight,
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+              color: _C.rustBg.withOpacity(0.6),
               child: Row(
                 children: [
                   Icon(
-                    _editingCommentId != null
-                        ? Icons.edit
-                        : Icons.reply_rounded,
+                    _editingCommentId != null ? Icons.edit : Icons.reply_rounded,
                     size: 14,
-                    color: AppColors.amberText,
+                    color: _C.rust,
                   ),
                   const SizedBox(width: 6),
                   Expanded(
                     child: Text(
-                      _editingCommentId != null
-                          ? 'Editing reply'
-                          : 'Replying to comment',
-                      style: const TextStyle(
-                          fontSize: 12, color: AppColors.amberText),
+                      _editingCommentId != null ? 'Editing reply' : 'Replying to comment',
+                      style: TextStyle(fontSize: 12, color: _C.rust),
                     ),
                   ),
                   GestureDetector(
                     onTap: _cancelEdit,
-                    child: const Text(
+                    child: Text(
                       'Cancel',
                       style: TextStyle(
-                          fontSize: 12,
-                          color: AppColors.amberText,
-                          fontWeight: FontWeight.w600),
+                          fontSize: 12, color: _C.rust, fontWeight: FontWeight.w600),
                     ),
                   ),
                 ],
               ),
             ),
-
-          // Comment input
           Padding(
             padding: const EdgeInsets.fromLTRB(14, 8, 14, 14),
             child: Row(
               children: [
                 Expanded(
-                  child: TextField(
-                    controller: _controller,
-                    decoration: InputDecoration(
-                      hintText: _editingCommentId != null
-                          ? 'Edit your reply...'
-                          : 'Write a reply...',
-                      hintStyle: const TextStyle(fontSize: 13),
-                      contentPadding: const EdgeInsets.symmetric(
-                          horizontal: 14, vertical: 10),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(20),
-                        borderSide:
-                            const BorderSide(color: AppColors.border),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.55),
+                      borderRadius: BorderRadius.circular(20),
+                      border: Border.all(color: Colors.white.withOpacity(0.85)),
+                    ),
+                    child: TextField(
+                      controller: _controller,
+                      style: TextStyle(fontSize: 13, color: _C.ink),
+                      decoration: InputDecoration(
+                        hintText:
+                            _editingCommentId != null ? 'Edit your reply...' : 'Write a reply...',
+                        hintStyle: TextStyle(fontSize: 13, color: _C.inkSoft),
+                        contentPadding:
+                            const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                        border: InputBorder.none,
                       ),
                     ),
-                    style: const TextStyle(fontSize: 13),
                   ),
                 ),
                 const SizedBox(width: 8),
@@ -983,18 +1072,13 @@ class _CommentsSectionState extends State<_CommentsSection> {
                   child: Container(
                     width: 38,
                     height: 38,
-                    decoration: BoxDecoration(
-                      color: AppColors.greenDark,
-                      borderRadius: BorderRadius.circular(19),
-                    ),
+                    decoration: const BoxDecoration(color: _C.rust, shape: BoxShape.circle),
                     child: _submitting
-                        ? const Padding(
-                            padding: EdgeInsets.all(10),
-                            child: CircularProgressIndicator(
-                                strokeWidth: 2, color: Colors.white),
+                        ? Padding(
+                            padding: const EdgeInsets.all(10),
+                            child: CircularProgressIndicator(strokeWidth: 2, color: _C.rustBg),
                           )
-                        : const Icon(Icons.send_rounded,
-                            color: Colors.white, size: 18),
+                        : Icon(Icons.send_rounded, color: _C.rustBg, size: 18),
                   ),
                 ),
               ],
@@ -1031,10 +1115,9 @@ class _CommentTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final avatar = _avatarColors(data['uid'] ?? '');
     return Container(
-      color: (isEditing || isReplyTarget)
-          ? AppColors.amberLight.withOpacity(0.3)
-          : null,
+      color: (isEditing || isReplyTarget) ? _C.rustBg.withOpacity(0.4) : null,
       padding: const EdgeInsets.fromLTRB(14, 10, 14, 0),
       child: FutureBuilder<String>(
         future: getName(data['uid'] ?? ''),
@@ -1045,14 +1128,10 @@ class _CommentTile extends StatelessWidget {
             children: [
               CircleAvatar(
                 radius: 14,
-                backgroundColor: AppColors.greenLight,
+                backgroundColor: avatar.bg,
                 child: Text(
                   name.isNotEmpty ? name[0].toUpperCase() : '?',
-                  style: const TextStyle(
-                    fontSize: 11,
-                    fontWeight: FontWeight.w600,
-                    color: AppColors.greenDeep,
-                  ),
+                  style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: avatar.fg),
                 ),
               ),
               const SizedBox(width: 8),
@@ -1062,31 +1141,21 @@ class _CommentTile extends StatelessWidget {
                   children: [
                     Row(
                       children: [
-                        Text(
-                          name,
-                          style: const TextStyle(
-                            fontSize: 12,
-                            fontWeight: FontWeight.w600,
-                            color: AppColors.textPrimary,
-                          ),
-                        ),
+                        Text(name,
+                            style: TextStyle(
+                                fontSize: 12, fontWeight: FontWeight.w600, color: _C.ink)),
                         if (data['edited'] == true)
-                          const Padding(
-                            padding: EdgeInsets.only(left: 6),
-                            child: Text(
-                              'edited',
-                              style: TextStyle(
-                                  fontSize: 10,
-                                  color: AppColors.textSecondary),
-                            ),
+                          Padding(
+                            padding: const EdgeInsets.only(left: 6),
+                            child: Text('edited',
+                                style: TextStyle(fontSize: 10, color: _C.inkSoft)),
                           ),
                         const Spacer(),
                         GestureDetector(
                           onTap: onReply,
-                          child: const Padding(
-                            padding: EdgeInsets.only(left: 10),
-                            child: Icon(Icons.reply_rounded,
-                                size: 14, color: AppColors.textSecondary),
+                          child: Padding(
+                            padding: const EdgeInsets.only(left: 10),
+                            child: Icon(Icons.reply_rounded, size: 14, color: _C.inkSoft),
                           ),
                         ),
                         if (isOwner)
@@ -1094,19 +1163,17 @@ class _CommentTile extends StatelessWidget {
                             children: [
                               GestureDetector(
                                 onTap: onEdit,
-                                child: const Padding(
-                                  padding: EdgeInsets.only(left: 10),
-                                  child: Icon(Icons.edit_outlined,
-                                      size: 14,
-                                      color: AppColors.textSecondary),
+                                child: Padding(
+                                  padding: const EdgeInsets.only(left: 10),
+                                  child:
+                                      Icon(Icons.edit_outlined, size: 14, color: _C.inkSoft),
                                 ),
                               ),
                               GestureDetector(
                                 onTap: onDelete,
-                                child: const Padding(
-                                  padding: EdgeInsets.only(left: 10),
-                                  child: Icon(Icons.delete_outline,
-                                      size: 14, color: AppColors.red),
+                                child: Padding(
+                                  padding: const EdgeInsets.only(left: 10),
+                                  child: Icon(Icons.delete_outline, size: 14, color: _C.rust),
                                 ),
                               ),
                             ],
@@ -1116,11 +1183,7 @@ class _CommentTile extends StatelessWidget {
                     const SizedBox(height: 2),
                     Text(
                       data['content'] ?? '',
-                      style: const TextStyle(
-                        fontSize: 13,
-                        color: AppColors.textPrimary,
-                        height: 1.4,
-                      ),
+                      style: TextStyle(fontSize: 13, color: _C.ink, height: 1.4),
                     ),
                     const SizedBox(height: 10),
                   ],
@@ -1134,6 +1197,9 @@ class _CommentTile extends StatelessWidget {
   }
 }
 
+/// New/edit post — a glass sheet sliding up over the feed, closed with an
+/// X rather than a back arrow since composing is a quick, interruptive
+/// action rather than its own destination (unlike Make a Pal).
 class _PostSheet extends StatefulWidget {
   final String uid;
   final String? existingPostId;
@@ -1161,8 +1227,7 @@ class _PostSheetState extends State<_PostSheet> {
   @override
   void initState() {
     super.initState();
-    _controller =
-        TextEditingController(text: widget.existingData?['content'] ?? '');
+    _controller = TextEditingController(text: widget.existingData?['content'] ?? '');
     _tag = widget.existingData?['tag'] ?? '';
     _location = widget.existingData?['location'] ?? '';
     _locationController = TextEditingController(text: _location);
@@ -1182,10 +1247,7 @@ class _PostSheetState extends State<_PostSheet> {
 
     try {
       if (_isEdit) {
-        await FirebaseFirestore.instance
-            .collection('posts')
-            .doc(widget.existingPostId)
-            .update({
+        await FirebaseFirestore.instance.collection('posts').doc(widget.existingPostId).update({
           'content': text,
           'tag': _tag,
           'location': _location,
@@ -1216,78 +1278,86 @@ class _PostSheetState extends State<_PostSheet> {
 
   @override
   Widget build(BuildContext context) {
+    const tags = ['FMD', 'Crops', 'Livestock', 'General'];
+
     return Container(
-      padding:
-          EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
+      padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
       decoration: const BoxDecoration(
-        color: AppColors.background,
+        color: _C.almond,
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
       child: Padding(
-        padding: const EdgeInsets.all(20),
+        padding: const EdgeInsets.fromLTRB(20, 12, 20, 22),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
+            Center(
+              child: Container(
+                width: 36,
+                height: 4,
+                margin: const EdgeInsets.only(bottom: 14),
+                decoration: BoxDecoration(
+                  color: _C.matcha.withOpacity(0.3),
+                  borderRadius: BorderRadius.circular(999),
+                ),
+              ),
+            ),
             Row(
               children: [
                 Text(
                   _isEdit ? 'Edit post' : 'New post',
-                  style: const TextStyle(
-                    fontSize: 17,
-                    fontWeight: FontWeight.w600,
-                    color: AppColors.textPrimary,
-                  ),
+                  style: TextStyle(fontSize: 17, fontWeight: FontWeight.w600, color: _C.ink),
                 ),
                 const Spacer(),
                 GestureDetector(
                   onTap: () => Navigator.of(context).pop(),
-                  child: const Icon(Icons.close_rounded,
-                      color: AppColors.textSecondary),
+                  child: Container(
+                    width: 30,
+                    height: 30,
+                    decoration: BoxDecoration(
+                      color: _C.matcha.withOpacity(0.12),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: Icon(Icons.close_rounded, color: _C.inkSoft, size: 16),
+                  ),
                 ),
               ],
             ),
             const SizedBox(height: 16),
-
-            TextField(
-              controller: _controller,
-              maxLines: 4,
-              decoration: InputDecoration(
-                hintText: 'What\'s happening on your farm?',
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(AppRadius.button),
-                  borderSide: const BorderSide(color: AppColors.border),
+            _GlassCard(
+              borderRadius: 14,
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 4),
+              child: TextField(
+                controller: _controller,
+                maxLines: 4,
+                style: TextStyle(fontSize: 13.5, color: _C.ink),
+                decoration: InputDecoration(
+                  hintText: "What's happening on your farm?",
+                  hintStyle: TextStyle(fontSize: 13.5, color: _C.inkSoft),
+                  border: InputBorder.none,
                 ),
               ),
             ),
             const SizedBox(height: 14),
-
             Row(
               children: [
-                const Text('Tag:',
-                    style: TextStyle(
-                        fontSize: 13, color: AppColors.textSecondary)),
+                Text('Tag:', style: TextStyle(fontSize: 13, color: _C.inkSoft)),
                 const SizedBox(width: 10),
-                ...['FMD', 'Crops', 'Livestock', 'General'].map((t) {
+                ...tags.map((t) {
                   final selected = _tag == t;
                   return Padding(
                     padding: const EdgeInsets.only(right: 6),
                     child: GestureDetector(
-                      onTap: () =>
-                          setState(() => _tag = selected ? '' : t),
+                      onTap: () => setState(() => _tag = selected ? '' : t),
                       child: Container(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 12, vertical: 5),
+                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                         decoration: BoxDecoration(
-                          color: selected
-                              ? AppColors.greenDark
-                              : AppColors.background2,
-                          borderRadius:
-                              BorderRadius.circular(AppRadius.chip),
+                          color: selected ? _C.matchaHeader : Colors.white.withOpacity(0.55),
+                          borderRadius: BorderRadius.circular(999),
                           border: Border.all(
-                            color: selected
-                                ? AppColors.greenDark
-                                : AppColors.border,
+                            color:
+                                selected ? _C.matchaHeader : Colors.white.withOpacity(0.85),
                           ),
                         ),
                         child: Text(
@@ -1295,9 +1365,7 @@ class _PostSheetState extends State<_PostSheet> {
                           style: TextStyle(
                             fontSize: 12,
                             fontWeight: FontWeight.w500,
-                            color: selected
-                                ? Colors.white
-                                : AppColors.textSecondary,
+                            color: selected ? _C.almond : _C.inkSoft,
                           ),
                         ),
                       ),
@@ -1307,32 +1375,51 @@ class _PostSheetState extends State<_PostSheet> {
               ],
             ),
             const SizedBox(height: 14),
-
-            TextField(
-              controller: _locationController,
-              decoration: InputDecoration(
-                hintText: 'Your location (optional)',
-                prefixIcon:
-                    const Icon(Icons.location_on_outlined, size: 18),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(AppRadius.button),
-                  borderSide: const BorderSide(color: AppColors.border),
-                ),
+            _GlassCard(
+              borderRadius: 14,
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 4),
+              child: Row(
+                children: [
+                  Icon(Icons.location_on_outlined, size: 17, color: _C.inkSoft),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: TextField(
+                      controller: _locationController,
+                      style: TextStyle(fontSize: 13.5, color: _C.ink),
+                      decoration: InputDecoration(
+                        hintText: 'Your location (optional)',
+                        hintStyle: TextStyle(fontSize: 13.5, color: _C.inkSoft),
+                        border: InputBorder.none,
+                      ),
+                      onChanged: (v) => _location = v,
+                    ),
+                  ),
+                ],
               ),
-              onChanged: (v) => _location = v,
             ),
             const SizedBox(height: 20),
-
-            ElevatedButton(
-              onPressed: _submitting ? null : _submit,
-              child: _submitting
-                  ? const SizedBox(
-                      height: 20,
-                      width: 20,
-                      child: CircularProgressIndicator(
-                          strokeWidth: 2, color: Colors.white),
-                    )
-                  : Text(_isEdit ? 'Save changes' : 'Post'),
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                onPressed: _submitting ? null : _submit,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: _C.rust,
+                  foregroundColor: _C.rustBg,
+                  padding: const EdgeInsets.symmetric(vertical: 14),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                  elevation: 0,
+                ),
+                child: _submitting
+                    ? SizedBox(
+                        height: 20,
+                        width: 20,
+                        child: CircularProgressIndicator(strokeWidth: 2, color: _C.rustBg),
+                      )
+                    : Text(
+                        _isEdit ? 'Save changes' : 'Post',
+                        style: const TextStyle(fontWeight: FontWeight.w600),
+                      ),
+              ),
             ),
           ],
         ),

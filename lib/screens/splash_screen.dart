@@ -1,8 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import '../main.dart';
 import 'login_screen.dart';
 import 'shell_screen.dart';
+
+/// AgroLens palette — matcha green / almond / white, dark splash variant.
+class _C {
+  static const matchaDark = Color(0xFF374530);
+  static const matcha = Color(0xFF5C7148);
+  static const matchaLight = Color(0xFFD6E0C4);
+  static const almond = Color(0xFFF6EFE2);
+  static const rust = Color(0xFFC1703E);
+}
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -62,7 +70,7 @@ class _SplashScreenState extends State<SplashScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.greenDark,
+      backgroundColor: _C.matchaDark,
       body: Center(
         child: AnimatedBuilder(
           animation: _controller,
@@ -77,44 +85,44 @@ class _SplashScreenState extends State<SplashScreen>
                     width: 96,
                     height: 96,
                     decoration: BoxDecoration(
-                      color: AppColors.greenMid,
+                      color: _C.rust,
                       borderRadius: BorderRadius.circular(28),
                     ),
-                    child: const Icon(
+                    child: Icon(
                       Icons.eco_rounded,
                       size: 52,
-                      color: Colors.white,
+                      color: _C.almond,
                     ),
                   ),
                   const SizedBox(height: 20),
 
-                  const Text(
+                  Text(
                     'AgroLens',
                     style: TextStyle(
                       fontSize: 34,
                       fontWeight: FontWeight.w600,
-                      color: Colors.white,
+                      color: _C.almond,
                       letterSpacing: -0.5,
                     ),
                   ),
                   const SizedBox(height: 6),
 
-                  const Text(
+                  Text(
                     'The Vet In Your Pocket.',
                     style: TextStyle(
                       fontSize: 14,
-                      color: AppColors.greenHint,
+                      color: _C.matchaLight,
                       fontWeight: FontWeight.w400,
                     ),
                   ),
                   const SizedBox(height: 48),
 
-                  const SizedBox(
+                  SizedBox(
                     width: 24,
                     height: 24,
                     child: CircularProgressIndicator(
                       strokeWidth: 2,
-                      color: AppColors.greenHint,
+                      color: _C.matchaLight,
                     ),
                   ),
                 ],

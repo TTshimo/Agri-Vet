@@ -1,7 +1,39 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:intl/intl.dart';
-import '../../main.dart';
+
+/// AgroLens palette — matcha green / almond / white, light module variant.
+class _C {
+  static const matchaDark = Color(0xFF374530);
+  static const matcha = Color(0xFF5C7148);
+  static const matchaLight = Color(0xFFD6E0C4);
+  static const almond = Color(0xFFF6EFE2);
+  static const ink = Color(0xFF2B2820);
+  static const inkSoft = Color(0xFF726C5C);
+  static const rust = Color(0xFFC1703E);
+  static const hairline = Color(0xFFEDE6D6);
+}
+
+/// Bottom wave finishing off the dark matcha header band — same shape
+/// used across the other restyled screens for a consistent silhouette.
+class _HeaderWaveClipper extends CustomClipper<Path> {
+  @override
+  Path getClip(Size size) {
+    final path = Path()
+      ..lineTo(0, size.height * 0.62)
+      ..cubicTo(
+        size.width * 0.32, size.height,
+        size.width * 0.66, size.height * 0.4,
+        size.width, size.height * 0.68,
+      )
+      ..lineTo(size.width, 0)
+      ..close();
+    return path;
+  }
+
+  @override
+  bool shouldReclip(covariant CustomClipper<Path> oldClipper) => false;
+}
 
 enum ActivityType { posts, diagnoses }
 
@@ -19,72 +51,120 @@ class UserActivityScreen extends StatelessWidget {
       type == ActivityType.posts ? 'posts' : 'diagnoses';
 
   String get _title =>
-      type == ActivityType.posts ? 'My Posts' : 'My Diagnoses';
+      type == ActivityType.posts ? 'My posts' : 'My diagnoses';
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
     return Scaffold(
-      backgroundColor: theme.scaffoldBackgroundColor,
-      appBar: AppBar(
-        backgroundColor: AppColors.greenDark,
-        foregroundColor: Colors.white,
-        title: Text(_title),
-        elevation: 0,
-      ),
-      body: StreamBuilder<QuerySnapshot>(
-        stream: FirebaseFirestore.instance
-            .collection(_collection)
-            .where('uid', isEqualTo: uid)
-            .orderBy('createdAt', descending: true)
-            .snapshots(),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(
-                child: CircularProgressIndicator(
-                    color: AppColors.greenDark));
-          }
-
-          final docs = snapshot.data?.docs ?? [];
-
-          if (docs.isEmpty) {
-            return Center(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Icon(
-                    type == ActivityType.posts
-                        ? Icons.article_outlined
-                        : Icons.biotech_outlined,
-                    size: 48,
-                    color: AppColors.textSecondary,
-                  ),
-                  const SizedBox(height: 12),
-                  Text(
-                    type == ActivityType.posts
-                        ? 'No posts yet'
-                        : 'No diagnoses yet',
-                    style: const TextStyle(
-                        color: AppColors.textSecondary),
-                  ),
-                ],
+      backgroundColor: _C.almond,
+      body: CustomScrollView(
+        slivers: [
+          SliverToBoxAdapter(
+            child: ClipPath(
+              clipper: _HeaderWaveClipper(),
+              child: Container(
+                color: _C.matchaDark,
+                padding: EdgeInsets.fromLTRB(
+                  8,
+                  MediaQuery.of(context).padding.top + 8,
+                  16,
+                  40,
+                ),
+                child: Row(
+                  children: [
+                    IconButton(
+                      icon: Icon(Icons.arrow_back_ios_new_rounded,
+                          color: _C.almond, size: 18),
+                      onPressed: () => Navigator.pop(context),
+                    ),
+                    Text(
+                      _title,
+                      style: TextStyle(
+                        fontSize: 17,
+                        fontWeight: FontWeight.w600,
+                        color: _C.almond,
+                      ),
+                    ),
+                  ],
+                ),
               ),
-            );
-          }
+            ),
+          ),
+          StreamBuilder<QuerySnapshot>(
+            stream: FirebaseFirestore.instance
+                .collection(_collection)
+                .where('uid', isEqualTo: uid)
+                .orderBy('createdAt', descending: true)
+                .snapshots(),
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return SliverFillRemaining(
+                  child: Center(
+                    child: CircularProgressIndicator(color: _C.matcha),
+                  ),
+                );
+              }
 
-          return ListView.separated(
-            padding: const EdgeInsets.all(16),
-            itemCount: docs.length,
-            separatorBuilder: (_, __) => const SizedBox(height: 12),
-            itemBuilder: (context, i) {
-              final d = docs[i].data() as Map<String, dynamic>;
-              return type == ActivityType.posts
-                  ? _PostCard(data: d)
-                  : _DiagnosisCard(data: d);
+              final docs = snapshot.data?.docs ?? [];
+
+              if (docs.isEmpty) {
+                return SliverFillRemaining(
+                  child: Center(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Container(
+                          width: 64,
+                          height: 64,
+                          decoration: BoxDecoration(
+                            color: _C.matchaLight.withOpacity(0.5),
+                            shape: BoxShape.circle,
+                          ),
+                          child: Icon(
+                            type == ActivityType.posts
+                                ? Icons.article_outlined
+                                : Icons.biotech_outlined,
+                            size: 26,
+                            color: _C.matcha.withOpacity(0.7),
+                          ),
+                        ),
+                        const SizedBox(height: 14),
+                        Text(
+                          type == ActivityType.posts
+                              ? 'No posts yet'
+                              : 'No diagnoses yet',
+                          style: TextStyle(
+                              fontSize: 15,
+                              fontWeight: FontWeight.w500,
+                              color: _C.ink),
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+              }
+
+              return SliverPadding(
+                padding: const EdgeInsets.all(16),
+                sliver: SliverList(
+                  delegate: SliverChildBuilderDelegate(
+                    (context, i) {
+                      final d = docs[i].data() as Map<String, dynamic>;
+                      return Padding(
+                        padding: const EdgeInsets.only(bottom: 12),
+                        child: type == ActivityType.posts
+                            ? _PostCard(data: d)
+                            : _DiagnosisCard(data: d),
+                      );
+                    },
+                    childCount: docs.length,
+                  ),
+                ),
+              );
             },
-          );
-        },
+          ),
+          const SliverToBoxAdapter(child: SizedBox(height: 24)),
+        ],
       ),
     );
   }
@@ -96,22 +176,15 @@ class _PostCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
     final ts = (data['createdAt'] as Timestamp?)?.toDate();
-    final dateStr = ts != null
-        ? DateFormat('d MMM yyyy').format(ts)
-        : '';
+    final dateStr = ts != null ? DateFormat('d MMM yyyy').format(ts) : '';
     final tags = List<String>.from(data['tags'] ?? []);
 
     return Container(
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF1E1E1E) : Colors.white,
-        borderRadius: BorderRadius.circular(AppRadius.card),
-        border: Border.all(
-            color: isDark
-                ? const Color(0xFF2C2C2C)
-                : AppColors.border),
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -120,15 +193,13 @@ class _PostCard extends StatelessWidget {
             Expanded(
               child: Text(
                 data['title'] ?? 'Untitled',
-                style: const TextStyle(
-                    fontSize: 15,
+                style: TextStyle(
+                    fontSize: 14.5,
                     fontWeight: FontWeight.w600,
-                    color: AppColors.textPrimary),
+                    color: _C.ink),
               ),
             ),
-            Text(dateStr,
-                style: const TextStyle(
-                    fontSize: 11, color: AppColors.textSecondary)),
+            Text(dateStr, style: TextStyle(fontSize: 11, color: _C.inkSoft)),
           ]),
           if ((data['body'] ?? '').isNotEmpty) ...[
             const SizedBox(height: 6),
@@ -136,8 +207,7 @@ class _PostCard extends StatelessWidget {
               data['body'],
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
-              style: const TextStyle(
-                  fontSize: 13, color: AppColors.textSecondary),
+              style: TextStyle(fontSize: 13, color: _C.inkSoft),
             ),
           ],
           if (tags.isNotEmpty) ...[
@@ -149,32 +219,27 @@ class _PostCard extends StatelessWidget {
                         padding: const EdgeInsets.symmetric(
                             horizontal: 8, vertical: 3),
                         decoration: BoxDecoration(
-                          color: AppColors.greenDark.withOpacity(0.08),
+                          color: _C.matchaLight.withOpacity(0.6),
                           borderRadius: BorderRadius.circular(20),
                         ),
                         child: Text(t,
-                            style: const TextStyle(
-                                fontSize: 11,
-                                color: AppColors.greenDark)),
+                            style: TextStyle(
+                                fontSize: 11, color: _C.matchaDark)),
                       ))
                   .toList(),
             ),
           ],
           const SizedBox(height: 8),
           Row(children: [
-            const Icon(Icons.thumb_up_outlined,
-                size: 14, color: AppColors.textSecondary),
+            Icon(Icons.thumb_up_outlined, size: 14, color: _C.inkSoft),
             const SizedBox(width: 4),
             Text('${data['likes'] ?? 0}',
-                style: const TextStyle(
-                    fontSize: 12, color: AppColors.textSecondary)),
+                style: TextStyle(fontSize: 12, color: _C.inkSoft)),
             const SizedBox(width: 14),
-            const Icon(Icons.comment_outlined,
-                size: 14, color: AppColors.textSecondary),
+            Icon(Icons.comment_outlined, size: 14, color: _C.inkSoft),
             const SizedBox(width: 4),
             Text('${data['commentCount'] ?? 0}',
-                style: const TextStyle(
-                    fontSize: 12, color: AppColors.textSecondary)),
+                style: TextStyle(fontSize: 12, color: _C.inkSoft)),
           ]),
         ],
       ),
@@ -188,23 +253,16 @@ class _DiagnosisCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
     final ts = (data['createdAt'] as Timestamp?)?.toDate();
-    final dateStr = ts != null
-        ? DateFormat('d MMM yyyy').format(ts)
-        : '';
+    final dateStr = ts != null ? DateFormat('d MMM yyyy').format(ts) : '';
     final confidence = ((data['confidence'] ?? 0.0) * 100).round();
     final severityColor = _severityColor(data['severity'] ?? '');
 
     return Container(
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF1E1E1E) : Colors.white,
-        borderRadius: BorderRadius.circular(AppRadius.card),
-        border: Border.all(
-            color: isDark
-                ? const Color(0xFF2C2C2C)
-                : AppColors.border),
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -213,31 +271,26 @@ class _DiagnosisCard extends StatelessWidget {
             Expanded(
               child: Text(
                 data['animalType'] ?? 'Unknown animal',
-                style: const TextStyle(
-                    fontSize: 15,
+                style: TextStyle(
+                    fontSize: 14.5,
                     fontWeight: FontWeight.w600,
-                    color: AppColors.textPrimary),
+                    color: _C.ink),
               ),
             ),
-            Text(dateStr,
-                style: const TextStyle(
-                    fontSize: 11, color: AppColors.textSecondary)),
+            Text(dateStr, style: TextStyle(fontSize: 11, color: _C.inkSoft)),
           ]),
           const SizedBox(height: 6),
           Text(
             data['prediction'] ?? 'No result',
-            style: const TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.w500,
-                color: AppColors.greenDark),
+            style: TextStyle(
+                fontSize: 14, fontWeight: FontWeight.w500, color: _C.matcha),
           ),
           const SizedBox(height: 8),
           Row(children: [
             Container(
-              padding: const EdgeInsets.symmetric(
-                  horizontal: 8, vertical: 3),
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
               decoration: BoxDecoration(
-                color: severityColor.withOpacity(0.12),
+                color: severityColor.withOpacity(0.14),
                 borderRadius: BorderRadius.circular(20),
               ),
               child: Text(
@@ -250,19 +303,21 @@ class _DiagnosisCard extends StatelessWidget {
             ),
             const Spacer(),
             Text('$confidence% confidence',
-                style: const TextStyle(
-                    fontSize: 11, color: AppColors.textSecondary)),
+                style: TextStyle(fontSize: 11, color: _C.inkSoft)),
           ]),
         ],
       ),
     );
   }
 
+  // Simplified to the app's two-tone risk system: high severity reads as
+  // rust (urgent), everything else reads as matcha (calm/informational).
   Color _severityColor(String s) {
     switch (s.toLowerCase()) {
-      case 'high':   return const Color(0xFFD32F2F);
-      case 'medium': return const Color(0xFFF57C00);
-      default:      return const Color(0xFF2E7D32);
+      case 'high':
+        return _C.rust;
+      default:
+        return _C.matcha;
     }
   }
 }

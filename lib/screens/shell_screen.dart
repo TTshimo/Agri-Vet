@@ -1,10 +1,21 @@
 import 'package:flutter/material.dart';
-import '../main.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'home_screen.dart';
 import 'diagnosis_screen.dart';
 import 'community_screen.dart';
 import 'learn_screen.dart';
 import 'profile_screen.dart';
+
+/// AgroLens palette — matcha green / almond / white, light module variant.
+class _C {
+  static const matcha = Color(0xFF5C7148);
+  static const ink = Color(0xFF2B2820);
+  static const inkSoft = Color(0xFF726C5C);
+  static const rust = Color(0xFFC1703E);
+  static const hairline = Color(0xFFEDE6D6);
+  static const danger = Color(0xFFC94C3F);
+}
 
 class ShellScreen extends StatefulWidget {
   const ShellScreen({super.key});
@@ -59,7 +70,7 @@ class _ShellScreenState extends State<ShellScreen> {
         index: _currentIndex,
         children: _screens,
       ),
-      bottomNavigationBar: _AgriVetNavBar(
+      bottomNavigationBar: _AgroLensNavBar(
         currentIndex: _currentIndex,
         items: _navItems,
         onTap: (i) => setState(() => _currentIndex = i),
@@ -68,12 +79,12 @@ class _ShellScreenState extends State<ShellScreen> {
   }
 }
 
-class _AgriVetNavBar extends StatelessWidget {
+class _AgroLensNavBar extends StatelessWidget {
   final int currentIndex;
   final List<_NavItem> items;
   final ValueChanged<int> onTap;
 
-  const _AgriVetNavBar({
+  const _AgroLensNavBar({
     required this.currentIndex,
     required this.items,
     required this.onTap,
@@ -82,12 +93,13 @@ class _AgriVetNavBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final bottomPad = MediaQuery.of(context).padding.bottom;
+    final uid = FirebaseAuth.instance.currentUser?.uid;
 
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
         border: const Border(
-          top: BorderSide(color: AppColors.border, width: 0.5),
+          top: BorderSide(color: _C.hairline, width: 0.5),
         ),
         boxShadow: [
           BoxShadow(
@@ -109,6 +121,31 @@ class _AgriVetNavBar extends StatelessWidget {
             children: List.generate(items.length, (i) {
               final active = i == currentIndex;
               final item = items[i];
+              final isProfileTab = item.label == 'Profile';
+
+              // Profile tab watches for unread notifications and shows a
+              // small badge dot — mirrors the unread query used on the
+              // Notifications item inside ProfileSocialMenu.
+              if (isProfileTab && uid != null) {
+                return StreamBuilder<QuerySnapshot>(
+                  stream: FirebaseFirestore.instance
+                      .collection('notifications')
+                      .doc(uid)
+                      .collection('items')
+                      .where('read', isEqualTo: false)
+                      .snapshots(),
+                  builder: (context, snapshot) {
+                    final hasUnread = (snapshot.data?.docs.length ?? 0) > 0;
+                    return _NavTile(
+                      item: item,
+                      active: active,
+                      showBadge: hasUnread,
+                      onTap: () => onTap(i),
+                    );
+                  },
+                );
+              }
+
               return _NavTile(
                 item: item,
                 active: active,
@@ -125,11 +162,13 @@ class _AgriVetNavBar extends StatelessWidget {
 class _NavTile extends StatelessWidget {
   final _NavItem item;
   final bool active;
+  final bool showBadge;
   final VoidCallback onTap;
 
   const _NavTile({
     required this.item,
     required this.active,
+    this.showBadge = false,
     required this.onTap,
   });
 
@@ -143,35 +182,47 @@ class _NavTile extends StatelessWidget {
         curve: Curves.easeInOut,
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
         decoration: BoxDecoration(
-          color: active
-              ? AppColors.brown.withOpacity(0.1)
-              : Colors.transparent,
+          color: active ? _C.rust.withOpacity(0.1) : Colors.transparent,
           borderRadius: BorderRadius.circular(12),
         ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            AnimatedSwitcher(
-              duration: const Duration(milliseconds: 200),
-              child: Icon(
-                active ? item.activeIcon : item.icon,
-                key: ValueKey(active),
-                size: 24,
-                color: active
-                    ? AppColors.brown
-                    : AppColors.textSecondary,
-              ),
+            Stack(
+              clipBehavior: Clip.none,
+              children: [
+                AnimatedSwitcher(
+                  duration: const Duration(milliseconds: 200),
+                  child: Icon(
+                    active ? item.activeIcon : item.icon,
+                    key: ValueKey(active),
+                    size: 24,
+                    color: active ? _C.rust : _C.inkSoft,
+                  ),
+                ),
+                if (showBadge)
+                  Positioned(
+                    right: -2,
+                    top: -2,
+                    child: Container(
+                      width: 8,
+                      height: 8,
+                      decoration: BoxDecoration(
+                        color: _C.danger,
+                        shape: BoxShape.circle,
+                        border: Border.all(color: Colors.white, width: 1.5),
+                      ),
+                    ),
+                  ),
+              ],
             ),
             const SizedBox(height: 3),
             Text(
               item.label,
               style: TextStyle(
                 fontSize: 10,
-                fontWeight:
-                    active ? FontWeight.w600 : FontWeight.w400,
-                color: active
-                    ? AppColors.brown
-                    : AppColors.textSecondary,
+                fontWeight: active ? FontWeight.w600 : FontWeight.w400,
+                color: active ? _C.rust : _C.inkSoft,
               ),
             ),
           ],

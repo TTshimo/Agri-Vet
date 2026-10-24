@@ -17,6 +17,21 @@ service cloud.firestore {
       return isSignedIn() && request.auth.uid in participants;
     }
 
+    // ── news ─────────────────────────────────────────────────────────────
+    // Single flat collection populated by a scheduled GitHub Actions
+    // workflow (web scraper) using the Firebase Admin SDK, which
+    // authenticates as a service account and bypasses these rules
+    // entirely — so no client create/update path is needed here.
+    // Documents carry a `category` field (alert, livestock, crop, weather,
+    // policy) that the Home screen filters/queries on client-side via
+    // `.where('category', isEqualTo: ...)`, rather than living in separate
+    // collections. The app only ever reads this collection.
+
+    match /news/{itemId} {
+      allow read: if isSignedIn();
+      allow write: if false;
+    }
+
     // ── users ────────────────────────────────────────────────────────────
     // Profile docs: name, bio, location, postCount, blockedUids[].
     // Anyone signed in can read (needed for Make a Pal / profile views /

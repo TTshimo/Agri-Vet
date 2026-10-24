@@ -2,8 +2,41 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:intl/intl.dart';
-import '../main.dart';
 import 'user_profile_screen.dart';
+
+/// AgroLens palette — matcha green / almond / white, light module variant.
+class _C {
+  static const matchaDark = Color(0xFF374530);
+  static const matcha = Color(0xFF5C7148);
+  static const matchaLight = Color(0xFFD6E0C4);
+  static const almond = Color(0xFFF6EFE2);
+  static const ink = Color(0xFF2B2820);
+  static const inkSoft = Color(0xFF726C5C);
+  static const rust = Color(0xFFC1703E);
+  static const hairline = Color(0xFFEDE6D6);
+  static const danger = Color(0xFFC94C3F);
+}
+
+/// Bottom wave finishing off the dark matcha header band — same shape
+/// used across the other restyled screens for a consistent silhouette.
+class _HeaderWaveClipper extends CustomClipper<Path> {
+  @override
+  Path getClip(Size size) {
+    final path = Path()
+      ..lineTo(0, size.height * 0.62)
+      ..cubicTo(
+        size.width * 0.32, size.height,
+        size.width * 0.66, size.height * 0.4,
+        size.width, size.height * 0.68,
+      )
+      ..lineTo(size.width, 0)
+      ..close();
+    return path;
+  }
+
+  @override
+  bool shouldReclip(covariant CustomClipper<Path> oldClipper) => false;
+}
 
 enum NotificationType {
   like,
@@ -157,15 +190,15 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
   Color _iconColorFor(NotificationType type) {
     switch (type) {
       case NotificationType.like:
-        return AppColors.red;
+        return _C.danger;
       case NotificationType.palRequest:
       case NotificationType.palAccept:
-        return AppColors.greenDark;
+        return _C.matcha;
       case NotificationType.msgRequest:
       case NotificationType.msgAccept:
-        return AppColors.amberText;
+        return _C.rust;
       default:
-        return AppColors.textSecondary;
+        return _C.inkSoft;
     }
   }
 
@@ -206,56 +239,60 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
         .limit(100);
 
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: _C.almond,
       body: CustomScrollView(
         slivers: [
           SliverToBoxAdapter(
-            child: Container(
-              color: AppColors.greenDark,
-              padding: EdgeInsets.fromLTRB(
-                16,
-                MediaQuery.of(context).padding.top + 8,
-                16,
-                16,
-              ),
-              child: Row(
-                children: [
-                  IconButton(
-                    icon: const Icon(Icons.arrow_back_ios_new_rounded,
-                        color: Colors.white, size: 20),
-                    onPressed: () => Navigator.pop(context),
-                  ),
-                  const Expanded(
-                    child: Text(
-                      'Notifications',
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.w600,
-                        color: Colors.white,
+            child: ClipPath(
+              clipper: _HeaderWaveClipper(),
+              child: Container(
+                color: _C.matchaDark,
+                padding: EdgeInsets.fromLTRB(
+                  8,
+                  MediaQuery.of(context).padding.top + 8,
+                  16,
+                  40,
+                ),
+                child: Row(
+                  children: [
+                    IconButton(
+                      icon: Icon(Icons.arrow_back_ios_new_rounded,
+                          color: _C.almond, size: 18),
+                      onPressed: () => Navigator.pop(context),
+                    ),
+                    Expanded(
+                      child: Text(
+                        'Notifications',
+                        style: TextStyle(
+                          fontSize: 17,
+                          fontWeight: FontWeight.w600,
+                          color: _C.almond,
+                        ),
                       ),
                     ),
-                  ),
-                  StreamBuilder<QuerySnapshot>(
-                    stream: itemsRef.snapshots(),
-                    builder: (context, snapshot) {
-                      final docs = snapshot.data?.docs ?? [];
-                      final hasUnread = docs.any((d) =>
-                          (d.data() as Map<String, dynamic>)['read'] != true);
-                      if (!hasUnread) return const SizedBox.shrink();
-                      return TextButton(
-                        onPressed: () => _markAllRead(docs),
-                        child: const Text(
-                          'Mark all read',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 12,
-                            fontWeight: FontWeight.w500,
+                    StreamBuilder<QuerySnapshot>(
+                      stream: itemsRef.snapshots(),
+                      builder: (context, snapshot) {
+                        final docs = snapshot.data?.docs ?? [];
+                        final hasUnread = docs.any((d) =>
+                            (d.data() as Map<String, dynamic>)['read'] !=
+                            true);
+                        if (!hasUnread) return const SizedBox.shrink();
+                        return TextButton(
+                          onPressed: () => _markAllRead(docs),
+                          child: Text(
+                            'Mark all read',
+                            style: TextStyle(
+                              color: _C.matchaLight,
+                              fontSize: 12,
+                              fontWeight: FontWeight.w500,
+                            ),
                           ),
-                        ),
-                      );
-                    },
-                  ),
-                ],
+                        );
+                      },
+                    ),
+                  ],
+                ),
               ),
             ),
           ),
@@ -264,9 +301,9 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
             stream: itemsRef.snapshots(),
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {
-                return const SliverFillRemaining(
+                return SliverFillRemaining(
                   child: Center(
-                    child: CircularProgressIndicator(color: AppColors.greenDark),
+                    child: CircularProgressIndicator(color: _C.matcha),
                   ),
                 );
               }
@@ -279,16 +316,26 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Icon(
-                          Icons.notifications_none_rounded,
-                          size: 48,
-                          color: AppColors.textSecondary.withOpacity(0.4),
+                        Container(
+                          width: 64,
+                          height: 64,
+                          decoration: BoxDecoration(
+                            color: _C.matchaLight.withOpacity(0.5),
+                            shape: BoxShape.circle,
+                          ),
+                          child: Icon(
+                            Icons.notifications_none_rounded,
+                            size: 26,
+                            color: _C.matcha.withOpacity(0.7),
+                          ),
                         ),
-                        const SizedBox(height: 12),
-                        const Text(
+                        const SizedBox(height: 14),
+                        Text(
                           'No notifications yet',
                           style: TextStyle(
-                              fontSize: 15, color: AppColors.textSecondary),
+                              fontSize: 15,
+                              fontWeight: FontWeight.w500,
+                              color: _C.ink),
                         ),
                       ],
                     ),
@@ -296,99 +343,102 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                 );
               }
 
-              return SliverList(
-                delegate: SliverChildBuilderDelegate(
-                  (context, i) {
-                    final doc = docs[i];
-                    final data = doc.data() as Map<String, dynamic>;
-                    final type = _typeFromString(data['type']);
-                    final fromName = data['fromName'] ?? 'Farmer';
-                    final isRead = data['read'] == true;
-                    final ts = data['createdAt'] as Timestamp?;
+              return SliverPadding(
+                padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+                sliver: SliverList(
+                  delegate: SliverChildBuilderDelegate(
+                    (context, i) {
+                      final doc = docs[i];
+                      final data = doc.data() as Map<String, dynamic>;
+                      final type = _typeFromString(data['type']);
+                      final fromName = data['fromName'] ?? 'Farmer';
+                      final isRead = data['read'] == true;
+                      final ts = data['createdAt'] as Timestamp?;
 
-                    return InkWell(
-                      onTap: () => _handleTap(doc.id, data),
-                      child: Container(
-                        color: isRead
-                            ? Colors.transparent
-                            : AppColors.greenLight.withOpacity(0.25),
-                        child: Column(
-                          children: [
-                            Padding(
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 16, vertical: 12),
-                              child: Row(
-                                children: [
-                                  Stack(
-                                    children: [
-                                      CircleAvatar(
-                                        radius: 20,
-                                        backgroundColor: AppColors.greenLight,
-                                        child: Text(
-                                          _initials(fromName),
-                                          style: const TextStyle(
-                                            fontSize: 12,
-                                            fontWeight: FontWeight.w600,
-                                            color: AppColors.greenDeep,
-                                          ),
-                                        ),
-                                      ),
-                                      Positioned(
-                                        right: -2,
-                                        bottom: -2,
-                                        child: Container(
-                                          padding: const EdgeInsets.all(3),
-                                          decoration: BoxDecoration(
-                                            color: Colors.white,
-                                            shape: BoxShape.circle,
-                                            border: Border.all(
-                                                color: AppColors.background,
-                                                width: 2),
-                                          ),
-                                          child: Icon(
-                                            _iconFor(type),
-                                            size: 11,
-                                            color: _iconColorFor(type),
-                                          ),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                  const SizedBox(width: 12),
-                                  Expanded(
-                                    child: Text(
-                                      _messageFor(type, fromName),
-                                      style: TextStyle(
-                                        fontSize: 13.5,
-                                        fontWeight: isRead
-                                            ? FontWeight.w400
-                                            : FontWeight.w500,
-                                        color: AppColors.textPrimary,
-                                        height: 1.4,
-                                      ),
-                                    ),
-                                  ),
-                                  const SizedBox(width: 8),
-                                  Text(
-                                    _timeAgo(ts),
-                                    style: const TextStyle(
-                                      fontSize: 11,
-                                      color: AppColors.textSecondary,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            const Divider(
-                                height: 1,
-                                color: AppColors.border,
-                                indent: 64),
-                          ],
+                      return Container(
+                        margin: const EdgeInsets.only(bottom: 10),
+                        decoration: BoxDecoration(
+                          color: isRead
+                              ? Colors.white
+                              : _C.matchaLight.withOpacity(0.35),
+                          borderRadius: BorderRadius.circular(16),
+                          border: isRead
+                              ? null
+                              : Border.all(
+                                  color: _C.matcha.withOpacity(0.25)),
                         ),
-                      ),
-                    );
-                  },
-                  childCount: docs.length,
+                        child: InkWell(
+                          borderRadius: BorderRadius.circular(16),
+                          onTap: () => _handleTap(doc.id, data),
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 14, vertical: 12),
+                            child: Row(
+                              children: [
+                                Stack(
+                                  children: [
+                                    CircleAvatar(
+                                      radius: 20,
+                                      backgroundColor: _C.matchaLight,
+                                      child: Text(
+                                        _initials(fromName),
+                                        style: TextStyle(
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.w600,
+                                          color: _C.matchaDark,
+                                        ),
+                                      ),
+                                    ),
+                                    Positioned(
+                                      right: -2,
+                                      bottom: -2,
+                                      child: Container(
+                                        padding: const EdgeInsets.all(3),
+                                        decoration: BoxDecoration(
+                                          color: Colors.white,
+                                          shape: BoxShape.circle,
+                                          border: Border.all(
+                                              color: _C.almond, width: 2),
+                                        ),
+                                        child: Icon(
+                                          _iconFor(type),
+                                          size: 11,
+                                          color: _iconColorFor(type),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(width: 12),
+                                Expanded(
+                                  child: Text(
+                                    _messageFor(type, fromName),
+                                    style: TextStyle(
+                                      fontSize: 13.5,
+                                      fontWeight: isRead
+                                          ? FontWeight.w400
+                                          : FontWeight.w500,
+                                      color: _C.ink,
+                                      height: 1.4,
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(width: 8),
+                                Text(
+                                  _timeAgo(ts),
+                                  style: TextStyle(
+                                    fontSize: 11,
+                                    color: _C.inkSoft,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      );
+                    },
+                    childCount: docs.length,
+                  ),
                 ),
               );
             },

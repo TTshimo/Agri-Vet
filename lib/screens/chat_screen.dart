@@ -1,7 +1,41 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:intl/intl.dart';
-import '../main.dart';
+
+/// AgroLens palette — matcha green / almond / white, light module variant.
+class _C {
+  static const matchaDark = Color(0xFF374530);
+  static const matcha = Color(0xFF5C7148);
+  static const matchaLight = Color(0xFFD6E0C4);
+  static const almond = Color(0xFFF6EFE2);
+  static const ink = Color(0xFF2B2820);
+  static const inkSoft = Color(0xFF726C5C);
+  static const rust = Color(0xFFC1703E);
+  static const rustBg = Color(0xFFF1DECB);
+  static const hairline = Color(0xFFEDE6D6);
+  static const danger = Color(0xFFC94C3F);
+}
+
+/// Bottom wave finishing off the dark matcha header band — same shape
+/// used across the other restyled screens for a consistent silhouette.
+class _HeaderWaveClipper extends CustomClipper<Path> {
+  @override
+  Path getClip(Size size) {
+    final path = Path()
+      ..lineTo(0, size.height * 0.7)
+      ..cubicTo(
+        size.width * 0.32, size.height,
+        size.width * 0.66, size.height * 0.5,
+        size.width, size.height * 0.76,
+      )
+      ..lineTo(size.width, 0)
+      ..close();
+    return path;
+  }
+
+  @override
+  bool shouldReclip(covariant CustomClipper<Path> oldClipper) => false;
+}
 
 class ChatScreen extends StatefulWidget {
   final String conversationId;
@@ -97,7 +131,7 @@ class _ChatScreenState extends State<ChatScreen> {
               child: const Text('Cancel')),
           TextButton(
             onPressed: () => Navigator.pop(context, true),
-            style: TextButton.styleFrom(foregroundColor: AppColors.red),
+            style: TextButton.styleFrom(foregroundColor: _C.danger),
             child: const Text('Decline'),
           ),
         ],
@@ -219,7 +253,7 @@ class _ChatScreenState extends State<ChatScreen> {
           ),
           TextButton(
             onPressed: () => Navigator.pop(context, true),
-            style: TextButton.styleFrom(foregroundColor: AppColors.red),
+            style: TextButton.styleFrom(foregroundColor: _C.danger),
             child: const Text('Delete'),
           ),
         ],
@@ -324,7 +358,7 @@ class _ChatScreenState extends State<ChatScreen> {
             if (mounted) Navigator.pop(context);
           });
           return const Scaffold(
-            backgroundColor: AppColors.background,
+            backgroundColor: _C.almond,
             body: SizedBox.shrink(),
           );
         }
@@ -334,59 +368,62 @@ class _ChatScreenState extends State<ChatScreen> {
         final inputLocked = isPending && !iAmRequester;
 
         return Scaffold(
-          backgroundColor: AppColors.background,
+          backgroundColor: _C.almond,
           body: Column(
             children: [
               // Header
-              Container(
-                color: AppColors.greenDark,
-                padding: EdgeInsets.fromLTRB(
-                  0,
-                  MediaQuery.of(context).padding.top + 8,
-                  16,
-                  12,
-                ),
-                child: Row(
-                  children: [
-                    IconButton(
-                      icon: const Icon(Icons.arrow_back_ios_new_rounded,
-                          color: Colors.white, size: 20),
-                      onPressed: () => Navigator.pop(context),
-                    ),
-                    CircleAvatar(
-                      radius: 18,
-                      backgroundColor: AppColors.greenMid,
-                      child: Text(
-                        _initials(widget.otherName),
-                        style: const TextStyle(
-                          fontSize: 12,
-                          fontWeight: FontWeight.w600,
-                          color: Colors.white,
+              ClipPath(
+                clipper: _HeaderWaveClipper(),
+                child: Container(
+                  color: _C.matchaDark,
+                  padding: EdgeInsets.fromLTRB(
+                    0,
+                    MediaQuery.of(context).padding.top + 8,
+                    16,
+                    28,
+                  ),
+                  child: Row(
+                    children: [
+                      IconButton(
+                        icon: Icon(Icons.arrow_back_ios_new_rounded,
+                            color: _C.almond, size: 18),
+                        onPressed: () => Navigator.pop(context),
+                      ),
+                      CircleAvatar(
+                        radius: 18,
+                        backgroundColor: _C.matcha,
+                        child: Text(
+                          _initials(widget.otherName),
+                          style: TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w600,
+                            color: _C.almond,
+                          ),
                         ),
                       ),
-                    ),
-                    const SizedBox(width: 10),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            widget.otherName,
-                            style: const TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w600,
-                              color: Colors.white,
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              widget.otherName,
+                              style: TextStyle(
+                                fontSize: 15.5,
+                                fontWeight: FontWeight.w600,
+                                color: _C.almond,
+                              ),
                             ),
-                          ),
-                          Text(
-                            isPending ? 'Message request' : 'Farmer',
-                            style: TextStyle(
-                                fontSize: 12, color: AppColors.greenHint),
-                          ),
-                        ],
+                            Text(
+                              isPending ? 'Message request' : 'Farmer',
+                              style: TextStyle(
+                                  fontSize: 11.5, color: _C.matchaLight),
+                            ),
+                          ],
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
 
@@ -395,20 +432,19 @@ class _ChatScreenState extends State<ChatScreen> {
                   width: double.infinity,
                   padding:
                       const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                  color: AppColors.amberLight,
+                  color: _C.rustBg,
                   child: iAmRequester
                       ? Row(
                           children: [
-                            const Icon(Icons.schedule_rounded,
-                                size: 16, color: AppColors.amberText),
+                            Icon(Icons.schedule_rounded,
+                                size: 16, color: _C.rust),
                             const SizedBox(width: 8),
                             Expanded(
                               child: Text(
                                 'Message request sent — waiting for '
                                 '${widget.otherName} to accept.',
-                                style: const TextStyle(
-                                    fontSize: 12.5,
-                                    color: AppColors.amberText),
+                                style: TextStyle(
+                                    fontSize: 12.5, color: _C.rust),
                               ),
                             ),
                           ],
@@ -418,16 +454,16 @@ class _ChatScreenState extends State<ChatScreen> {
                           children: [
                             Row(
                               children: [
-                                const Icon(Icons.mark_email_unread_rounded,
-                                    size: 16, color: AppColors.amberText),
+                                Icon(Icons.mark_email_unread_rounded,
+                                    size: 16, color: _C.rust),
                                 const SizedBox(width: 8),
                                 Expanded(
                                   child: Text(
                                     '${widget.otherName} wants to message you.',
-                                    style: const TextStyle(
+                                    style: TextStyle(
                                         fontSize: 12.5,
                                         fontWeight: FontWeight.w500,
-                                        color: AppColors.amberText),
+                                        color: _C.rust),
                                   ),
                                 ),
                               ],
@@ -443,11 +479,11 @@ class _ChatScreenState extends State<ChatScreen> {
                                           ? null
                                           : _acceptRequest,
                                       style: ElevatedButton.styleFrom(
-                                        backgroundColor: AppColors.greenDark,
+                                        backgroundColor: _C.rust,
+                                        foregroundColor: _C.almond,
                                         shape: RoundedRectangleBorder(
                                           borderRadius:
-                                              BorderRadius.circular(
-                                                  AppRadius.button),
+                                              BorderRadius.circular(12),
                                         ),
                                       ),
                                       child: _decidingRequest
@@ -474,13 +510,11 @@ class _ChatScreenState extends State<ChatScreen> {
                                           ? null
                                           : _declineRequest,
                                       style: OutlinedButton.styleFrom(
-                                        foregroundColor: AppColors.red,
-                                        side: const BorderSide(
-                                            color: AppColors.red),
+                                        foregroundColor: _C.danger,
+                                        side: BorderSide(color: _C.danger),
                                         shape: RoundedRectangleBorder(
                                           borderRadius:
-                                              BorderRadius.circular(
-                                                  AppRadius.button),
+                                              BorderRadius.circular(12),
                                         ),
                                       ),
                                       child: const Text('Decline',
@@ -504,9 +538,8 @@ class _ChatScreenState extends State<ChatScreen> {
                       .snapshots(),
                   builder: (context, snapshot) {
                     if (snapshot.connectionState == ConnectionState.waiting) {
-                      return const Center(
-                        child: CircularProgressIndicator(
-                            color: AppColors.greenDark),
+                      return Center(
+                        child: CircularProgressIndicator(color: _C.matcha),
                       );
                     }
 
@@ -519,23 +552,23 @@ class _ChatScreenState extends State<ChatScreen> {
                           children: [
                             CircleAvatar(
                               radius: 32,
-                              backgroundColor: AppColors.greenLight,
+                              backgroundColor: _C.matchaLight,
                               child: Text(
                                 _initials(widget.otherName),
-                                style: const TextStyle(
+                                style: TextStyle(
                                   fontSize: 20,
                                   fontWeight: FontWeight.w600,
-                                  color: AppColors.greenDeep,
+                                  color: _C.matchaDark,
                                 ),
                               ),
                             ),
                             const SizedBox(height: 12),
                             Text(
                               widget.otherName,
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.w600,
-                                color: AppColors.textPrimary,
+                                color: _C.ink,
                               ),
                             ),
                             const SizedBox(height: 4),
@@ -543,8 +576,8 @@ class _ChatScreenState extends State<ChatScreen> {
                               isPending && iAmRequester
                                   ? 'Say hello to start the conversation.'
                                   : 'Send a message to start the conversation.',
-                              style: const TextStyle(
-                                  fontSize: 13, color: AppColors.textSecondary),
+                              style: TextStyle(
+                                  fontSize: 13, color: _C.inkSoft),
                             ),
                           ],
                         ),
@@ -586,14 +619,14 @@ class _ChatScreenState extends State<ChatScreen> {
                                   padding: const EdgeInsets.symmetric(
                                       horizontal: 12, vertical: 4),
                                   decoration: BoxDecoration(
-                                    color: AppColors.border,
+                                    color: _C.matchaLight.withOpacity(0.6),
                                     borderRadius: BorderRadius.circular(10),
                                   ),
                                   child: Text(
                                     dateLabel,
-                                    style: const TextStyle(
+                                    style: TextStyle(
                                       fontSize: 11,
-                                      color: AppColors.textSecondary,
+                                      color: _C.matchaDark,
                                     ),
                                   ),
                                 ),
@@ -638,7 +671,7 @@ class _ChatScreenState extends State<ChatScreen> {
                 Container(
                   padding:
                       const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-                  color: AppColors.amberLight,
+                  color: _C.rustBg,
                   child: Row(
                     children: [
                       Icon(
@@ -646,7 +679,7 @@ class _ChatScreenState extends State<ChatScreen> {
                             ? Icons.edit
                             : Icons.reply_rounded,
                         size: 14,
-                        color: AppColors.amberText,
+                        color: _C.rust,
                       ),
                       const SizedBox(width: 6),
                       Expanded(
@@ -656,17 +689,17 @@ class _ChatScreenState extends State<ChatScreen> {
                               : 'Replying to $_replyToSender: "${_replyToText ?? ''}"',
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
-                          style: const TextStyle(
-                              fontSize: 12, color: AppColors.amberText),
+                          style: TextStyle(
+                              fontSize: 12, color: _C.rust),
                         ),
                       ),
                       GestureDetector(
                         onTap: _cancelAction,
-                        child: const Text(
+                        child: Text(
                           'Cancel',
                           style: TextStyle(
                               fontSize: 12,
-                              color: AppColors.amberText,
+                              color: _C.rust,
                               fontWeight: FontWeight.w600),
                         ),
                       ),
@@ -683,16 +716,16 @@ class _ChatScreenState extends State<ChatScreen> {
                     16,
                     MediaQuery.of(context).padding.bottom + 10,
                   ),
-                  decoration: const BoxDecoration(
+                  decoration: BoxDecoration(
                     color: Colors.white,
-                    border: Border(top: BorderSide(color: AppColors.border)),
+                    border: Border(top: BorderSide(color: _C.hairline)),
                   ),
                   child: Text(
                     'Accept the request above to reply.',
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       fontSize: 12.5,
-                      color: AppColors.textSecondary,
+                      color: _C.inkSoft,
                     ),
                   ),
                 )
@@ -704,9 +737,9 @@ class _ChatScreenState extends State<ChatScreen> {
                     12,
                     MediaQuery.of(context).padding.bottom + 8,
                   ),
-                  decoration: const BoxDecoration(
+                  decoration: BoxDecoration(
                     color: Colors.white,
-                    border: Border(top: BorderSide(color: AppColors.border)),
+                    border: Border(top: BorderSide(color: _C.hairline)),
                   ),
                   child: Row(
                     children: [
@@ -719,16 +752,18 @@ class _ChatScreenState extends State<ChatScreen> {
                             hintText: _editingMessageId != null
                                 ? 'Edit message...'
                                 : 'Message ${widget.otherName}...',
-                            hintStyle: const TextStyle(fontSize: 14),
+                            hintStyle: TextStyle(
+                                fontSize: 14, color: _C.inkSoft),
+                            filled: true,
+                            fillColor: _C.almond,
                             contentPadding: const EdgeInsets.symmetric(
                                 horizontal: 14, vertical: 10),
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(20),
-                              borderSide:
-                                  const BorderSide(color: AppColors.border),
+                              borderSide: BorderSide.none,
                             ),
                           ),
-                          style: const TextStyle(fontSize: 14),
+                          style: TextStyle(fontSize: 14, color: _C.ink),
                           textCapitalization: TextCapitalization.sentences,
                         ),
                       ),
@@ -743,7 +778,7 @@ class _ChatScreenState extends State<ChatScreen> {
                           width: 42,
                           height: 42,
                           decoration: BoxDecoration(
-                            color: AppColors.greenDark,
+                            color: _C.rust,
                             borderRadius: BorderRadius.circular(21),
                           ),
                           child: _submitting
@@ -756,7 +791,7 @@ class _ChatScreenState extends State<ChatScreen> {
                                   _editingMessageId != null
                                       ? Icons.check_rounded
                                       : Icons.send_rounded,
-                                  color: Colors.white,
+                                  color: _C.almond,
                                   size: 20,
                                 ),
                         ),
@@ -837,9 +872,9 @@ class _MessageBubble extends StatelessWidget {
                     const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                 decoration: BoxDecoration(
                   color: isDeleted
-                      ? AppColors.border
+                      ? _C.hairline
                       : isMe
-                          ? AppColors.greenDark
+                          ? _C.matchaDark
                           : Colors.white,
                   borderRadius: BorderRadius.only(
                     topLeft: const Radius.circular(16),
@@ -849,7 +884,7 @@ class _MessageBubble extends StatelessWidget {
                   ),
                   border: isMe
                       ? null
-                      : Border.all(color: AppColors.border),
+                      : Border.all(color: _C.hairline),
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -861,13 +896,13 @@ class _MessageBubble extends StatelessWidget {
                         decoration: BoxDecoration(
                           color: isMe
                               ? Colors.white.withOpacity(0.15)
-                              : AppColors.background,
+                              : _C.almond,
                           borderRadius: BorderRadius.circular(8),
                           border: Border(
                             left: BorderSide(
                               color: isMe
                                   ? Colors.white.withOpacity(0.6)
-                                  : AppColors.greenDark,
+                                  : _C.matchaDark,
                               width: 3,
                             ),
                           ),
@@ -882,7 +917,7 @@ class _MessageBubble extends StatelessWidget {
                                 fontWeight: FontWeight.w600,
                                 color: isMe
                                     ? Colors.white.withOpacity(0.9)
-                                    : AppColors.greenDark,
+                                    : _C.matchaDark,
                               ),
                             ),
                             const SizedBox(height: 2),
@@ -894,7 +929,7 @@ class _MessageBubble extends StatelessWidget {
                                 fontSize: 12,
                                 color: isMe
                                     ? Colors.white.withOpacity(0.7)
-                                    : AppColors.textSecondary,
+                                    : _C.inkSoft,
                               ),
                             ),
                           ],
@@ -903,12 +938,12 @@ class _MessageBubble extends StatelessWidget {
 
                     // Message text
                     if (isDeleted)
-                      const Text(
+                      Text(
                         'Message deleted',
                         style: TextStyle(
                           fontSize: 14,
                           fontStyle: FontStyle.italic,
-                          color: AppColors.textSecondary,
+                          color: _C.inkSoft,
                         ),
                       )
                     else
@@ -916,7 +951,7 @@ class _MessageBubble extends StatelessWidget {
                         text,
                         style: TextStyle(
                           fontSize: 14,
-                          color: isMe ? Colors.white : AppColors.textPrimary,
+                          color: isMe ? _C.almond : _C.ink,
                           height: 1.4,
                         ),
                       ),
@@ -930,18 +965,18 @@ class _MessageBubble extends StatelessWidget {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     if (edited && !isDeleted)
-                      const Text(
+                      Text(
                         'edited · ',
                         style: TextStyle(
                           fontSize: 10,
-                          color: AppColors.textSecondary,
+                          color: _C.inkSoft,
                         ),
                       ),
                     Text(
                       time,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 10,
-                        color: AppColors.textSecondary,
+                        color: _C.inkSoft,
                       ),
                     ),
                   ],
@@ -979,15 +1014,14 @@ class _MessageActionsSheet extends StatelessWidget {
             width: 36,
             height: 4,
             decoration: BoxDecoration(
-              color: AppColors.border,
+              color: _C.hairline,
               borderRadius: BorderRadius.circular(2),
             ),
           ),
           const SizedBox(height: 12),
           if (onReply != null)
             ListTile(
-              leading: const Icon(Icons.reply_rounded,
-                  color: AppColors.textPrimary),
+              leading: Icon(Icons.reply_rounded, color: _C.ink),
               title: const Text('Reply'),
               onTap: () {
                 Navigator.pop(context);
@@ -996,8 +1030,7 @@ class _MessageActionsSheet extends StatelessWidget {
             ),
           if (onEdit != null)
             ListTile(
-              leading: const Icon(Icons.edit_outlined,
-                  color: AppColors.textPrimary),
+              leading: Icon(Icons.edit_outlined, color: _C.ink),
               title: const Text('Edit'),
               onTap: () {
                 Navigator.pop(context);
@@ -1006,10 +1039,8 @@ class _MessageActionsSheet extends StatelessWidget {
             ),
           if (onDelete != null)
             ListTile(
-              leading:
-                  const Icon(Icons.delete_outline, color: AppColors.red),
-              title: const Text('Delete',
-                  style: TextStyle(color: AppColors.red)),
+              leading: Icon(Icons.delete_outline, color: _C.danger),
+              title: Text('Delete', style: TextStyle(color: _C.danger)),
               onTap: () {
                 Navigator.pop(context);
                 onDelete?.call();

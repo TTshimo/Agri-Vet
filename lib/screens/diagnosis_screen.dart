@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'dart:convert';
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
@@ -7,9 +8,23 @@ import 'package:image/image.dart' as img;
 import 'package:tflite_flutter/tflite_flutter.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import '../../main.dart';
 import '../../services/translation_service.dart';
 import '../../services/behavioural_score.dart';
+
+// Self-contained palette for the redesign — matcha green / almond / rust.
+// Matches the palette used across the other redesigned screens. Fold into
+// a shared AppColors in main.dart later if you want it app-wide.
+class _C {
+  static const matchaDark = Color(0xFF374530);
+  static const matchaHeader = Color(0xFF4A5B41);
+  static const matcha = Color(0xFF5C7148);
+  static const matchaTint = Color(0xFFD6E0C4);
+  static const almond = Color(0xFFF6EFE2);
+  static const ink = Color(0xFF2B2820);
+  static const inkSoft = Color(0xFF726C5C);
+  static const rust = Color(0xFFC1703E);
+  static const rustBg = Color(0xFFF1DECB);
+}
 
 enum DiagnosisType { animal, plant }
 
@@ -133,7 +148,7 @@ class _DiagnosisScreenState extends State<DiagnosisScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
           content: Text('Analysis failed: ${e.toString()}'),
-          backgroundColor: AppColors.red,
+          backgroundColor: _C.rust,
         ));
       }
     } finally {
@@ -231,21 +246,28 @@ class _DiagnosisScreenState extends State<DiagnosisScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.background,
-      body: CustomScrollView(
-        slivers: [
-          SliverToBoxAdapter(child: _buildTopBar()),
-          if (widget.initialType == null && _step == _FlowStep.upload)
-            SliverToBoxAdapter(child: _buildTypeSelector()),
-          if (_selectedType != null) ...[
-            if (_step == _FlowStep.upload)
-              SliverToBoxAdapter(child: _buildUploadSection()),
-            if (_step == _FlowStep.profiling)
-              SliverToBoxAdapter(child: _buildProfiling()),
-            if (_step == _FlowStep.result && _result != null)
-              SliverToBoxAdapter(child: _buildResult()),
-          ],
-          const SliverToBoxAdapter(child: SizedBox(height: 40)),
+      backgroundColor: _C.almond,
+      body: Stack(
+        children: [
+          Positioned.fill(
+            child: CustomPaint(painter: _BottomFieldWavePainter()),
+          ),
+          CustomScrollView(
+            slivers: [
+              SliverToBoxAdapter(child: _buildTopBar()),
+              if (widget.initialType == null && _step == _FlowStep.upload)
+                SliverToBoxAdapter(child: _buildTypeSelector()),
+              if (_selectedType != null) ...[
+                if (_step == _FlowStep.upload)
+                  SliverToBoxAdapter(child: _buildUploadSection()),
+                if (_step == _FlowStep.profiling)
+                  SliverToBoxAdapter(child: _buildProfiling()),
+                if (_step == _FlowStep.result && _result != null)
+                  SliverToBoxAdapter(child: _buildResult()),
+              ],
+              const SliverToBoxAdapter(child: SizedBox(height: 40)),
+            ],
+          ),
         ],
       ),
     );
@@ -268,110 +290,94 @@ class _DiagnosisScreenState extends State<DiagnosisScreen> {
                 : (_showSetswana ? 'Supa' : 'Diagnose');
     }
 
-    return Container(
-      color: AppColors.greenDark,
-      padding: EdgeInsets.fromLTRB(20, MediaQuery.of(context).padding.top + 16, 20, 20),
-      child: Row(
-        children: [
-          if (widget.initialType != null || _step != _FlowStep.upload)
-            GestureDetector(
-              onTap: () {
-                if (_step == _FlowStep.profiling) {
-                  setState(() => _step = _FlowStep.upload);
-                } else if (_step == _FlowStep.result) {
-            
-                  setState(() {
-                    if (_questions.isEmpty) {
-                      _step = _FlowStep.upload;
-                    } else {
-                      _currentQuestion = _questions.length - 1;
-                      _step = _FlowStep.profiling;
-                    }
-                  });
-                } else {
-                  Navigator.of(context).pop();
-                }
-              },
-              child: const Icon(Icons.arrow_back_rounded,
-                  color: AppColors.greenHint, size: 24),
+    final showBack = widget.initialType != null || _step != _FlowStep.upload;
+
+    return _WavyHeader(
+      height: MediaQuery.of(context).padding.top + 100,
+      child: Padding(
+        padding: EdgeInsets.fromLTRB(
+          20,
+          MediaQuery.of(context).padding.top + 18,
+          20,
+          0,
+        ),
+        child: Row(
+          children: [
+            if (showBack)
+              GestureDetector(
+                onTap: () {
+                  if (_step == _FlowStep.profiling) {
+                    setState(() => _step = _FlowStep.upload);
+                  } else if (_step == _FlowStep.result) {
+                    setState(() {
+                      if (_questions.isEmpty) {
+                        _step = _FlowStep.upload;
+                      } else {
+                        _currentQuestion = _questions.length - 1;
+                        _step = _FlowStep.profiling;
+                      }
+                    });
+                  } else {
+                    Navigator.of(context).pop();
+                  }
+                },
+                child: const Icon(Icons.arrow_back_rounded,
+                    color: _C.almond, size: 22),
+              ),
+            if (showBack) const SizedBox(width: 12),
+            Text(
+              title,
+              style: const TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.w600,
+                color: _C.almond,
+              ),
             ),
-          if (widget.initialType != null || _step != _FlowStep.upload)
-            const SizedBox(width: 12),
-          Text(
-            title,
-            style: const TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.w600,
-              color: Colors.white,
-            ),
-          ),
-          const Spacer(),
-          if (_step != _FlowStep.upload)
-            GestureDetector(
-              onTap: () => setState(() => _showSetswana = !_showSetswana),
-              child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.15),
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                child: Text(
-                  _showSetswana ? 'EN' : 'TN',
-                  style: const TextStyle(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w600,
-                    color: Colors.white,
+            const Spacer(),
+            if (_step != _FlowStep.upload)
+              GestureDetector(
+                onTap: () => setState(() => _showSetswana = !_showSetswana),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withOpacity(0.16),
+                    borderRadius: BorderRadius.circular(999),
+                  ),
+                  child: Text(
+                    _showSetswana ? 'EN' : 'TN',
+                    style: const TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600,
+                      color: _C.almond,
+                    ),
                   ),
                 ),
               ),
-            ),
-        ],
+          ],
+        ),
       ),
     );
   }
 
   Widget _buildTypeSelector() {
     return Padding(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.fromLTRB(16, 10, 16, 0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const SizedBox(height: 8),
-          const Text(
+          Text(
             'What are you diagnosing?',
-            style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500, color: AppColors.textPrimary),
+            style: TextStyle(fontSize: 15, fontWeight: FontWeight.w500, color: _C.ink),
           ),
-          const SizedBox(height: 14),
-          Row(
-            children: [
-              Expanded(
-                child: _TypeCard(
-                  icon: Icons.pets_rounded,
-                  label: 'Animal',
-                  selected: _selectedType == DiagnosisType.animal,
-                  onTap: () => setState(() {
-                    _selectedType = DiagnosisType.animal;
-                    _result = null;
-                    _selectedImage = null;
-                    _step = _FlowStep.upload;
-                  }),
-                ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: _TypeCard(
-                  icon: Icons.eco_rounded,
-                  label: 'Plant',
-                  selected: _selectedType == DiagnosisType.plant,
-                  onTap: () => setState(() {
-                    _selectedType = DiagnosisType.plant;
-                    _result = null;
-                    _selectedImage = null;
-                    _step = _FlowStep.upload;
-                  }),
-                ),
-              ),
-            ],
+          const SizedBox(height: 12),
+          _TypeToggle(
+            selected: _selectedType,
+            onSelect: (type) => setState(() {
+              _selectedType = type;
+              _result = null;
+              _selectedImage = null;
+              _step = _FlowStep.upload;
+            }),
           ),
         ],
       ),
@@ -417,32 +423,53 @@ class _DiagnosisScreenState extends State<DiagnosisScreen> {
             ],
           ),
           if (_selectedType == DiagnosisType.animal) ...[
-            const SizedBox(height: 16),
-            const Text(
+            const SizedBox(height: 18),
+            Text(
               'Animal type',
-              style: TextStyle(fontSize: 13, fontWeight: FontWeight.w500, color: AppColors.textPrimary),
+              style: TextStyle(fontSize: 13, fontWeight: FontWeight.w500, color: _C.ink),
             ),
-            const SizedBox(height: 6),
-            DropdownButtonFormField<String>(
-              value: _animalType.isEmpty ? null : _animalType,   // fixed: value not initialValue
-              decoration: InputDecoration(
-                hintText: 'Select animal type',
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(AppRadius.button),
-                  borderSide: const BorderSide(color: AppColors.border),
+            const SizedBox(height: 8),
+            _GlassCard(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 4),
+                child: DropdownButtonHideUnderline(
+                  child: DropdownButtonFormField<String>(
+                    value: _animalType.isEmpty ? null : _animalType,
+                    isExpanded: true,
+                    icon: Icon(Icons.keyboard_arrow_down_rounded, color: _C.inkSoft),
+                    style: TextStyle(fontSize: 13, color: _C.ink),
+                    dropdownColor: _C.almond,
+                    decoration: InputDecoration(
+                      hintText: 'Select animal type',
+                      hintStyle: TextStyle(fontSize: 13, color: _C.inkSoft),
+                      border: InputBorder.none,
+                      contentPadding:
+                          const EdgeInsets.symmetric(horizontal: 10, vertical: 12),
+                    ),
+                    items: ['Cattle', 'Goat', 'Poultry']
+                        .map((e) => DropdownMenuItem(value: e, child: Text(e)))
+                        .toList(),
+                    onChanged: (v) => setState(() => _animalType = v ?? ''),
+                  ),
                 ),
               ),
-              items: ['Cattle', 'Goat', 'Poultry']
-                  .map((e) => DropdownMenuItem(value: e, child: Text(e)))
-                  .toList(),
-              onChanged: (v) => setState(() => _animalType = v ?? ''),
             ),
           ],
-          const SizedBox(height: 24),
+          const SizedBox(height: 22),
           SizedBox(
             width: double.infinity,
             child: ElevatedButton(
               onPressed: _selectedImage == null || _analysing ? null : _analyse,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: _C.rust,
+                disabledBackgroundColor: _C.rust.withOpacity(0.35),
+                foregroundColor: _C.rustBg,
+                padding: const EdgeInsets.symmetric(vertical: 15),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                elevation: 0,
+              ),
               child: _analysing
                   ? const Row(
                       mainAxisAlignment: MainAxisAlignment.center,
@@ -450,13 +477,15 @@ class _DiagnosisScreenState extends State<DiagnosisScreen> {
                         SizedBox(
                           width: 18,
                           height: 18,
-                          child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                          child: CircularProgressIndicator(
+                              strokeWidth: 2, color: _C.rustBg),
                         ),
                         SizedBox(width: 10),
                         Text('Analysing...'),
                       ],
                     )
-                  : const Text('Analyse photo'),
+                  : const Text('Analyse photo',
+                      style: TextStyle(fontWeight: FontWeight.w600)),
             ),
           ),
         ],
@@ -488,13 +517,13 @@ class _DiagnosisScreenState extends State<DiagnosisScreen> {
     final progress = (_currentQuestion + 1) / _questions.length;
 
     return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 20, 16, 0),
+      padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           if (_result != null) _buildDiseaseBanner(lang),
 
-          const SizedBox(height: 20),
+          const SizedBox(height: 18),
 
           Row(
             children: [
@@ -502,15 +531,15 @@ class _DiagnosisScreenState extends State<DiagnosisScreen> {
                 _showSetswana
                     ? 'Potso ${_currentQuestion + 1} ya ${_questions.length}'
                     : 'Question ${_currentQuestion + 1} of ${_questions.length}',
-                style: const TextStyle(fontSize: 12, color: AppColors.textSecondary),
+                style: TextStyle(fontSize: 12, color: _C.inkSoft),
               ),
               const Spacer(),
               Text(
                 '${(progress * 100).toInt()}%',
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 12,
                   fontWeight: FontWeight.w600,
-                  color: AppColors.greenMid,
+                  color: _C.matcha,
                 ),
               ),
             ],
@@ -520,25 +549,25 @@ class _DiagnosisScreenState extends State<DiagnosisScreen> {
             borderRadius: BorderRadius.circular(4),
             child: LinearProgressIndicator(
               value: progress,
-              backgroundColor: AppColors.background2,
-              valueColor: const AlwaysStoppedAnimation(AppColors.greenMid),
+              backgroundColor: Colors.white.withOpacity(0.6),
+              valueColor: AlwaysStoppedAnimation(_C.matcha),
               minHeight: 6,
             ),
           ),
 
-          const SizedBox(height: 28),
+          const SizedBox(height: 24),
 
           Text(
             questionText,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 17,
               fontWeight: FontWeight.w500,
-              color: AppColors.textPrimary,
+              color: _C.ink,
               height: 1.45,
             ),
           ),
 
-          const SizedBox(height: 20),
+          const SizedBox(height: 18),
 
           ...List.generate(optionsEn.length, (i) {
             final enOption = optionsEn[i];
@@ -547,49 +576,43 @@ class _DiagnosisScreenState extends State<DiagnosisScreen> {
                 : enOption;
             final isSelected = currentAnswer == enOption;
 
-            return GestureDetector(
-              onTap: () => _answerQuestion(qId, enOption),
-              child: AnimatedContainer(
-                duration: const Duration(milliseconds: 150),
-                margin: const EdgeInsets.only(bottom: 10),
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-                decoration: BoxDecoration(
-                  color: isSelected ? AppColors.greenLight : Colors.white,
-                  borderRadius: BorderRadius.circular(AppRadius.card),
-                  border: Border.all(
-                    color: isSelected ? AppColors.greenMid : AppColors.border,
-                    width: isSelected ? 1.5 : 1,
-                  ),
-                ),
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: Text(
-                        displayLabel,
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: isSelected ? AppColors.greenDark : AppColors.textPrimary,
-                          fontWeight: isSelected ? FontWeight.w500 : FontWeight.w400,
+            return Padding(
+              padding: const EdgeInsets.only(bottom: 10),
+              child: GestureDetector(
+                onTap: () => _answerQuestion(qId, enOption),
+                child: _GlassCard(
+                  borderColor: isSelected ? _C.matcha.withOpacity(0.6) : null,
+                  glossTint: isSelected ? _C.matchaTint : null,
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: Text(
+                            displayLabel,
+                            style: TextStyle(
+                              fontSize: 14,
+                              color: isSelected ? _C.matchaDark : _C.ink,
+                              fontWeight: isSelected ? FontWeight.w500 : FontWeight.w400,
+                            ),
+                          ),
                         ),
-                      ),
+                        Icon(
+                          isSelected
+                              ? Icons.check_circle_rounded
+                              : Icons.radio_button_unchecked_rounded,
+                          color: isSelected ? _C.matcha : _C.inkSoft.withOpacity(0.5),
+                          size: 20,
+                        ),
+                      ],
                     ),
-                    AnimatedSwitcher(
-                      duration: const Duration(milliseconds: 150),
-                      child: isSelected
-                          ? const Icon(Icons.check_circle_rounded,
-                              key: ValueKey('checked'),
-                              color: AppColors.greenDark, size: 20)
-                          : const Icon(Icons.radio_button_unchecked_rounded,
-                              key: ValueKey('unchecked'),
-                              color: AppColors.border, size: 20),
-                    ),
-                  ],
+                  ),
                 ),
               ),
             );
           }),
 
-          const SizedBox(height: 24),
+          const SizedBox(height: 20),
 
           Row(
             children: [
@@ -598,14 +621,14 @@ class _DiagnosisScreenState extends State<DiagnosisScreen> {
                   child: OutlinedButton(
                     onPressed: _previousQuestion,
                     style: OutlinedButton.styleFrom(
-                      side: const BorderSide(color: AppColors.border),
+                      side: BorderSide(color: _C.inkSoft.withOpacity(0.3)),
                       padding: const EdgeInsets.symmetric(vertical: 14),
                       shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(AppRadius.button)),
+                          borderRadius: BorderRadius.circular(14)),
                     ),
                     child: Text(
                       _showSetswana ? 'Moago' : 'Back',
-                      style: const TextStyle(color: AppColors.textSecondary),
+                      style: TextStyle(color: _C.inkSoft),
                     ),
                   ),
                 ),
@@ -615,10 +638,20 @@ class _DiagnosisScreenState extends State<DiagnosisScreen> {
                 flex: 2,
                 child: ElevatedButton(
                   onPressed: currentAnswer == null ? null : _nextQuestion,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: _C.rust,
+                    disabledBackgroundColor: _C.rust.withOpacity(0.35),
+                    foregroundColor: _C.rustBg,
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(14)),
+                    elevation: 0,
+                  ),
                   child: Text(
                     isLastQuestion
                         ? (_showSetswana ? 'Bona supego' : 'See diagnosis')
                         : (_showSetswana ? 'E e latelang' : 'Next'),
+                    style: const TextStyle(fontWeight: FontWeight.w600),
                   ),
                 ),
               ),
@@ -634,9 +667,9 @@ class _DiagnosisScreenState extends State<DiagnosisScreen> {
                 _showSetswana
                     ? 'Tlola dipotso tse di setseng'
                     : 'Skip remaining questions',
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 13,
-                  color: AppColors.textSecondary,
+                  color: _C.inkSoft,
                   decoration: TextDecoration.underline,
                 ),
               ),
@@ -654,37 +687,35 @@ class _DiagnosisScreenState extends State<DiagnosisScreen> {
     final name = nameMap[lang]?.toString() ?? nameMap['en']?.toString() ?? _result!.diseaseKey;
     final confidence = (_result!.modelConfidence * 100).toStringAsFixed(0);
 
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-      decoration: BoxDecoration(
-        color: AppColors.greenLight,
-        borderRadius: BorderRadius.circular(AppRadius.card),
-        border: Border.all(color: AppColors.greenMid.withOpacity(0.4)),
-      ),
-      child: Row(
-        children: [
-          const Icon(Icons.image_search_rounded, size: 18, color: AppColors.greenDark),
-          const SizedBox(width: 10),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  _showSetswana ? 'Semelo se se bonweng mo setshwantshong' : 'Detected from image',
-                  style: const TextStyle(fontSize: 11, color: AppColors.textSecondary),
-                ),
-                Text(
-                  '$name  ·  $confidence% match',
-                  style: const TextStyle(
-                    fontSize: 13,
-                    fontWeight: FontWeight.w600,
-                    color: AppColors.greenDark,
+    return _GlassCard(
+      borderColor: _C.matcha.withOpacity(0.35),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+        child: Row(
+          children: [
+            Icon(Icons.image_search_rounded, size: 18, color: _C.matchaDark),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    _showSetswana ? 'Semelo se se bonweng mo setshwantshong' : 'Detected from image',
+                    style: TextStyle(fontSize: 11, color: _C.inkSoft),
                   ),
-                ),
-              ],
+                  Text(
+                    '$name  ·  $confidence% match',
+                    style: TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w600,
+                      color: _C.matchaDark,
+                    ),
+                  ),
+                ],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -699,32 +730,26 @@ class _DiagnosisScreenState extends State<DiagnosisScreen> {
     final displayName =
         nameMap[lang]?.toString() ?? nameMap['en']?.toString() ?? r.diseaseKey;
 
-    Color riskColor;
-    Color riskBg;
+    // Two-tone risk language, consistent with the rest of the app: only
+    // "high" gets the rust warning treatment, everything else reads calm.
+    final isHigh = riskLevel == 'high';
+    final riskColor = isHigh ? _C.rust : _C.matcha;
     String riskLabel;
     IconData riskIcon;
     switch (riskLevel) {
       case 'high':
-        riskColor = AppColors.red;
-        riskBg = AppColors.redLight;
         riskLabel = _showSetswana ? 'Kotsing e kgolo' : 'High risk';
         riskIcon = Icons.warning_rounded;
         break;
       case 'medium':
-        riskColor = AppColors.amber;
-        riskBg = AppColors.amberLight;
         riskLabel = _showSetswana ? 'Lebelela' : 'Monitor';
         riskIcon = Icons.info_rounded;
         break;
       case 'none':
-        riskColor = AppColors.greenText;
-        riskBg = AppColors.greenLight;
         riskLabel = _showSetswana ? 'E itekanetseng' : 'Healthy';
         riskIcon = Icons.check_circle_rounded;
         break;
       default: // 'low'
-        riskColor = AppColors.amber;
-        riskBg = AppColors.amberLight;
         riskLabel = _showSetswana ? 'Lebelela' : 'Low concern';
         riskIcon = Icons.info_outline_rounded;
     }
@@ -755,18 +780,19 @@ class _DiagnosisScreenState extends State<DiagnosisScreen> {
           ),
           const SizedBox(height: 12),
 
-          Container(
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(AppRadius.card),
-              border: Border.all(color: AppColors.border),
-              color: Colors.white,
-            ),
-            clipBehavior: Clip.hardEdge,
+          _GlassCard(
+            borderColor: riskColor.withOpacity(0.35),
             child: Column(
               children: [
                 Container(
+                  width: double.infinity,
                   padding: const EdgeInsets.all(16),
-                  color: AppColors.greenDark,
+                  decoration: BoxDecoration(
+                    color: _C.matchaHeader.withOpacity(0.88),
+                    borderRadius: const BorderRadius.vertical(
+                      top: Radius.circular(18),
+                    ),
+                  ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -779,30 +805,31 @@ class _DiagnosisScreenState extends State<DiagnosisScreen> {
                               style: const TextStyle(
                                 fontSize: 18,
                                 fontWeight: FontWeight.w600,
-                                color: Colors.white,
+                                color: _C.almond,
                                 letterSpacing: -0.3,
                               ),
                             ),
                           ),
                           const SizedBox(width: 10),
                           Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                            padding:
+                                const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                             decoration: BoxDecoration(
-                              color: riskBg.withOpacity(0.15),
-                              borderRadius: BorderRadius.circular(20),
-                              border: Border.all(color: riskColor.withOpacity(0.5)),
+                              color: Colors.white.withOpacity(0.15),
+                              borderRadius: BorderRadius.circular(999),
+                              border: Border.all(color: Colors.white.withOpacity(0.4)),
                             ),
                             child: Row(
                               mainAxisSize: MainAxisSize.min,
                               children: [
-                                Icon(riskIcon, size: 13, color: riskBg),
+                                Icon(riskIcon, size: 13, color: _C.almond),
                                 const SizedBox(width: 4),
                                 Text(
                                   riskLabel,
-                                  style: TextStyle(
+                                  style: const TextStyle(
                                     fontSize: 11,
                                     fontWeight: FontWeight.w600,
-                                    color: riskBg,
+                                    color: _C.almond,
                                   ),
                                 ),
                               ],
@@ -814,14 +841,12 @@ class _DiagnosisScreenState extends State<DiagnosisScreen> {
                       _ConfidenceBar(
                         label: _showSetswana ? 'Setshwantsho' : 'Image match',
                         value: r.modelConfidence,
-                        color: AppColors.greenMid,
                       ),
                       if (r.answers.isNotEmpty) ...[
                         const SizedBox(height: 6),
                         _ConfidenceBar(
                           label: _showSetswana ? 'Maitshwaro' : 'Behavioural',
                           value: (r.behavioralScore).clamp(0.0, 1.0),
-                          color: riskColor.withOpacity(0.8),
                           trailingLabel: riskLabel,
                         ),
                       ],
@@ -861,17 +886,12 @@ class _DiagnosisScreenState extends State<DiagnosisScreen> {
             _ActionCard(
               title: _showSetswana ? 'Se o tshwanetse go se dira jaanong' : 'What to do now',
               content: recommendationText,
-              riskLevel: riskLevel,
+              isHigh: isHigh,
             ),
 
           const SizedBox(height: 12),
 
-          Container(
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(AppRadius.card),
-              border: Border.all(color: AppColors.border),
-            ),
+          _GlassCard(
             child: Column(
               children: [
                 _ExpandableSection(
@@ -888,7 +908,7 @@ class _DiagnosisScreenState extends State<DiagnosisScreen> {
                       : 'When to call a vet',
                   content: loc('when_to_call_vet'),
                   isLast: true,
-                  highlight: riskLevel == 'high',
+                  highlight: isHigh,
                 ),
               ],
             ),
@@ -909,14 +929,13 @@ class _DiagnosisScreenState extends State<DiagnosisScreen> {
               _currentQuestion = 0;
             }),
             style: OutlinedButton.styleFrom(
-              side: const BorderSide(color: AppColors.border),
+              side: BorderSide(color: _C.inkSoft.withOpacity(0.3)),
               padding: const EdgeInsets.symmetric(vertical: 14),
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(AppRadius.button)),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
             ),
             child: Text(
               _showSetswana ? 'Tshwara supego e nngwe' : 'Diagnose again',
-              style: const TextStyle(color: AppColors.textSecondary),
+              style: TextStyle(color: _C.inkSoft),
             ),
           ),
         ],
@@ -925,71 +944,65 @@ class _DiagnosisScreenState extends State<DiagnosisScreen> {
   }
 
   Widget _buildAnswerSummary(String lang) {
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(AppRadius.card),
-        border: Border.all(color: AppColors.border),
-      ),
-      padding: const EdgeInsets.all(16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            _showSetswana ? 'Dikarabo tsa gago' : 'Your responses',
-            style: const TextStyle(
-              fontSize: 13,
-              fontWeight: FontWeight.w600,
-              color: AppColors.textSecondary,
-              letterSpacing: 0.4,
-            ),
-          ),
-          const SizedBox(height: 10),
-          ..._questions.map((q) {
-            final id = q['id'] as String? ?? '';
-            final answer = _answers[id];
-            if (answer == null) return const SizedBox.shrink();
-
-            final qText =
-                (q['question'] as Map<String, dynamic>?)?[lang]?.toString() ??
-                (q['question'] as Map<String, dynamic>?)?['en']?.toString() ??
-                '';
-
-            final optionsEn =
-                ((q['options'] as Map<String, dynamic>?)?['en'] as List?)
-                    ?.cast<String>() ?? [];
-            final optionsTn =
-                ((q['options'] as Map<String, dynamic>?)?['tn'] as List?)
-                    ?.cast<String>() ?? [];
-            final idx = optionsEn.indexOf(answer);
-            final displayAnswer = (_showSetswana && idx >= 0 && idx < optionsTn.length)
-                ? optionsTn[idx]
-                : answer;
-
-            return Padding(
-              padding: const EdgeInsets.only(bottom: 8),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    qText,
-                    style: const TextStyle(
-                        fontSize: 12, color: AppColors.textSecondary, height: 1.3),
-                  ),
-                  const SizedBox(height: 3),
-                  Text(
-                    displayAnswer,
-                    style: const TextStyle(
-                        fontSize: 13,
-                        fontWeight: FontWeight.w500,
-                        color: AppColors.textPrimary),
-                  ),
-                  const Divider(height: 16, color: AppColors.border),
-                ],
+    return _GlassCard(
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              _showSetswana ? 'Dikarabo tsa gago' : 'Your responses',
+              style: TextStyle(
+                fontSize: 13,
+                fontWeight: FontWeight.w600,
+                color: _C.inkSoft,
+                letterSpacing: 0.4,
               ),
-            );
-          }),
-        ],
+            ),
+            const SizedBox(height: 10),
+            ..._questions.map((q) {
+              final id = q['id'] as String? ?? '';
+              final answer = _answers[id];
+              if (answer == null) return const SizedBox.shrink();
+
+              final qText =
+                  (q['question'] as Map<String, dynamic>?)?[lang]?.toString() ??
+                  (q['question'] as Map<String, dynamic>?)?['en']?.toString() ??
+                  '';
+
+              final optionsEn =
+                  ((q['options'] as Map<String, dynamic>?)?['en'] as List?)
+                      ?.cast<String>() ?? [];
+              final optionsTn =
+                  ((q['options'] as Map<String, dynamic>?)?['tn'] as List?)
+                      ?.cast<String>() ?? [];
+              final idx = optionsEn.indexOf(answer);
+              final displayAnswer = (_showSetswana && idx >= 0 && idx < optionsTn.length)
+                  ? optionsTn[idx]
+                  : answer;
+
+              return Padding(
+                padding: const EdgeInsets.only(bottom: 8),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      qText,
+                      style: TextStyle(fontSize: 12, color: _C.inkSoft, height: 1.3),
+                    ),
+                    const SizedBox(height: 3),
+                    Text(
+                      displayAnswer,
+                      style: TextStyle(
+                          fontSize: 13, fontWeight: FontWeight.w500, color: _C.ink),
+                    ),
+                    Divider(height: 16, color: Colors.white.withOpacity(0.7)),
+                  ],
+                ),
+              );
+            }),
+          ],
+        ),
       ),
     );
   }
@@ -1031,16 +1044,226 @@ class _DiagnosisResult {
   }
 }
 
+/// Header with a soft wavy bottom edge instead of a hard rectangle, so it
+/// blends into the field-wave background instead of sitting on top of it
+/// as a flat UI bar. Shared shape/behaviour with the news and learn screens.
+class _WavyHeader extends StatelessWidget {
+  const _WavyHeader({required this.height, required this.child});
+
+  final double height;
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      height: height,
+      child: Stack(
+        fit: StackFit.expand,
+        children: [
+          ClipPath(
+            clipper: _WavyHeaderClipper(),
+            child: Container(color: _C.matchaHeader.withOpacity(0.88)),
+          ),
+          child,
+        ],
+      ),
+    );
+  }
+}
+
+class _WavyHeaderClipper extends CustomClipper<Path> {
+  @override
+  Path getClip(Size size) {
+    final w = size.width;
+    final h = size.height;
+    return Path()
+      ..moveTo(0, 0)
+      ..lineTo(w, 0)
+      ..lineTo(w, h * 0.774)
+      ..cubicTo(
+        w * 0.806, h * 0.955,
+        w * 0.639, h * 0.697,
+        w * 0.458, h * 0.839,
+      )
+      ..cubicTo(
+        w * 0.292, h * 0.968,
+        w * 0.153, h * 0.903,
+        0, h * 0.968,
+      )
+      ..close();
+  }
+
+  @override
+  bool shouldReclip(covariant CustomClipper<Path> oldClipper) => false;
+}
+
+/// Single soft horizon wash at the bottom of the screen.
+class _BottomFieldWavePainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()..color = _C.matchaTint.withOpacity(0.5);
+    final path = Path()
+      ..moveTo(0, size.height * 0.82)
+      ..cubicTo(
+        size.width * 0.17, size.height * 0.76,
+        size.width * 0.36, size.height * 0.86,
+        size.width * 0.56, size.height * 0.79,
+      )
+      ..cubicTo(
+        size.width * 0.72, size.height * 0.74,
+        size.width * 0.86, size.height * 0.78,
+        size.width, size.height * 0.76,
+      )
+      ..lineTo(size.width, size.height)
+      ..lineTo(0, size.height)
+      ..close();
+    canvas.drawPath(path, paint);
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+}
+
+/// Frosted glass surface with a glossy highlight band across the top.
+class _GlassCard extends StatelessWidget {
+  const _GlassCard({
+    required this.child,
+    this.borderColor,
+    this.glossTint,
+  });
+
+  final Widget child;
+  final Color? borderColor;
+  final Color? glossTint;
+
+  @override
+  Widget build(BuildContext context) {
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(18),
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 18, sigmaY: 18),
+        child: Container(
+          decoration: BoxDecoration(
+            color: Colors.white.withOpacity(0.5),
+            borderRadius: BorderRadius.circular(18),
+            border: Border.all(
+              color: borderColor ?? Colors.white.withOpacity(0.85),
+              width: 0.8,
+            ),
+          ),
+          child: Stack(
+            children: [
+              Positioned(
+                top: 0,
+                left: 0,
+                right: 0,
+                child: FractionallySizedBox(
+                  heightFactor: 0.4,
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: (glossTint ?? Colors.white).withOpacity(0.4),
+                      borderRadius: const BorderRadius.vertical(
+                        top: Radius.circular(18),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              child,
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// Animal / Plant segmented toggle — one glass pill, selected side filled.
+class _TypeToggle extends StatelessWidget {
+  final DiagnosisType? selected;
+  final ValueChanged<DiagnosisType> onSelect;
+  const _TypeToggle({required this.selected, required this.onSelect});
+
+  @override
+  Widget build(BuildContext context) {
+    return _GlassCard(
+      child: Padding(
+        padding: const EdgeInsets.all(5),
+        child: Row(
+          children: [
+            Expanded(
+              child: _TypeSegment(
+                icon: Icons.pets_rounded,
+                label: 'Animal',
+                selected: selected == DiagnosisType.animal,
+                onTap: () => onSelect(DiagnosisType.animal),
+              ),
+            ),
+            Expanded(
+              child: _TypeSegment(
+                icon: Icons.eco_rounded,
+                label: 'Plant',
+                selected: selected == DiagnosisType.plant,
+                onTap: () => onSelect(DiagnosisType.plant),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _TypeSegment extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final bool selected;
+  final VoidCallback onTap;
+  const _TypeSegment({
+    required this.icon,
+    required this.label,
+    required this.selected,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        padding: const EdgeInsets.symmetric(vertical: 13),
+        decoration: BoxDecoration(
+          color: selected ? _C.matchaHeader : Colors.transparent,
+          borderRadius: BorderRadius.circular(14),
+        ),
+        child: Column(
+          children: [
+            Icon(icon, size: 19, color: selected ? _C.almond : _C.inkSoft),
+            const SizedBox(height: 6),
+            Text(
+              label,
+              style: TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.w500,
+                color: selected ? _C.almond : _C.inkSoft,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
 class _ConfidenceBar extends StatelessWidget {
   final String label;
   final double value;
-  final Color color;
   final String? trailingLabel;
 
   const _ConfidenceBar({
     required this.label,
     required this.value,
-    required this.color,
     this.trailingLabel,
   });
 
@@ -1048,7 +1271,7 @@ class _ConfidenceBar extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       children: [
-        Text(label, style: const TextStyle(fontSize: 11, color: AppColors.greenHint)),
+        Text(label, style: TextStyle(fontSize: 11, color: _C.matchaTint)),
         const SizedBox(width: 8),
         Expanded(
           child: ClipRRect(
@@ -1056,7 +1279,7 @@ class _ConfidenceBar extends StatelessWidget {
             child: LinearProgressIndicator(
               value: value,
               backgroundColor: Colors.white.withOpacity(0.15),
-              valueColor: AlwaysStoppedAnimation(color),
+              valueColor: AlwaysStoppedAnimation(_C.almond),
               minHeight: 5,
             ),
           ),
@@ -1064,8 +1287,8 @@ class _ConfidenceBar extends StatelessWidget {
         const SizedBox(width: 8),
         Text(
           trailingLabel ?? '${(value * 100).toStringAsFixed(0)}%',
-          style: const TextStyle(
-              fontSize: 11, color: AppColors.greenHint, fontWeight: FontWeight.w600),
+          style: TextStyle(
+              fontSize: 11, color: _C.matchaTint, fontWeight: FontWeight.w600),
         ),
       ],
     );
@@ -1079,27 +1302,25 @@ class _LangToggle extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        color: AppColors.background2,
-        borderRadius: BorderRadius.circular(10),
-      ),
-      padding: const EdgeInsets.all(3),
-      child: Row(
-        children: [
-          Expanded(
-            child: GestureDetector(
-              onTap: () => onToggle(false),
-              child: _LangBtn(label: 'English', active: !showSetswana),
+    return _GlassCard(
+      child: Padding(
+        padding: const EdgeInsets.all(3),
+        child: Row(
+          children: [
+            Expanded(
+              child: GestureDetector(
+                onTap: () => onToggle(false),
+                child: _LangBtn(label: 'English', active: !showSetswana),
+              ),
             ),
-          ),
-          Expanded(
-            child: GestureDetector(
-              onTap: () => onToggle(true),
-              child: _LangBtn(label: 'Setswana', active: showSetswana),
+            Expanded(
+              child: GestureDetector(
+                onTap: () => onToggle(true),
+                child: _LangBtn(label: 'Setswana', active: showSetswana),
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -1116,9 +1337,8 @@ class _LangBtn extends StatelessWidget {
       duration: const Duration(milliseconds: 200),
       padding: const EdgeInsets.symmetric(vertical: 8),
       decoration: BoxDecoration(
-        color: active ? Colors.white : Colors.transparent,
-        borderRadius: BorderRadius.circular(8),
-        border: active ? Border.all(color: AppColors.border) : null,
+        color: active ? _C.matchaHeader : Colors.transparent,
+        borderRadius: BorderRadius.circular(10),
       ),
       child: Text(
         label,
@@ -1126,7 +1346,7 @@ class _LangBtn extends StatelessWidget {
         style: TextStyle(
           fontSize: 13,
           fontWeight: FontWeight.w500,
-          color: active ? AppColors.greenDark : AppColors.textSecondary,
+          color: active ? _C.almond : _C.inkSoft,
         ),
       ),
     );
@@ -1136,92 +1356,42 @@ class _LangBtn extends StatelessWidget {
 class _ActionCard extends StatelessWidget {
   final String title;
   final String content;
-  final String riskLevel;
-  const _ActionCard({required this.title, required this.content, required this.riskLevel});
+  final bool isHigh;
+  const _ActionCard({required this.title, required this.content, required this.isHigh});
 
   @override
   Widget build(BuildContext context) {
-    final isHigh = riskLevel == 'high';
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: isHigh ? AppColors.amberLight : AppColors.greenLight,
-        borderRadius: BorderRadius.circular(AppRadius.card),
-        border: Border.all(
-          color: isHigh
-              ? AppColors.amber.withOpacity(0.4)
-              : AppColors.greenMid.withOpacity(0.4),
-        ),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Icon(
-                isHigh ? Icons.warning_amber_rounded : Icons.check_circle_outline_rounded,
-                size: 16,
-                color: isHigh ? AppColors.amberDark : AppColors.greenDeep,
-              ),
-              const SizedBox(width: 6),
-              Text(
-                title,
-                style: TextStyle(
-                  fontSize: 13,
-                  fontWeight: FontWeight.w600,
-                  color: isHigh ? AppColors.amberDark : AppColors.greenDeep,
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 8),
-          Text(
-            content,
-            style: TextStyle(
-              fontSize: 13,
-              color: isHigh ? AppColors.amberText : AppColors.greenText,
-              height: 1.6,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _TypeCard extends StatelessWidget {
-  final IconData icon;
-  final String label;
-  final bool selected;
-  final VoidCallback onTap;
-  const _TypeCard({required this.icon, required this.label, required this.selected, required this.onTap});
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
+    final accent = isHigh ? _C.rust : _C.matcha;
+    return _GlassCard(
+      borderColor: accent.withOpacity(0.5),
+      glossTint: isHigh ? _C.rustBg : _C.matchaTint,
+      child: Padding(
         padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: selected ? AppColors.greenDark : Colors.white,
-          borderRadius: BorderRadius.circular(AppRadius.card),
-          border: Border.all(
-            color: selected ? AppColors.greenDark : AppColors.border,
-            width: selected ? 2 : 1,
-          ),
-        ),
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Icon(icon, size: 32, color: selected ? Colors.white : AppColors.textSecondary),
+            Row(
+              children: [
+                Icon(
+                  isHigh ? Icons.warning_amber_rounded : Icons.check_circle_outline_rounded,
+                  size: 16,
+                  color: accent,
+                ),
+                const SizedBox(width: 6),
+                Text(
+                  title,
+                  style: TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w600,
+                    color: accent,
+                  ),
+                ),
+              ],
+            ),
             const SizedBox(height: 8),
             Text(
-              label,
-              style: TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.w500,
-                color: selected ? Colors.white : AppColors.textPrimary,
-              ),
+              content,
+              style: TextStyle(fontSize: 13, color: _C.ink, height: 1.6),
             ),
           ],
         ),
@@ -1239,29 +1409,36 @@ class _UploadZone extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: onGallery,
-      child: Container(
-        height: 180,
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(AppRadius.card),
-          border: Border.all(color: AppColors.greenMid, width: 1.5),
-        ),
-        child: const Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(Icons.add_photo_alternate_outlined, size: 40, color: AppColors.greenMid),
-            SizedBox(height: 10),
-            Text(
-              'Take a photo or upload from your gallery',
-              textAlign: TextAlign.center,
-              style: TextStyle(fontSize: 14, color: AppColors.textSecondary),
+      child: _GlassCard(
+        child: Container(
+          height: 180,
+          margin: const EdgeInsets.all(4),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(14),
+            border: Border.all(
+              color: _C.matcha.withOpacity(0.4),
+              width: 1.5,
+              style: BorderStyle.solid,
             ),
-            SizedBox(height: 4),
-            Text(
-              'Best results: clear lighting, close up of affected area',
-              textAlign: TextAlign.center,
-              style: TextStyle(fontSize: 12, color: AppColors.textSecondary),
-            ),
-          ],
+          ),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(Icons.add_photo_alternate_outlined, size: 36, color: _C.matchaHeader),
+              const SizedBox(height: 10),
+              Text(
+                'Take a photo or upload from your gallery',
+                textAlign: TextAlign.center,
+                style: TextStyle(fontSize: 13, color: _C.ink),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                'Best results: clear lighting, close up of affected area',
+                textAlign: TextAlign.center,
+                style: TextStyle(fontSize: 11, color: _C.inkSoft),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -1278,7 +1455,7 @@ class _ImagePreview extends StatelessWidget {
     return Stack(
       children: [
         ClipRRect(
-          borderRadius: BorderRadius.circular(AppRadius.card),
+          borderRadius: BorderRadius.circular(18),
           child: Image.file(image, height: 220, width: double.infinity, fit: BoxFit.cover),
         ),
         Positioned(
@@ -1309,20 +1486,17 @@ class _SecondaryButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 12),
-        decoration: BoxDecoration(
-          color: AppColors.background2,
-          borderRadius: BorderRadius.circular(AppRadius.button),
-          border: Border.all(color: AppColors.border),
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(icon, size: 18, color: AppColors.textPrimary),
-            const SizedBox(width: 6),
-            Text(label, style: const TextStyle(fontSize: 13, color: AppColors.textPrimary)),
-          ],
+      child: _GlassCard(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 12),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(icon, size: 17, color: _C.matchaHeader),
+              const SizedBox(width: 6),
+              Text(label, style: TextStyle(fontSize: 13, color: _C.ink)),
+            ],
+          ),
         ),
       ),
     );
@@ -1332,9 +1506,8 @@ class _SecondaryButton extends StatelessWidget {
 class _InfoRow extends StatelessWidget {
   final String label;
   final String value;
-  final Color? valueColor;
   final bool multiline;
-  const _InfoRow({required this.label, required this.value, this.valueColor, this.multiline = false});
+  const _InfoRow({required this.label, required this.value, this.multiline = false});
 
   @override
   Widget build(BuildContext context) {
@@ -1344,24 +1517,24 @@ class _InfoRow extends StatelessWidget {
           ? Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(label, style: const TextStyle(fontSize: 12, color: AppColors.textSecondary)),
+                Text(label, style: TextStyle(fontSize: 12, color: _C.inkSoft)),
                 const SizedBox(height: 4),
                 Text(
                   value,
                   style: TextStyle(
                     fontSize: 13,
                     fontWeight: FontWeight.w500,
-                    color: valueColor ?? AppColors.textPrimary,
+                    color: _C.ink,
                     height: 1.5,
                   ),
                 ),
-                const Divider(height: 16, color: AppColors.border),
+                Divider(height: 16, color: Colors.white.withOpacity(0.7)),
               ],
             )
           : Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(label, style: const TextStyle(fontSize: 13, color: AppColors.textSecondary)),
+                Text(label, style: TextStyle(fontSize: 13, color: _C.inkSoft)),
                 const SizedBox(width: 12),
                 Flexible(
                   child: Text(
@@ -1370,7 +1543,7 @@ class _InfoRow extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 13,
                       fontWeight: FontWeight.w500,
-                      color: valueColor ?? AppColors.textPrimary,
+                      color: _C.ink,
                     ),
                   ),
                 ),
@@ -1410,14 +1583,14 @@ class _ExpandableSectionState extends State<_ExpandableSection> {
             decoration: BoxDecoration(
               border: widget.isLast
                   ? null
-                  : const Border(bottom: BorderSide(color: AppColors.border)),
+                  : Border(bottom: BorderSide(color: Colors.white.withOpacity(0.7))),
             ),
             child: Row(
               children: [
                 if (widget.highlight)
-                  const Padding(
-                    padding: EdgeInsets.only(right: 6),
-                    child: Icon(Icons.warning_amber_rounded, size: 16, color: AppColors.red),
+                  Padding(
+                    padding: const EdgeInsets.only(right: 6),
+                    child: Icon(Icons.warning_amber_rounded, size: 16, color: _C.rust),
                   ),
                 Expanded(
                   child: Text(
@@ -1425,7 +1598,7 @@ class _ExpandableSectionState extends State<_ExpandableSection> {
                     style: TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.w500,
-                      color: widget.highlight ? AppColors.red : AppColors.textPrimary,
+                      color: widget.highlight ? _C.rust : _C.ink,
                     ),
                   ),
                 ),
@@ -1433,7 +1606,7 @@ class _ExpandableSectionState extends State<_ExpandableSection> {
                   _expanded
                       ? Icons.keyboard_arrow_up_rounded
                       : Icons.keyboard_arrow_down_rounded,
-                  color: AppColors.textSecondary,
+                  color: _C.inkSoft,
                 ),
               ],
             ),
@@ -1445,7 +1618,7 @@ class _ExpandableSectionState extends State<_ExpandableSection> {
             padding: const EdgeInsets.fromLTRB(16, 0, 16, 14),
             child: Text(
               widget.content,
-              style: const TextStyle(fontSize: 13, color: AppColors.textSecondary, height: 1.6),
+              style: TextStyle(fontSize: 13, color: _C.inkSoft, height: 1.6),
             ),
           ),
       ],

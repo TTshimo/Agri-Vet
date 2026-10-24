@@ -1,7 +1,22 @@
 import 'dart:convert';
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import '../main.dart';
+
+// Self-contained palette for the redesign — matcha green / almond / rust.
+// Matches the palette used in the redesigned home/news screen. Fold into
+// a shared AppColors in main.dart later if you want it app-wide.
+class _C {
+  static const matchaDark = Color(0xFF374530);
+  static const matchaHeader = Color(0xFF4A5B41);
+  static const matcha = Color(0xFF5C7148);
+  static const matchaTint = Color(0xFFD6E0C4);
+  static const almond = Color(0xFFF6EFE2);
+  static const ink = Color(0xFF2B2820);
+  static const inkSoft = Color(0xFF726C5C);
+  static const rust = Color(0xFFC1703E);
+  static const rustBg = Color(0xFFF1DECB);
+}
 
 class LearnScreen extends StatefulWidget {
   const LearnScreen({super.key});
@@ -20,6 +35,12 @@ class _LearnScreenState extends State<LearnScreen> {
     'goat pox',
     'salmonella',
     'coccidiosis',
+    'african swine fever',
+    'newcastle disease',
+    'brucellosis',
+    'anthrax',
+    'blackleg',
+    'heartwater',
   ];
 
   final List<String> _cropDiseases = [
@@ -28,6 +49,10 @@ class _LearnScreenState extends State<LearnScreen> {
     'sorghum covered kernel smut',
     'potato late blight',
     'tomato late blight',
+    'maize streak virus',
+    'groundnut rosette',
+    'cassava mosaic disease',
+    'sorghum anthracnose',
   ];
 
   @override
@@ -37,8 +62,7 @@ class _LearnScreenState extends State<LearnScreen> {
   }
 
   Future<void> _load() async {
-    final raw =
-        await rootBundle.loadString('assets/data/disease_info.json');
+    final raw = await rootBundle.loadString('assets/data/disease_info.json');
     setState(() {
       _diseaseData = json.decode(raw);
       _loading = false;
@@ -48,119 +72,257 @@ class _LearnScreenState extends State<LearnScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: _C.almond,
       body: _loading
           ? const Center(
-              child:
-                  CircularProgressIndicator(color: AppColors.greenDark))
-          : CustomScrollView(
-              slivers: [
-                SliverToBoxAdapter(
-                  child: Container(
-                    color: AppColors.greenDark,
-                    padding: EdgeInsets.fromLTRB(
-                      20,
-                      MediaQuery.of(context).padding.top + 16,
-                      20,
-                      20,
+              child: CircularProgressIndicator(color: _C.matcha),
+            )
+          : Stack(
+              children: [
+                Positioned.fill(
+                  child: CustomPaint(painter: _BottomFieldWavePainter()),
+                ),
+                CustomScrollView(
+                  slivers: [
+                    SliverToBoxAdapter(
+                      child: _WavyHeader(
+                        height: MediaQuery.of(context).padding.top + 118,
+                        child: Padding(
+                          padding: EdgeInsets.fromLTRB(
+                            20,
+                            MediaQuery.of(context).padding.top + 20,
+                            20,
+                            0,
+                          ),
+                          child: const Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Learn',
+                                style: TextStyle(
+                                  fontSize: 22,
+                                  fontWeight: FontWeight.w600,
+                                  color: _C.almond,
+                                ),
+                              ),
+                              SizedBox(height: 6),
+                              Text(
+                                'Stay ahead of the season',
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  color: _C.matchaTint,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
                     ),
-                    child: const Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Learn',
+                    SliverPadding(
+                      padding: const EdgeInsets.fromLTRB(16, 2, 16, 2),
+                      sliver: SliverToBoxAdapter(
+                        child: Text(
+                          'ANIMAL DISEASES',
                           style: TextStyle(
-                            fontSize: 20,
+                            fontSize: 11,
                             fontWeight: FontWeight.w600,
-                            color: Colors.white,
+                            color: _C.inkSoft,
+                            letterSpacing: 0.9,
                           ),
                         ),
-                        SizedBox(height: 2),
-                        Text(
-                          'Stay informed about diseases',
+                      ),
+                    ),
+                    SliverList(
+                      delegate: SliverChildBuilderDelegate(
+                        (context, i) {
+                          final key = _animalDiseases[i];
+                          final data =
+                              Map<String, dynamic>.from(_diseaseData[key] ?? {});
+                          return Padding(
+                            padding: const EdgeInsets.fromLTRB(16, 0, 16, 10),
+                            child: _DiseaseCard(
+                              diseaseKey: key,
+                              data: data,
+                              isAnimal: true,
+                            ),
+                          );
+                        },
+                        childCount: _animalDiseases.length,
+                      ),
+                    ),
+                    SliverPadding(
+                      padding: const EdgeInsets.fromLTRB(16, 10, 16, 2),
+                      sliver: SliverToBoxAdapter(
+                        child: Text(
+                          'CROP DISEASES',
                           style: TextStyle(
-                            fontSize: 13,
-                            color: AppColors.greenHint,
+                            fontSize: 11,
+                            fontWeight: FontWeight.w600,
+                            color: _C.inkSoft,
+                            letterSpacing: 0.9,
                           ),
                         ),
-                      ],
-                    ),
-                  ),
-                ),
-
-                const SliverToBoxAdapter(
-                  child: Padding(
-                    padding: EdgeInsets.fromLTRB(16, 20, 16, 8),
-                    child: Text(
-                      'ANIMAL DISEASES',
-                      style: TextStyle(
-                        fontSize: 11,
-                        fontWeight: FontWeight.w600,
-                        color: AppColors.textSecondary,
-                        letterSpacing: 0.08 * 11,
                       ),
                     ),
-                  ),
-                ),
-
-                SliverList(
-                  delegate: SliverChildBuilderDelegate(
-                    (context, i) {
-                      final key = _animalDiseases[i];
-                      final data = Map<String, dynamic>.from(
-                          _diseaseData[key] ?? {});
-                      return Padding(
-                        padding:
-                            const EdgeInsets.fromLTRB(16, 0, 16, 10),
-                        child: _DiseaseCard(
-                          diseaseKey: key,
-                          data: data,
-                          isAnimal: true,
-                        ),
-                      );
-                    },
-                    childCount: _animalDiseases.length,
-                  ),
-                ),
-
-                const SliverToBoxAdapter(
-                  child: Padding(
-                    padding: EdgeInsets.fromLTRB(16, 12, 16, 8),
-                    child: Text(
-                      'CROP DISEASES',
-                      style: TextStyle(
-                        fontSize: 11,
-                        fontWeight: FontWeight.w600,
-                        color: AppColors.textSecondary,
-                        letterSpacing: 0.08 * 11,
+                    SliverList(
+                      delegate: SliverChildBuilderDelegate(
+                        (context, i) {
+                          final key = _cropDiseases[i];
+                          final data =
+                              Map<String, dynamic>.from(_diseaseData[key] ?? {});
+                          return Padding(
+                            padding: const EdgeInsets.fromLTRB(16, 0, 16, 10),
+                            child: _DiseaseCard(
+                              diseaseKey: key,
+                              data: data,
+                              isAnimal: false,
+                            ),
+                          );
+                        },
+                        childCount: _cropDiseases.length,
                       ),
                     ),
-                  ),
+                    const SliverToBoxAdapter(child: SizedBox(height: 24)),
+                  ],
                 ),
-
-                SliverList(
-                  delegate: SliverChildBuilderDelegate(
-                    (context, i) {
-                      final key = _cropDiseases[i];
-                      final data = Map<String, dynamic>.from(
-                          _diseaseData[key] ?? {});
-                      return Padding(
-                        padding:
-                            const EdgeInsets.fromLTRB(16, 0, 16, 10),
-                        child: _DiseaseCard(
-                          diseaseKey: key,
-                          data: data,
-                          isAnimal: false,
-                        ),
-                      );
-                    },
-                    childCount: _cropDiseases.length,
-                  ),
-                ),
-
-                const SliverToBoxAdapter(child: SizedBox(height: 24)),
               ],
             ),
+    );
+  }
+}
+
+/// Header with a soft wavy bottom edge instead of a hard rectangle, so it
+/// blends into the field-wave background instead of sitting on top of it
+/// as a flat UI bar.
+class _WavyHeader extends StatelessWidget {
+  const _WavyHeader({required this.height, required this.child});
+
+  final double height;
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      height: height,
+      child: Stack(
+        fit: StackFit.expand,
+        children: [
+          ClipPath(
+            clipper: _WavyHeaderClipper(),
+            child: Container(color: _C.matchaHeader.withOpacity(0.88)),
+          ),
+          child,
+        ],
+      ),
+    );
+  }
+}
+
+class _WavyHeaderClipper extends CustomClipper<Path> {
+  @override
+  Path getClip(Size size) {
+    final w = size.width;
+    final h = size.height;
+    return Path()
+      ..moveTo(0, 0)
+      ..lineTo(w, 0)
+      ..lineTo(w, h * 0.774)
+      ..cubicTo(
+        w * 0.806, h * 0.955,
+        w * 0.639, h * 0.697,
+        w * 0.458, h * 0.839,
+      )
+      ..cubicTo(
+        w * 0.292, h * 0.968,
+        w * 0.153, h * 0.903,
+        0, h * 0.968,
+      )
+      ..close();
+  }
+
+  @override
+  bool shouldReclip(covariant CustomClipper<Path> oldClipper) => false;
+}
+
+/// Single soft horizon wash at the bottom of the screen.
+class _BottomFieldWavePainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()..color = _C.matchaTint.withOpacity(0.5);
+    final path = Path()
+      ..moveTo(0, size.height * 0.82)
+      ..cubicTo(
+        size.width * 0.17, size.height * 0.76,
+        size.width * 0.36, size.height * 0.86,
+        size.width * 0.56, size.height * 0.79,
+      )
+      ..cubicTo(
+        size.width * 0.72, size.height * 0.74,
+        size.width * 0.86, size.height * 0.78,
+        size.width, size.height * 0.76,
+      )
+      ..lineTo(size.width, size.height)
+      ..lineTo(0, size.height)
+      ..close();
+    canvas.drawPath(path, paint);
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+}
+
+/// Frosted glass surface with a glossy highlight band across the top.
+/// [glossTint] lets the highlighted "what to do" section tint its gloss
+/// warm (rust-bg) instead of plain white.
+class _GlassCard extends StatelessWidget {
+  const _GlassCard({
+    required this.child,
+    this.borderColor,
+    this.glossTint,
+  });
+
+  final Widget child;
+  final Color? borderColor;
+  final Color? glossTint;
+
+  @override
+  Widget build(BuildContext context) {
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(18),
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 18, sigmaY: 18),
+        child: Container(
+          decoration: BoxDecoration(
+            color: Colors.white.withOpacity(0.5),
+            borderRadius: BorderRadius.circular(18),
+            border: Border.all(
+              color: borderColor ?? Colors.white.withOpacity(0.85),
+              width: 0.8,
+            ),
+          ),
+          child: Stack(
+            children: [
+              Positioned(
+                top: 0,
+                left: 0,
+                right: 0,
+                child: FractionallySizedBox(
+                  heightFactor: 0.46,
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: (glossTint ?? Colors.white).withOpacity(0.4),
+                      borderRadius: const BorderRadius.vertical(
+                        top: Radius.circular(18),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              child,
+            ],
+          ),
+        ),
+      ),
     );
   }
 }
@@ -176,27 +338,8 @@ class _DiseaseCard extends StatelessWidget {
     required this.isAnimal,
   });
 
-  Color get _riskColor {
-    switch (data['risk_level']) {
-      case 'high':
-        return AppColors.red;
-      case 'medium':
-        return AppColors.amber;
-      default:
-        return AppColors.greenText;
-    }
-  }
-
-  Color get _riskBg {
-    switch (data['risk_level']) {
-      case 'high':
-        return AppColors.redLight;
-      case 'medium':
-        return AppColors.amberLight;
-      default:
-        return AppColors.greenLight;
-    }
-  }
+  bool get _highRisk => data['risk_level'] == 'high';
+  Color get _riskColor => _highRisk ? _C.rust : _C.matcha;
 
   @override
   Widget build(BuildContext context) {
@@ -210,61 +353,50 @@ class _DiseaseCard extends StatelessWidget {
           ),
         ),
       ),
-      child: Container(
-        padding: const EdgeInsets.all(14),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(AppRadius.card),
-          border: Border.all(color: AppColors.border),
-        ),
-        child: Row(
-          children: [
-            Container(
-              width: 42,
-              height: 42,
-              decoration: BoxDecoration(
-                color: _riskBg,
-                borderRadius: BorderRadius.circular(12),
+      child: _GlassCard(
+        child: Padding(
+          padding: const EdgeInsets.all(14),
+          child: Row(
+            children: [
+              Container(
+                width: 42,
+                height: 42,
+                decoration: BoxDecoration(
+                  color: _riskColor.withOpacity(0.2),
+                  borderRadius: BorderRadius.circular(13),
+                ),
+                child: Icon(
+                  isAnimal ? Icons.pets_rounded : Icons.eco_rounded,
+                  size: 20,
+                  color: _riskColor,
+                ),
               ),
-              child: Icon(
-                isAnimal ? Icons.pets_rounded : Icons.eco_rounded,
-                size: 22,
-                color: _riskColor,
-              ),
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    data['display_name'] ?? diseaseKey,
-                    style: const TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w500,
-                      color: AppColors.textPrimary,
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      data['display_name'] ?? diseaseKey,
+                      style: const TextStyle(
+                        fontSize: 14,
+                        color: _C.ink,
+                      ),
                     ),
-                  ),
-                  const SizedBox(height: 2),
-                  Text(
-                    data['symptoms'] ?? '',
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
-                      fontSize: 12,
-                      color: AppColors.textSecondary,
+                    const SizedBox(height: 3),
+                    Text(
+                      data['symptoms'] ?? '',
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(fontSize: 11, color: _C.inkSoft),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
-            ),
-            const SizedBox(width: 8),
-            const Icon(
-              Icons.chevron_right_rounded,
-              color: AppColors.textSecondary,
-              size: 20,
-            ),
-          ],
+              const SizedBox(width: 8),
+              Icon(Icons.chevron_right_rounded, color: _C.inkSoft, size: 18),
+            ],
+          ),
         ),
       ),
     );
@@ -282,108 +414,100 @@ class _DiseaseDetailScreen extends StatelessWidget {
     required this.isAnimal,
   });
 
-  Color get _riskColor {
-    switch (data['risk_level']) {
-      case 'high':
-        return AppColors.red;
-      case 'medium':
-        return AppColors.amber;
-      default:
-        return AppColors.greenText;
-    }
-  }
+  bool get _highRisk => data['risk_level'] == 'high';
+  Color get _riskColor => _highRisk ? _C.rust : _C.matcha;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.background,
-      body: CustomScrollView(
-        slivers: [
-          SliverToBoxAdapter(
-            child: Container(
-              color: AppColors.greenDark,
-              padding: EdgeInsets.fromLTRB(
-                20,
-                MediaQuery.of(context).padding.top + 16,
-                20,
-                24,
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  GestureDetector(
-                    onTap: () => Navigator.of(context).pop(),
-                    child: const Icon(
-                      Icons.arrow_back_rounded,
-                      color: AppColors.greenHint,
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                  Text(
-                    data['display_name'] ?? diseaseKey,
-                    style: const TextStyle(
-                      fontSize: 22,
-                      fontWeight: FontWeight.w600,
-                      color: Colors.white,
-                      letterSpacing: -0.3,
-                    ),
-                  ),
-                  const SizedBox(height: 6),
-                  Text(
-                    isAnimal ? 'Animal disease' : 'Crop disease',
-                    style: const TextStyle(
-                      fontSize: 13,
-                      color: AppColors.greenHint,
-                    ),
-                  ),
-                ],
-              ),
-            ),
+      backgroundColor: _C.almond,
+      body: Stack(
+        children: [
+          Positioned.fill(
+            child: CustomPaint(painter: _BottomFieldWavePainter()),
           ),
-
-          SliverToBoxAdapter(
-            child: Padding(
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  _DetailSection(
-                    label: 'Symptoms',
-                    content: data['symptoms'] ?? '',
-                    icon: Icons.search_rounded,
+          CustomScrollView(
+            slivers: [
+              SliverToBoxAdapter(
+                child: _WavyHeader(
+                  height: MediaQuery.of(context).padding.top + 132,
+                  child: Padding(
+                    padding: EdgeInsets.fromLTRB(
+                      20,
+                      MediaQuery.of(context).padding.top + 20,
+                      20,
+                      0,
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        GestureDetector(
+                          onTap: () => Navigator.of(context).pop(),
+                          child: const Icon(
+                            Icons.arrow_back_rounded,
+                            color: _C.almond,
+                          ),
+                        ),
+                        const SizedBox(height: 14),
+                        Text(
+                          data['display_name'] ?? diseaseKey,
+                          style: const TextStyle(
+                            fontSize: 22,
+                            fontWeight: FontWeight.w600,
+                            color: _C.almond,
+                            letterSpacing: -0.3,
+                          ),
+                        ),
+                        const SizedBox(height: 6),
+                        Text(
+                          isAnimal ? 'Animal disease' : 'Crop disease',
+                          style: TextStyle(fontSize: 12, color: _C.matchaTint),
+                        ),
+                      ],
+                    ),
                   ),
-                  const SizedBox(height: 12),
-                  _DetailSection(
-                    label: 'Affects',
-                    content: data['affects'] ?? '',
-                    icon: Icons.pets_rounded,
-                  ),
-                  const SizedBox(height: 12),
-                  _DetailSection(
-                    label: 'How it spreads',
-                    content: data['spreads_by'] ?? '',
-                    icon: Icons.share_outlined,
-                  ),
-                  const SizedBox(height: 12),
-                  _DetailSection(
-                    label: 'What to do',
-                    content: data['what_to_do'] ?? '',
-                    icon: Icons.medical_services_outlined,
-                    highlight: true,
-                    highlightColor: _riskColor,
-                  ),
-                  const SizedBox(height: 12),
-                  _DetailSection(
-                    label: 'Prevention',
-                    content: data['prevention'] ?? '',
-                    icon: Icons.shield_outlined,
-                  ),
-                ],
+                ),
               ),
-            ),
+              SliverPadding(
+                padding: const EdgeInsets.fromLTRB(16, 2, 16, 16),
+                sliver: SliverList(
+                  delegate: SliverChildListDelegate([
+                    _DetailSection(
+                      label: 'Symptoms',
+                      content: data['symptoms'] ?? '',
+                      icon: Icons.search_rounded,
+                    ),
+                    const SizedBox(height: 10),
+                    _DetailSection(
+                      label: 'Affects',
+                      content: data['affects'] ?? '',
+                      icon: Icons.pets_rounded,
+                    ),
+                    const SizedBox(height: 10),
+                    _DetailSection(
+                      label: 'How it spreads',
+                      content: data['spreads_by'] ?? '',
+                      icon: Icons.share_outlined,
+                    ),
+                    const SizedBox(height: 10),
+                    _DetailSection(
+                      label: 'What to do',
+                      content: data['what_to_do'] ?? '',
+                      icon: Icons.medical_services_outlined,
+                      highlight: true,
+                      highlightColor: _riskColor,
+                    ),
+                    const SizedBox(height: 10),
+                    _DetailSection(
+                      label: 'Prevention',
+                      content: data['prevention'] ?? '',
+                      icon: Icons.shield_outlined,
+                    ),
+                  ]),
+                ),
+              ),
+            ],
           ),
-
-          const SliverToBoxAdapter(child: SizedBox(height: 24)),
         ],
       ),
     );
@@ -407,55 +531,36 @@ class _DetailSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: highlight
-            ? (highlightColor ?? AppColors.greenDark).withOpacity(0.05)
-            : Colors.white,
-        borderRadius: BorderRadius.circular(AppRadius.card),
-        border: Border.all(
-          color: highlight
-              ? (highlightColor ?? AppColors.greenDark).withOpacity(0.2)
-              : AppColors.border,
-        ),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Icon(
-                icon,
-                size: 16,
-                color: highlight
-                    ? (highlightColor ?? AppColors.greenDark)
-                    : AppColors.textSecondary,
-              ),
-              const SizedBox(width: 6),
-              Text(
-                label,
-                style: TextStyle(
-                  fontSize: 12,
-                  fontWeight: FontWeight.w600,
-                  color: highlight
-                      ? (highlightColor ?? AppColors.greenDark)
-                      : AppColors.textSecondary,
-                  letterSpacing: 0.4,
+    final accent = highlight ? (highlightColor ?? _C.rust) : _C.matcha;
+    return _GlassCard(
+      borderColor: highlight ? accent.withOpacity(0.5) : null,
+      glossTint: highlight ? _C.rustBg : null,
+      child: Padding(
+        padding: const EdgeInsets.all(14),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Icon(icon, size: 15, color: accent),
+                const SizedBox(width: 6),
+                Text(
+                  label,
+                  style: TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
+                    color: accent,
+                  ),
                 ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 8),
-          Text(
-            content,
-            style: const TextStyle(
-              fontSize: 14,
-              color: AppColors.textPrimary,
-              height: 1.6,
+              ],
             ),
-          ),
-        ],
+            const SizedBox(height: 8),
+            Text(
+              content,
+              style: TextStyle(fontSize: 13.5, color: _C.ink, height: 1.5),
+            ),
+          ],
+        ),
       ),
     );
   }
