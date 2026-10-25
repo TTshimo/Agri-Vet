@@ -133,7 +133,10 @@ service cloud.firestore {
     // tradeoff for client-side writes without Cloud Functions.
 
     match /pals/{palId} {
+      // A missing doc must be readable too: Make a pal checks whether
+      // pals/{me}_{them} exists, and a refused read left it spinning.
       allow read: if isSignedIn() && (
+        resource == null ||
         request.auth.uid == resource.data.uid ||
         request.auth.uid == resource.data.otherUid
       );

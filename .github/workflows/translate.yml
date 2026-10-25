@@ -8,6 +8,7 @@ on:
   pull_request:
     paths:
       - assets/data/disease_knowledge_base.json
+      - assets/data/disease_info.json
       - assets/i18n/en.json
       - assets/i18n/languages.json
       - assets/i18n/overrides/**

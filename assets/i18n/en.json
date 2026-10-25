@@ -1,5 +1,5 @@
 {
-  "_comment": "English source for diagnosis-screen text. Edit here only; scripts/translate.py generates the other languages. {placeholders} must stay as-is.",
+  "_comment": "English source for screen text (diagnosis and Learn). Edit here only; scripts/translate.py generates the other languages. {placeholders} must stay as-is.",
   "ui.diag.affects": "Affects",
   "ui.diag.analyse_photo": "Analyse photo",
   "ui.diag.analysing": "Analysing...",
@@ -42,5 +42,16 @@
   "ui.diag.what_diagnosing": "What are you diagnosing?",
   "ui.diag.what_to_do": "What to do now",
   "ui.diag.when_to_call_vet": "When to call a vet",
-  "ui.diag.your_responses": "Your responses"
+  "ui.diag.your_responses": "Your responses",
+  "ui.learn.affects": "Affects",
+  "ui.learn.animal_disease": "Animal disease",
+  "ui.learn.animal_diseases": "Animal diseases",
+  "ui.learn.crop_disease": "Crop disease",
+  "ui.learn.crop_diseases": "Crop diseases",
+  "ui.learn.prevention": "Prevention",
+  "ui.learn.spreads": "How it spreads",
+  "ui.learn.subtitle": "Stay ahead of the season",
+  "ui.learn.symptoms": "Symptoms",
+  "ui.learn.title": "Learn",
+  "ui.learn.what_to_do": "What to do"
 }

@@ -20,6 +20,10 @@ DROP = [
     ("Heavy rains expected this weekend", "Motorists are urged to drive carefully."),
     ("Teams work in silos, report finds", "Layers of red tape slow down the bull market."),
     ("Covid vaccination drive reaches schools", "Learners received the vaccine."),
+    ("Bulls, Stormers hold on to win after strong fightbacks", ""),
+    ("Hyundai takes on Chinese rivals with new, cheaper Creta", ""),
+    ("We are very confident of ANC victory in Eastern Cape: Ramaphosa", ""),
+    ("Russia and Ukraine swap 270 prisoners each", ""),
 ]
 
 KEEP = [
@@ -29,6 +33,7 @@ KEEP = [
     ("Farmers warned of heavy rains", "Planting should wait until the soil drains.", ["weather", "crop"]),
     ("Botswana resumes beef exports to the EU", "The beef industry welcomed the decision.", ["livestock"]),
     ("Fall armyworm spotted in sorghum fields", "Extension officers advise pesticides.", ["crop"]),
+    ("Beyond the spray: Rethinking weed control", "", ["crop"]),
 ]
 
 

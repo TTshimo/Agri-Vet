@@ -185,5 +185,12 @@
   "kb.plants.watermelon mosaic virus.spreads_by": "Wadudu aphid, sehemu za mimea zilizoambukizwa, vifaa vya kuunganisha",
   "kb.plants.watermelon mosaic virus.treatment": "Hakuna tiba ya maambukizi ya virusi. Usimamizi tu: ondoa mimea iliyoambukizwa, dhibiti wabebaji wa aphid kwa dawa ya wadudu (mf. imidacloprid, pyrethroids), tumia matandazo ya kuakisi, na panda aina zinazostahimili katika misimu ijayo.",
   "kb.plants.watermelon mosaic virus.visual_symptoms": "Madoa ya manjano-kijani kama mosaic kwenye majani. Majani yaliyopinda na kujikunja. Tunda lenye rangi isiyo sawa, ukubwa mdogo au uso wenye vinundu. Ukuaji uliodumaa wa mmea.",
-  "kb.plants.watermelon mosaic virus.when_to_call_vet": "Wasiliana na afisa ugani wa kilimo ikiwa zaidi ya 20% ya mazao yako yameathirika, au ikiwa unahitaji msaada kutambua dawa sahihi ya wadudu."
+  "kb.plants.watermelon mosaic virus.when_to_call_vet": "Wasiliana na afisa ugani wa kilimo ikiwa zaidi ya 20% ya mazao yako yameathirika, au ikiwa unahitaji msaada kutambua dawa sahihi ya wadudu.",
+  "learn.foot and mouth.display_name": "Ugonjwa wa Miguu na Mdomo",
+  "learn.goat pox.display_name": "Ndui ya Mbuzi",
+  "learn.lumpy cow disease.display_name": "Ugonjwa wa Uvimbe wa Ngozi ya Ng'ombe",
+  "learn.potato late blight.display_name": "Ugonjwa wa Baka Marehemu wa Viazi",
+  "learn.sorghum cereal grain mold.display_name": "Ukungu wa Nafaka ya Mtama",
+  "learn.tomato late blight.display_name": "Ugonjwa wa Baka Marehemu wa Nyanya",
+  "learn.watermelon mosaic virus.display_name": "Virusi vya Mosaic ya Tikiti"
 }

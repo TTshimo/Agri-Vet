@@ -8,6 +8,7 @@ import 'learn_screen.dart';
 import 'profile_screen.dart';
 import 'notifications_screen.dart';
 import '../services/notification_service.dart';
+import '../services/profile_service.dart';
 import '../theme/palette.dart';
 
 class ShellScreen extends StatefulWidget {
@@ -32,6 +33,12 @@ class _ShellScreenState extends State<ShellScreen> {
       );
     };
     NotificationService.instance.start();
+    final user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      ProfileService.ensureProfile(user).catchError((Object e) {
+        debugPrint('Profile check failed: $e');
+      });
+    }
   }
 
   final List<Widget> _screens = const [

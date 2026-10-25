@@ -2,7 +2,8 @@
 
 English is the only language anyone writes by hand:
   * assets/data/disease_knowledge_base.json   – disease content ({"en": ...} fields)
-  * assets/i18n/en.json                        – diagnosis-screen UI strings
+  * assets/data/disease_info.json              – Learn tab content
+  * assets/i18n/en.json                        – screen text (diagnosis, Learn)
 
 This script flattens both into keys, translates every key into each language
 listed in assets/i18n/languages.json, and writes assets/i18n/<code>.json.
@@ -36,6 +37,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 KB_PATH = ROOT / "assets/data/disease_knowledge_base.json"
+INFO_PATH = ROOT / "assets/data/disease_info.json"  # the Learn tab
 I18N_DIR = ROOT / "assets/i18n"
 UI_EN_PATH = I18N_DIR / "en.json"
 LANGS_PATH = I18N_DIR / "languages.json"
@@ -75,11 +77,27 @@ def kb_english(kb: dict) -> dict[str, str]:
     return out
 
 
+# Learn-tab fields people read (risk_level is a code, not text).
+INFO_FIELDS = ("display_name", "symptoms", "affects", "spreads_by", "what_to_do", "prevention", "urgency")
+
+
+def info_english(info: dict) -> dict[str, str]:
+    """Learn tab content as keys: learn.<disease>.<field>."""
+    return {
+        f"learn.{disease}.{field}": str(data[field])
+        for disease, data in info.items()
+        for field in INFO_FIELDS
+        if isinstance(data.get(field), str) and data[field].strip() and data[field] != "N/A"
+    }
+
+
 def english_strings() -> dict[str, str]:
     kb = json.loads(KB_PATH.read_text(encoding="utf-8"))
+    info = json.loads(INFO_PATH.read_text(encoding="utf-8"))
     ui = json.loads(UI_EN_PATH.read_text(encoding="utf-8"))
     strings = {k: v for k, v in ui.items() if not k.startswith("_")}
     strings.update(kb_english(kb))
+    strings.update(info_english(info))
     return strings
 
 

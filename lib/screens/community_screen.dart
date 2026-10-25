@@ -600,7 +600,7 @@ class _PostCardState extends State<_PostCard> {
     await FirebaseFirestore.instance
         .collection('users')
         .doc(widget.uid)
-        .update({'postCount': FieldValue.increment(-1)});
+        .set({'postCount': FieldValue.increment(-1)}, SetOptions(merge: true));
   }
 
   void _editPost(BuildContext context) {
@@ -1253,13 +1253,25 @@ class _PostSheetState extends State<_PostSheet> {
           'commentCount': 0,
           'createdAt': FieldValue.serverTimestamp(),
         });
-        await FirebaseFirestore.instance
-            .collection('users')
-            .doc(widget.uid)
-            .update({'postCount': FieldValue.increment(1)});
+        // The post is saved; a failed counter bump must not keep the sheet open.
+        try {
+          await FirebaseFirestore.instance
+              .collection('users')
+              .doc(widget.uid)
+              .set({'postCount': FieldValue.increment(1)}, SetOptions(merge: true));
+        } catch (e) {
+          debugPrint('Post count not updated: $e');
+        }
       }
 
       if (mounted) Navigator.of(context).pop();
+    } catch (e) {
+      debugPrint('Post failed: $e');
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Could not post. Check your connection and try again.')),
+        );
+      }
     } finally {
       if (mounted) setState(() => _submitting = false);
     }

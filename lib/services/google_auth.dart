@@ -1,7 +1,8 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+
+import 'profile_service.dart';
 
 /// "Continue with Google" through Firebase Authentication.
 ///
@@ -25,7 +26,7 @@ class GoogleAuth {
       result = await FirebaseAuth.instance.signInWithCredential(credential);
     }
     final user = result.user;
-    if (user != null) await _ensureProfile(user);
+    if (user != null) await ProfileService.ensureProfile(user, signInMethod: 'google');
     return user;
   }
 
@@ -65,28 +66,5 @@ class GoogleAuth {
       accessToken: auth.accessToken,
       idToken: auth.idToken,
     );
-  }
-
-  /// Google users skip the registration form, so give them the same
-  /// profile fields it creates. They can fill in farm details later.
-  static Future<void> _ensureProfile(User user) async {
-    final ref = FirebaseFirestore.instance.collection('users').doc(user.uid);
-    final snap = await ref.get();
-    if (snap.exists) return;
-    await ref.set({
-      'name': user.displayName ?? 'Farmer',
-      'email': user.email ?? '',
-      'phone': user.phoneNumber ?? '',
-      'farmerType': 'both',
-      'farmName': '',
-      'location': '',
-      'animalsKept': <String>[],
-      'soilType': '',
-      'waterSource': '',
-      'yearsFarming': '',
-      'photoUrl': user.photoURL ?? '',
-      'signInMethod': 'google',
-      'createdAt': FieldValue.serverTimestamp(),
-    });
   }
 }

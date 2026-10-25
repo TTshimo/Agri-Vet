@@ -2,7 +2,19 @@ import 'dart:convert';
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:provider/provider.dart';
+import '../providers/language_provider.dart';
 import '../theme/palette.dart';
+import '../widgets/language_chip.dart';
+
+/// Learn text in the language chosen in Settings (or the header chip);
+/// English from disease_info.json when a translation is missing.
+String _learn(BuildContext context, String disease, Map<String, dynamic> data, String field) =>
+    context.watch<LanguageProvider>().t('learn.$disease.$field',
+        fallback: (data[field] ?? (field == 'display_name' ? disease : '')).toString());
+
+String _ui(BuildContext context, String key) =>
+    context.watch<LanguageProvider>().t('ui.learn.$key');
 
 // Self-contained palette for the redesign — matcha green / almond / rust.
 // Matches the palette used in the redesigned home/news screen. Fold into
@@ -90,11 +102,15 @@ class _LearnScreenState extends State<LearnScreen> {
                             20,
                             0,
                           ),
-                          child: Column(
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Expanded(
+                                child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                'Learn',
+                                _ui(context, 'title'),
                                 style: TextStyle(
                                   fontSize: 22,
                                   fontWeight: FontWeight.w600,
@@ -103,12 +119,20 @@ class _LearnScreenState extends State<LearnScreen> {
                               ),
                               SizedBox(height: 6),
                               Text(
-                                'Stay ahead of the season',
+                                _ui(context, 'subtitle'),
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
                                 style: TextStyle(
                                   fontSize: 12,
                                   color: Fg.matchaTint,
                                 ),
                               ),
+                            ],
+                          ),
+                              ),
+                              const SizedBox(width: 8),
+                              // Language choice right here, same setting as Settings.
+                              const LanguageChip(),
                             ],
                           ),
                         ),
@@ -118,7 +142,7 @@ class _LearnScreenState extends State<LearnScreen> {
                       padding: const EdgeInsets.fromLTRB(16, 2, 16, 2),
                       sliver: SliverToBoxAdapter(
                         child: Text(
-                          'ANIMAL DISEASES',
+                          _ui(context, 'animal_diseases').toUpperCase(),
                           style: TextStyle(
                             fontSize: 11,
                             fontWeight: FontWeight.w600,
@@ -150,7 +174,7 @@ class _LearnScreenState extends State<LearnScreen> {
                       padding: const EdgeInsets.fromLTRB(16, 10, 16, 2),
                       sliver: SliverToBoxAdapter(
                         child: Text(
-                          'CROP DISEASES',
+                          _ui(context, 'crop_diseases').toUpperCase(),
                           style: TextStyle(
                             fontSize: 11,
                             fontWeight: FontWeight.w600,
@@ -373,7 +397,7 @@ class _DiseaseCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      data['display_name'] ?? diseaseKey,
+                      _learn(context, diseaseKey, data, 'display_name'),
                       style: TextStyle(
                         fontSize: 14,
                         color: Fg.ink,
@@ -381,7 +405,7 @@ class _DiseaseCard extends StatelessWidget {
                     ),
                     const SizedBox(height: 3),
                     Text(
-                      data['symptoms'] ?? '',
+                      _learn(context, diseaseKey, data, 'symptoms'),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: TextStyle(fontSize: 11, color: Fg.inkSoft),
@@ -446,7 +470,7 @@ class _DiseaseDetailScreen extends StatelessWidget {
                         ),
                         const SizedBox(height: 14),
                         Text(
-                          data['display_name'] ?? diseaseKey,
+                          _learn(context, diseaseKey, data, 'display_name'),
                           style: TextStyle(
                             fontSize: 22,
                             fontWeight: FontWeight.w600,
@@ -456,7 +480,7 @@ class _DiseaseDetailScreen extends StatelessWidget {
                         ),
                         const SizedBox(height: 6),
                         Text(
-                          isAnimal ? 'Animal disease' : 'Crop disease',
+                          _ui(context, isAnimal ? 'animal_disease' : 'crop_disease'),
                           style: TextStyle(fontSize: 12, color: Fg.matchaTint),
                         ),
                       ],
@@ -469,34 +493,34 @@ class _DiseaseDetailScreen extends StatelessWidget {
                 sliver: SliverList(
                   delegate: SliverChildListDelegate([
                     _DetailSection(
-                      label: 'Symptoms',
-                      content: data['symptoms'] ?? '',
+                      label: _ui(context, 'symptoms'),
+                      content: _learn(context, diseaseKey, data, 'symptoms'),
                       icon: Icons.search_rounded,
                     ),
                     const SizedBox(height: 10),
                     _DetailSection(
-                      label: 'Affects',
-                      content: data['affects'] ?? '',
+                      label: _ui(context, 'affects'),
+                      content: _learn(context, diseaseKey, data, 'affects'),
                       icon: Icons.pets_rounded,
                     ),
                     const SizedBox(height: 10),
                     _DetailSection(
-                      label: 'How it spreads',
-                      content: data['spreads_by'] ?? '',
+                      label: _ui(context, 'spreads'),
+                      content: _learn(context, diseaseKey, data, 'spreads_by'),
                       icon: Icons.share_outlined,
                     ),
                     const SizedBox(height: 10),
                     _DetailSection(
-                      label: 'What to do',
-                      content: data['what_to_do'] ?? '',
+                      label: _ui(context, 'what_to_do'),
+                      content: _learn(context, diseaseKey, data, 'what_to_do'),
                       icon: Icons.medical_services_outlined,
                       highlight: true,
                       highlightColor: _riskColor,
                     ),
                     const SizedBox(height: 10),
                     _DetailSection(
-                      label: 'Prevention',
-                      content: data['prevention'] ?? '',
+                      label: _ui(context, 'prevention'),
+                      content: _learn(context, diseaseKey, data, 'prevention'),
                       icon: Icons.shield_outlined,
                     ),
                   ]),

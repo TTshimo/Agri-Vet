@@ -10,6 +10,7 @@
 
 import 'dart:io';
 
+import 'package:agrivet/main.dart';
 import 'package:agrivet/providers/language_provider.dart';
 import 'package:agrivet/providers/theme_provider.dart';
 import 'package:agrivet/screens/diagnosis_screen.dart';
@@ -23,6 +24,7 @@ import 'package:agrivet/screens/register_screen.dart';
 import 'package:agrivet/screens/settings_screen.dart';
 import 'package:agrivet/screens/community_screen.dart';
 import 'package:agrivet/screens/messaging_screen.dart';
+import 'package:agrivet/screens/make_pal_screen.dart';
 import 'package:agrivet/theme/palette.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_core_platform_interface/test.dart';
@@ -85,6 +87,9 @@ final _shots = <_Shot>[
       language: 'es'),
   _Shot('community', () => const CommunityScreen()),
   _Shot('learn', () => const LearnScreen()),
+  _Shot('learn_setswana', () => const LearnScreen(), language: 'tn'),
+  _Shot('learn_french', () => const LearnScreen(), language: 'fr'),
+  _Shot('make_pal', () => const MakePalScreen()),
   _Shot('messaging', () => const MessagingScreen()),
   _Shot('notifications', () => const NotificationsScreen()),
   _Shot('profile', () => const ProfileScreen()),
@@ -127,9 +132,12 @@ void main() {
               ],
               child: MaterialApp(
                 debugShowCheckedModeBanner: false,
-                theme: ThemeData(useMaterial3: true, fontFamily: 'Roboto'),
-                darkTheme: ThemeData(
-                    useMaterial3: true, brightness: Brightness.dark, fontFamily: 'Roboto'),
+                // The app's real themes, so theme bugs (like the white field
+                // fill that hid login text) show up here.
+                theme: AgriVetApp.lightTheme(googleFonts: false)
+                    .copyWith(textTheme: ThemeData.light().textTheme.apply(fontFamily: 'Roboto')),
+                darkTheme: AgriVetApp.darkTheme(googleFonts: false)
+                    .copyWith(textTheme: ThemeData.dark().textTheme.apply(fontFamily: 'Roboto')),
                 themeMode: dark ? ThemeMode.dark : ThemeMode.light,
                 home: RepaintBoundary(key: const ValueKey('shot'), child: shot.build()),
               ),

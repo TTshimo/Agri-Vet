@@ -6,27 +6,10 @@ import 'login_screen.dart';
 import '../services/google_auth.dart';
 import '../services/notification_service.dart';
 import 'profile_social_menu.dart';
+import 'settings_screen.dart';
 import '../theme/palette.dart';
+import '../theme/header_wave.dart';
 
-/// Bottom wave that finishes off the dark matcha header band.
-class _HeaderWaveClipper extends CustomClipper<Path> {
-  @override
-  Path getClip(Size size) {
-    final path = Path()
-      ..lineTo(0, size.height * 0.62)
-      ..cubicTo(
-        size.width * 0.32, size.height,
-        size.width * 0.66, size.height * 0.4,
-        size.width, size.height * 0.68,
-      )
-      ..lineTo(size.width, 0)
-      ..close();
-    return path;
-  }
-
-  @override
-  bool shouldReclip(covariant CustomClipper<Path> oldClipper) => false;
-}
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -80,6 +63,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               const SizedBox(height: 18),
                               _buildSectionLabel('Farm details', editable: true),
                               _buildFarmDetails(data),
+                              const SizedBox(height: 18),
+                              _buildSectionLabel('App'),
+                              _buildSettingsTile(context),
                               const SizedBox(height: 22),
                               _buildLogoutButton(),
                             ],
@@ -107,25 +93,18 @@ class _ProfileScreenState extends State<ProfileScreen> {
         : name.trim().split(RegExp(r'\s+')).take(2).map((s) => s[0]).join().toUpperCase();
 
     return ClipPath(
-      clipper: _HeaderWaveClipper(),
+      clipper: const HeaderWaveClipper(),
       child: Container(
         width: double.infinity,
-        padding: const EdgeInsets.fromLTRB(20, 20, 20, 60),
+        // Clear of the status bar on top; clear of the wave at the bottom.
+        padding: EdgeInsets.fromLTRB(20, MediaQuery.of(context).padding.top + 12, 20, 72),
         color: Bg.matchaDark,
         child: Column(
           children: [
-            Row(
-              children: [
-                Text('Profile',
-                    style: TextStyle(color: Fg.matchaLight, fontSize: 13, fontWeight: FontWeight.w500)),
-                const Spacer(),
-                IconButton(
-                  icon: Icon(Icons.settings_outlined, color: Fg.matchaLight, size: 20),
-                  onPressed: () {
-                    // TODO: navigate to settings screen
-                  },
-                ),
-              ],
+            Align(
+              alignment: Alignment.centerLeft,
+              child: Text('Profile',
+                  style: TextStyle(color: Fg.matchaLight, fontSize: 13, fontWeight: FontWeight.w500)),
             ),
             const SizedBox(height: 8),
             Stack(
@@ -295,6 +274,42 @@ class _ProfileScreenState extends State<ProfileScreen> {
           _DetailRow(label: 'Soil type', value: data['soilType'] as String? ?? '—'),
           _DetailRow(label: 'Years farming', value: data['yearsFarming'] as String? ?? '—', isLast: true),
         ],
+      ),
+    );
+  }
+
+  /// Settings lives on the page (it used to be a gear in the header corner
+  /// that did nothing when tapped).
+  Widget _buildSettingsTile(BuildContext context) {
+    return Material(
+      color: Bg.surface,
+      borderRadius: BorderRadius.circular(16),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(16),
+        onTap: () => Navigator.of(context).push(
+          MaterialPageRoute(builder: (_) => const SettingsScreen()),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+          child: Row(
+            children: [
+              Icon(Icons.settings_outlined, size: 20, color: Fg.matcha),
+              const SizedBox(width: 14),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('Settings', style: TextStyle(fontSize: 14, color: Fg.ink)),
+                    const SizedBox(height: 2),
+                    Text('Language, dark mode, notifications, account',
+                        style: TextStyle(fontSize: 11.5, color: Fg.inkSoft)),
+                  ],
+                ),
+              ),
+              Icon(Icons.chevron_right_rounded, size: 20, color: Fg.inkSoft),
+            ],
+          ),
+        ),
       ),
     );
   }

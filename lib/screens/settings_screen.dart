@@ -14,27 +14,8 @@ import '../services/notification_service.dart';
 import '../providers/theme_provider.dart';
 import '../providers/language_provider.dart';
 import '../theme/palette.dart';
+import '../theme/header_wave.dart';
 
-/// Bottom wave finishing off the dark matcha header band — same shape
-/// used across the other restyled screens for a consistent silhouette.
-class _HeaderWaveClipper extends CustomClipper<Path> {
-  @override
-  Path getClip(Size size) {
-    final path = Path()
-      ..lineTo(0, size.height * 0.62)
-      ..cubicTo(
-        size.width * 0.32, size.height,
-        size.width * 0.66, size.height * 0.4,
-        size.width, size.height * 0.68,
-      )
-      ..lineTo(size.width, 0)
-      ..close();
-    return path;
-  }
-
-  @override
-  bool shouldReclip(covariant CustomClipper<Path> oldClipper) => false;
-}
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -82,14 +63,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
         slivers: [
           SliverToBoxAdapter(
             child: ClipPath(
-              clipper: _HeaderWaveClipper(),
+              clipper: const HeaderWaveClipper(),
               child: Container(
                 color: Bg.matchaDark,
                 padding: EdgeInsets.fromLTRB(
                   8,
                   MediaQuery.of(context).padding.top + 8,
                   16,
-                  40,
+                  48,
                 ),
                 child: Row(
                   children: [

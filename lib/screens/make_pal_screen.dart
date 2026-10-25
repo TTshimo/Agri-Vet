@@ -3,27 +3,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'user_profile_screen.dart';
 import '../theme/palette.dart';
+import '../theme/header_wave.dart';
 
-/// Bottom wave finishing off the dark matcha header band — same shape
-/// used across the other restyled screens for a consistent silhouette.
-class _HeaderWaveClipper extends CustomClipper<Path> {
-  @override
-  Path getClip(Size size) {
-    final path = Path()
-      ..lineTo(0, size.height * 0.68)
-      ..cubicTo(
-        size.width * 0.32, size.height,
-        size.width * 0.66, size.height * 0.44,
-        size.width, size.height * 0.72,
-      )
-      ..lineTo(size.width, 0)
-      ..close();
-    return path;
-  }
-
-  @override
-  bool shouldReclip(covariant CustomClipper<Path> oldClipper) => false;
-}
 
 enum _RowState {
   loading,
@@ -65,14 +46,14 @@ class _MakePalScreenState extends State<MakePalScreen> {
         slivers: [
           SliverToBoxAdapter(
             child: ClipPath(
-              clipper: _HeaderWaveClipper(),
+              clipper: const HeaderWaveClipper(),
               child: Container(
                 color: Bg.matchaDark,
                 padding: EdgeInsets.fromLTRB(
                   16,
                   MediaQuery.of(context).padding.top + 8,
                   16,
-                  36,
+                  56,
                 ),
                 child: Column(
                   children: [
@@ -279,6 +260,18 @@ class _PalRowState extends State<_PalRow> {
   }
 
   Future<void> _loadState() async {
+    try {
+      await _loadStateOrThrow();
+    } catch (e) {
+      // Offline or refused: show the Add button rather than a spinner forever.
+      debugPrint('Pal status for ${widget.uid} failed: $e');
+      if (mounted && _state == _RowState.loading) {
+        setState(() => _state = _RowState.none);
+      }
+    }
+  }
+
+  Future<void> _loadStateOrThrow() async {
     final fs = FirebaseFirestore.instance;
 
     final palId = _palDocId(widget.currentUid, widget.uid);
