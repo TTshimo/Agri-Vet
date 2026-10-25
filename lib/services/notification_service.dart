@@ -8,9 +8,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-/// Which kinds of push notification a user wants. Stored, with the
-/// device tokens, in the owner-only doc users/{uid}/private/notifications,
-/// where the Cloud Function (functions/index.js) reads them.
+/// Which kinds of notification a user wants. Stored in the owner-only doc
+/// users/{uid}/private/notifications.
 class NotificationPrefs {
   final bool alerts; // disease outbreak alerts (from the news scraper)
   final bool community; // likes, comments, replies, pal requests
@@ -39,9 +38,15 @@ class NotificationPrefs {
       );
 }
 
-/// Push notifications: permission, device token registration, the
-/// disease-alert topic, showing notifications while the app is open, and
-/// opening the right screen when one is tapped.
+/// Phone notifications, entirely on Firebase's free plan (no Cloud Functions):
+///
+/// * Disease outbreak alerts arrive by push even when the app is closed:
+///   the news scraper (GitHub Actions) sends them to the `disease_alerts`
+///   topic, which this phone joins or leaves with the Settings switch.
+/// * Likes, comments, pal requests and chat messages are shown as phone
+///   notifications while AgroLens is open or still running in the
+///   background: the app listens to the user's bell list and pops up
+///   anything new, if that kind is switched on in Settings.
 class NotificationService {
   NotificationService._();
   static final instance = NotificationService._();
@@ -55,6 +60,8 @@ class NotificationService {
   final _local = FlutterLocalNotificationsPlugin();
   final _subscriptions = <StreamSubscription<dynamic>>[];
   String? _uid;
+  NotificationPrefs _prefs = const NotificationPrefs();
+  bool _primed = false; // first snapshot = what's already there; don't pop it up
 
   static const _channels = [
     AndroidNotificationChannel('disease_alerts', 'Disease outbreak alerts',
@@ -85,12 +92,19 @@ class NotificationService {
       await _initLocalNotifications();
       await _messaging.requestPermission();
 
-      final token = await _messaging.getToken();
-      if (token != null) await _saveToken(uid, token);
-      _subscriptions.add(_messaging.onTokenRefresh.listen((t) => _saveToken(uid, t)));
+      _prefs = await loadPrefs();
+      await _applyAlertTopic(_prefs.alerts);
 
-      final prefs = await loadPrefs();
-      await _applyAlertTopic(prefs.alerts);
+      _primed = false;
+      _subscriptions.add(FirebaseFirestore.instance
+          .collection('notifications')
+          .doc(uid)
+          .collection('items')
+          .where('read', isEqualTo: false)
+          .snapshots()
+          .listen(_onBellChanged, onError: (Object e) {
+        debugPrint('Notification listener stopped: $e');
+      }));
 
       _subscriptions.add(FirebaseMessaging.onMessage.listen(_showForeground));
       _subscriptions.add(FirebaseMessaging.onMessageOpenedApp.listen(_open));
@@ -111,12 +125,6 @@ class NotificationService {
     _uid = null;
     if (uid == null || kIsWeb) return;
     try {
-      final token = await _messaging.getToken();
-      if (token != null) {
-        await _doc(uid).set({
-          'tokens': FieldValue.arrayRemove([token]),
-        }, SetOptions(merge: true));
-      }
       await _messaging.unsubscribeFromTopic(alertTopic);
     } catch (e) {
       debugPrint('NotificationService.stop failed: $e');
@@ -134,7 +142,84 @@ class NotificationService {
     final uid = FirebaseAuth.instance.currentUser?.uid;
     if (uid == null) return;
     await _doc(uid).set({'prefs': prefs.toMap()}, SetOptions(merge: true));
+    _prefs = prefs;
     await _applyAlertTopic(prefs.alerts);
+  }
+
+  /// Pops up a phone notification for each new unread bell item, and for a
+  /// chat item updated by a newer message.
+  void _onBellChanged(QuerySnapshot<Map<String, dynamic>> snap) {
+    if (!_primed) {
+      _primed = true;
+      return;
+    }
+    for (final change in snap.docChanges) {
+      if (change.type == DocumentChangeType.removed) continue;
+      final data = change.doc.data();
+      if (data == null || data['read'] == true) continue;
+      if (change.type == DocumentChangeType.modified && data['type'] != 'message') continue;
+      final category = categoryFor(data['type'] as String?);
+      final allowed = category == 'messages' ? _prefs.messages : _prefs.community;
+      if (!allowed) continue;
+      final text = pushText(data);
+      _showLocal(change.doc.id, text.title, text.body, category,
+          {'type': '${data['type'] ?? ''}', 'itemId': change.doc.id});
+    }
+  }
+
+  /// Which Settings switch (and Android channel) a notification type uses.
+  static String categoryFor(String? type) => const {
+        'msg_request': 'messages',
+        'msg_accept': 'messages',
+        'message': 'messages',
+      }[type] ??
+      'community';
+
+  /// Title and body, matching the wording of the in-app list.
+  static ({String title, String body}) pushText(Map<String, dynamic> data) {
+    final name = (data['fromName'] as String?) ?? 'A farmer';
+    switch (data['type']) {
+      case 'like':
+        return (title: 'New like', body: '$name liked your post');
+      case 'comment':
+        return (title: 'New comment', body: '$name commented on your post');
+      case 'reply':
+        return (title: 'New reply', body: '$name replied to your comment');
+      case 'pal_request':
+        return (title: 'Pal request', body: '$name sent you a pal request');
+      case 'pal_accept':
+        return (title: 'New pal', body: '$name accepted your pal request');
+      case 'msg_request':
+        return (title: 'Message request', body: '$name wants to message you');
+      case 'msg_accept':
+        return (title: 'Request accepted', body: '$name accepted your message request');
+      case 'message':
+        final preview = (data['preview'] as String?) ?? '';
+        return (title: name, body: preview.isEmpty ? 'Sent you a message' : preview);
+      default:
+        return (title: 'AgroLens', body: 'You have a new notification');
+    }
+  }
+
+  void _showLocal(String tag, String? title, String? body, String channelId,
+      Map<String, String> data) {
+    final channel = _channels.firstWhere((c) => c.id == channelId,
+        orElse: () => _channels[1]);
+    _local.show(
+      // Same id for the same bell item: a chat's newer message replaces
+      // its older notification instead of stacking.
+      tag.hashCode,
+      title,
+      body,
+      NotificationDetails(
+        android: AndroidNotificationDetails(channel.id, channel.name,
+            channelDescription: channel.description,
+            importance: channel.importance,
+            priority: Priority.high),
+        iOS: const DarwinNotificationDetails(),
+      ),
+      payload: Uri(queryParameters: data).query,
+    );
   }
 
   Future<void> _applyAlertTopic(bool enabled) async {
@@ -145,11 +230,6 @@ class NotificationService {
       await _messaging.unsubscribeFromTopic(alertTopic);
     }
   }
-
-  Future<void> _saveToken(String uid, String token) => _doc(uid).set({
-        'tokens': FieldValue.arrayUnion([token]),
-        'updatedAt': FieldValue.serverTimestamp(),
-      }, SetOptions(merge: true));
 
   Future<void> _initLocalNotifications() async {
     await _local.initialize(
@@ -171,25 +251,14 @@ class NotificationService {
   }
 
   /// Android doesn't display pushes while the app is open; show them here.
+  /// Android doesn't display pushes (outbreak alerts) while the app is
+  /// open; show them here. iOS shows them itself.
   void _showForeground(RemoteMessage message) {
     final n = message.notification;
     if (n == null || defaultTargetPlatform != TargetPlatform.android) return;
-    final channelId = n.android?.channelId ?? 'community';
-    final channel = _channels.firstWhere((c) => c.id == channelId,
-        orElse: () => _channels[1]);
-    _local.show(
-      message.hashCode,
-      n.title,
-      n.body,
-      NotificationDetails(
-        android: AndroidNotificationDetails(channel.id, channel.name,
-            channelDescription: channel.description,
-            importance: channel.importance,
-            priority: Priority.high),
-      ),
-      payload: Uri(queryParameters: message.data.map((k, v) => MapEntry(k, '$v')))
-          .query,
-    );
+    _showLocal('${message.messageId ?? message.hashCode}', n.title, n.body,
+        n.android?.channelId ?? 'disease_alerts',
+        message.data.map((k, v) => MapEntry(k, '$v')));
   }
 
   Map<String, String> _decodePayload(String? payload) =>

@@ -20,7 +20,6 @@ farmer community (posts, pals and messaging).
 | `assets/i18n/` | Languages list, English UI strings, machine translations, human overrides |
 | `scripts/translate.py` | Generates the translations with Meta's NLLB-200 |
 | `scraper/` | Python RSS scraper that fills the Firestore `news` collection and sends outbreak alerts |
-| `functions/` | Cloud Functions: push notifications and account clean-up |
 | `.github/workflows/` | Flutter CI, translation, and the scheduled news scraper |
 | `firestore.rules`, `firestore.indexes.json` | Firestore security rules and indexes |
 | `test/` | Unit tests |
@@ -76,32 +75,37 @@ the result.
 
 ## Notifications
 
+Everything runs on Firebase's free Spark plan (no Cloud Functions):
+
 - **In-app:** every like, comment, reply, pal/message request and chat message
   lands in `notifications/{uid}/items` and shows in the bell list.
-- **Push:** the `pushNotification` Cloud Function sends each of those to the
-  user's phones, unless they turned that kind off in **Settings → Notifications**.
-  Phone tokens and switches live in the owner-only `users/{uid}/private/notifications`.
-- **Disease outbreak alerts:** the scraper pushes new outbreak stories about
-  diseases AgroLens diagnoses, in Botswana and the region, to the
-  `disease_alerts` topic (max 3 per run).
+- **On the phone:** while AgroLens is open or still running in the
+  background, the app listens to that list and pops up a notification for
+  anything new, if that kind is switched on in **Settings → Notifications**
+  (switches live in the owner-only `users/{uid}/private/notifications`).
+  Once Android closes the app, these wait in the bell list.
+- **Disease outbreak alerts** reach the phone even when the app is closed:
+  the scraper (GitHub Actions) pushes new outbreak stories about diseases
+  AgroLens diagnoses, in Botswana and the region, to the `disease_alerts`
+  topic (max 3 per run). The Settings switch joins or leaves that topic.
 
 ## Firebase
 
 ```bash
 firebase deploy --only firestore:rules,firestore:indexes
-cd functions && npm install && cd ..
-firebase deploy --only functions            # requires the Blaze plan
 ```
 
-Push on iOS also needs an APNs key uploaded in the Firebase console and the
-Push Notifications capability enabled in Xcode.
+That's all the deploying there is: the app runs on the free Spark plan.
+
+Outbreak alerts on iOS also need an APNs key uploaded in the Firebase console
+and the Push Notifications capability enabled in Xcode.
 
 Collections: `users` (+ `private`), `posts` (+ `comments`), `diagnoses`, `news`,
 `palRequests`, `pals`, `conversations` (+ `messages`),
 `notifications/{uid}/items`.
 
-Deleting an account (Settings → Delete account) removes the login; the
-`cleanUpDeletedUser` function then deletes everything that user created.
+Deleting an account (Settings → Delete account) first deletes everything that
+user created (`lib/services/account_cleanup.dart`), then the login.
 
 ## Sign in with Google
 

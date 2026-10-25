@@ -8,6 +8,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
+import '../services/account_cleanup.dart';
 import '../services/google_auth.dart';
 import '../services/notification_service.dart';
 import '../providers/theme_provider.dart';
@@ -430,8 +431,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 
   /// Firebase only deletes a login that was used recently, so confirm the
-  /// password first. Deleting the login triggers the cleanUpDeletedUser
-  /// Cloud Function, which removes all of the user's data.
+  /// password (or Google account) first. Then the app removes everything
+  /// the user created, and finally the login itself.
   Future<void> _deleteAccount(BuildContext context) async {
     final user = FirebaseAuth.instance.currentUser;
     if (user == null) return;
@@ -455,6 +456,16 @@ class _SettingsScreenState extends State<SettingsScreen> {
         if (context.mounted) _showSnack(context, 'That password is not correct.');
         return;
       }
+    }
+
+    try {
+      await AccountCleanup.deleteAllDataOf(user.uid);
+    } catch (e) {
+      debugPrint('Account clean-up failed: $e');
+      if (context.mounted) {
+        _showSnack(context, 'Could not delete your data. Check your connection and try again.');
+      }
+      return; // keep the login so they can try again
     }
 
     try {

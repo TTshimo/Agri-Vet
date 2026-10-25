@@ -43,10 +43,9 @@ service cloud.firestore {
       allow read: if isSignedIn();
       allow create: if isOwner(uid);
       allow update: if isOwner(uid);
-      allow delete: if false; // done by the cleanUpDeletedUser function
+      allow delete: if isOwner(uid); // Settings → Delete account
 
-      // Owner-only: push tokens and notification switches (read by the
-      // pushNotification Cloud Function, which bypasses these rules).
+      // Owner-only: the user's notification switches.
       match /private/{docId} {
         allow read, write: if isOwner(uid);
       }
@@ -88,6 +87,12 @@ service cloud.firestore {
         allow delete: if isOwner(resource.data.uid) ||
           isOwner(get(/databases/$(database)/documents/posts/$(postId)).data.uid);
       }
+    }
+
+    // Collection-group read of comments (Delete account finds the user's
+    // comments on other people's posts this way).
+    match /{path=**}/comments/{commentId} {
+      allow read: if isSignedIn();
     }
 
     // ── palRequests ──────────────────────────────────────────────────────
@@ -158,9 +163,9 @@ service cloud.firestore {
       allow update: if isParticipant(resource.data.participants) &&
         request.resource.data.participants == resource.data.participants;
 
-      allow delete: if isSignedIn() &&
-        resource.data.status == 'pending' &&
-        request.auth.uid == resource.data.requestedBy;
+      // The requester can withdraw a pending request; any participant can
+      // delete the conversation when deleting their account.
+      allow delete: if isParticipant(resource.data.participants);
 
       match /messages/{messageId} {
         allow read: if isParticipant(
@@ -180,7 +185,10 @@ service cloud.firestore {
             get(/databases/$(database)/documents/conversations/$(conversationId)).data.requestedBy == request.auth.uid
           );
         allow update: if isOwner(resource.data.senderUid);
-        allow delete: if isOwner(resource.data.senderUid);
+        allow delete: if isOwner(resource.data.senderUid) ||
+          isParticipant(
+            get(/databases/$(database)/documents/conversations/$(conversationId)).data.participants
+          );
       }
     }
 
