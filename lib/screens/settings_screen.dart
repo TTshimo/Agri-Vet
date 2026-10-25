@@ -122,7 +122,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 Padding(
                   padding: EdgeInsets.fromLTRB(4, 8, 4, 0),
                   child: Text(
-                    'Diagnosis results are shown in this language. '
+                    'Diagnosis results and Learn are shown in this language. '
                     'Translations other than English are machine-generated.',
                     style: TextStyle(fontSize: 11, color: Fg.inkSoft, height: 1.4),
                   ),
