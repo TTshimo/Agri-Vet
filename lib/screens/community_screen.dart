@@ -96,7 +96,7 @@ class _CommunityScreenState extends State<CommunityScreen> {
             slivers: [
               SliverToBoxAdapter(
                 child: _WavyHeader(
-                  height: MediaQuery.of(context).padding.top + 96,
+                  height: MediaQuery.of(context).padding.top + 80,
                   child: Padding(
                     padding: EdgeInsets.fromLTRB(
                       20,
@@ -114,11 +114,6 @@ class _CommunityScreenState extends State<CommunityScreen> {
                             fontWeight: FontWeight.w600,
                             color: Fg.almond,
                           ),
-                        ),
-                        SizedBox(height: 6),
-                        Text(
-                          'Share knowledge with other farmers',
-                          style: TextStyle(fontSize: 12, color: Fg.matchaTint),
                         ),
                       ],
                     ),

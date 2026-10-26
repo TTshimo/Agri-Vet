@@ -6,6 +6,7 @@ import 'chat_screen.dart';
 import 'user_profile_screen.dart';
 import '../theme/palette.dart';
 import '../theme/header_wave.dart';
+import '../widgets/field_background.dart';
 
 
 enum NotificationType {
@@ -231,7 +232,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
 
     return Scaffold(
       backgroundColor: Bg.almond,
-      body: CustomScrollView(
+      body: FieldBackground(child: CustomScrollView(
         slivers: [
           SliverToBoxAdapter(
             child: ClipPath(
@@ -437,7 +438,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
 
           const SliverToBoxAdapter(child: SizedBox(height: 24)),
         ],
-      ),
+      )),
     );
   }
 }

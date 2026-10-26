@@ -4,6 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'user_profile_screen.dart';
 import '../theme/palette.dart';
 import '../theme/header_wave.dart';
+import '../widgets/field_background.dart';
 
 
 enum _RowState {
@@ -42,7 +43,7 @@ class _MakePalScreenState extends State<MakePalScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Bg.almond,
-      body: CustomScrollView(
+      body: FieldBackground(child: CustomScrollView(
         slivers: [
           SliverToBoxAdapter(
             child: ClipPath(
@@ -79,14 +80,7 @@ class _MakePalScreenState extends State<MakePalScreen> {
                         const SizedBox(width: 34),
                       ],
                     ),
-                    const SizedBox(height: 4),
-                    Padding(
-                      padding: const EdgeInsets.only(bottom: 12),
-                      child: Text(
-                        'Find other farmers to connect with',
-                        style: TextStyle(fontSize: 12.5, color: Fg.matchaLight),
-                      ),
-                    ),
+                    const SizedBox(height: 16),
                     TextField(
                       controller: _searchController,
                       style: TextStyle(color: Fg.almond, fontSize: 14),
@@ -221,7 +215,7 @@ class _MakePalScreenState extends State<MakePalScreen> {
 
           const SliverToBoxAdapter(child: SizedBox(height: 24)),
         ],
-      ),
+      )),
     );
   }
 }

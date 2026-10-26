@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 import 'chat_screen.dart';
 import '../theme/palette.dart';
 import '../theme/header_wave.dart';
+import '../widgets/field_background.dart';
 
 
 class MessagingScreen extends StatefulWidget {
@@ -47,7 +48,7 @@ class _MessagingScreenState extends State<MessagingScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Bg.almond,
-      body: CustomScrollView(
+      body: FieldBackground(child: CustomScrollView(
         slivers: [
           // Header
           SliverToBoxAdapter(
@@ -360,7 +361,7 @@ class _MessagingScreenState extends State<MessagingScreen> {
 
           const SliverToBoxAdapter(child: SizedBox(height: 24)),
         ],
-      ),
+      )),
     );
   }
 }

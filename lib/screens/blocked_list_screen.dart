@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../theme/palette.dart';
 import '../theme/header_wave.dart';
+import '../widgets/field_background.dart';
 
 
 class BlockedListScreen extends StatefulWidget {
@@ -37,7 +38,7 @@ class _BlockedListScreenState extends State<BlockedListScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Bg.almond,
-      body: CustomScrollView(
+      body: FieldBackground(child: CustomScrollView(
         slivers: [
           SliverToBoxAdapter(
             child: ClipPath(
@@ -225,7 +226,7 @@ class _BlockedListScreenState extends State<BlockedListScreen> {
 
           const SliverToBoxAdapter(child: SizedBox(height: 24)),
         ],
-      ),
+      )),
     );
   }
 }

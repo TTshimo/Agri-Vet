@@ -4,6 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'user_profile_screen.dart';
 import '../theme/palette.dart';
 import '../theme/header_wave.dart';
+import '../widgets/field_background.dart';
 
 
 class PalsScreen extends StatefulWidget {
@@ -50,7 +51,7 @@ class _PalsScreenState extends State<PalsScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Bg.almond,
-      body: CustomScrollView(
+      body: FieldBackground(child: CustomScrollView(
         slivers: [
           SliverToBoxAdapter(
             child: ClipPath(
@@ -281,7 +282,7 @@ class _PalsScreenState extends State<PalsScreen> {
 
           const SliverToBoxAdapter(child: SizedBox(height: 24)),
         ],
-      ),
+      )),
     );
   }
 }

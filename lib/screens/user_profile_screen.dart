@@ -4,6 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'chat_screen.dart';
 import '../theme/palette.dart';
 import '../theme/header_wave.dart';
+import '../widgets/field_background.dart';
 
 
 enum _PalState {
@@ -408,7 +409,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Bg.almond,
-      body: FutureBuilder<DocumentSnapshot>(
+      body: FieldBackground(child: FutureBuilder<DocumentSnapshot>(
         future: FirebaseFirestore.instance
             .collection('users')
             .doc(widget.profileUid)
@@ -549,7 +550,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
             ],
           );
         },
-      ),
+      )),
     );
   }
 

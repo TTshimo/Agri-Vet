@@ -9,6 +9,7 @@ import 'profile_social_menu.dart';
 import 'settings_screen.dart';
 import '../theme/palette.dart';
 import '../theme/header_wave.dart';
+import '../widgets/field_background.dart';
 
 
 class ProfileScreen extends StatefulWidget {
@@ -37,9 +38,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
     final uid = _uid;
     return Scaffold(
       backgroundColor: Bg.almond,
-      body: uid == null
+      body: FieldBackground(child: uid == null
           ? const Center(child: Text('Not signed in'))
-          : StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
+          : StreamBuilder<DocumentSnapshot<Map<String), dynamic>>>(
               stream: FirebaseFirestore.instance.collection('users').doc(uid).snapshots(),
               builder: (context, snapshot) {
                 final data = snapshot.data?.data() ?? const <String, dynamic>{};

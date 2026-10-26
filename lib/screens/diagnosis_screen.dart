@@ -347,7 +347,7 @@ class _DiagnosisScreenState extends State<DiagnosisScreen> {
     // Main tab: title + subtitle like Community and Learn.
     if (!showBack) {
       return _WavyHeader(
-        height: MediaQuery.of(context).padding.top + 96,
+        height: MediaQuery.of(context).padding.top + 80,
         child: Padding(
           padding: EdgeInsets.fromLTRB(
             20,
@@ -367,13 +367,6 @@ class _DiagnosisScreenState extends State<DiagnosisScreen> {
                   fontWeight: FontWeight.w600,
                   color: Fg.almond,
                 ),
-              ),
-              const SizedBox(height: 2),
-              Text(
-                _t('ui.diag.subtitle'),
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-                style: TextStyle(fontSize: 12.5, color: Fg.matchaLight),
               ),
             ],
           ),

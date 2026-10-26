@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:intl/intl.dart';
 import '../theme/palette.dart';
 import '../theme/header_wave.dart';
+import '../widgets/field_background.dart';
 
 
 class ChatScreen extends StatefulWidget {
@@ -376,7 +377,7 @@ class _ChatScreenState extends State<ChatScreen> {
 
         return Scaffold(
           backgroundColor: Bg.almond,
-          body: Column(
+          body: FieldBackground(child: Column(
             children: [
               // Header
               ClipPath(
@@ -807,7 +808,7 @@ class _ChatScreenState extends State<ChatScreen> {
                   ),
                 ),
             ],
-          ),
+          )),
         );
       },
     );

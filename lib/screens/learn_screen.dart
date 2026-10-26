@@ -94,7 +94,7 @@ class _LearnScreenState extends State<LearnScreen> {
                   slivers: [
                     SliverToBoxAdapter(
                       child: _WavyHeader(
-                        height: MediaQuery.of(context).padding.top + 96, // same as Community
+                        height: MediaQuery.of(context).padding.top + 80, // same as Community
                         child: Padding(
                           padding: EdgeInsets.fromLTRB(
                             20,
@@ -115,16 +115,6 @@ class _LearnScreenState extends State<LearnScreen> {
                                   fontSize: 22,
                                   fontWeight: FontWeight.w600,
                                   color: Fg.almond,
-                                ),
-                              ),
-                              SizedBox(height: 6),
-                              Text(
-                                _ui(context, 'subtitle'),
-                                maxLines: 2,
-                                overflow: TextOverflow.ellipsis,
-                                style: TextStyle(
-                                  fontSize: 12,
-                                  color: Fg.matchaTint,
                                 ),
                               ),
                             ],
