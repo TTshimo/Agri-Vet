@@ -5,6 +5,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:intl/intl.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../theme/palette.dart';
+import '../widgets/field_background.dart';
+import '../widgets/page_header.dart';
 
 // Self-contained palette for the redesign — matcha green / almond / rust.
 // Not pulled from main.dart's AppColors so this file renders correctly
@@ -32,22 +34,39 @@ class _HomeScreenState extends State<HomeScreen> {
     _Category(id: 'policy', label: 'Policy', icon: Icons.policy_outlined),
   ];
 
+  String? _profileName;
+
   String get _greeting {
     final hour = DateTime.now().hour;
     if (hour < 12) return 'Good morning';
-    if (hour < 17) return 'Hello';
-    return 'Yesterday';
+    if (hour < 17) return 'Good afternoon';
+    return 'Good evening'; // was 'Yesterday'
   }
 
   String get _firstName {
-    final name = _user?.displayName ?? 'Farmer';
-    return name.split(' ').first;
+    final name = (_profileName?.trim().isNotEmpty == true)
+        ? _profileName!
+        : (_user?.displayName ?? 'Farmer');
+    return name.trim().split(' ').first;
+  }
+
+  /// The name from the farmer's profile (email sign-ups have no
+  /// displayName, so the greeting used to say "Farmer").
+  Future<void> _loadName() async {
+    final uid = _user?.uid;
+    if (uid == null) return;
+    try {
+      final snap = await FirebaseFirestore.instance.collection('users').doc(uid).get();
+      final name = snap.data()?['name'] as String?;
+      if (mounted && name != null) setState(() => _profileName = name);
+    } catch (_) {}
   }
 
   @override
   void initState() {
     super.initState();
     _stream = _buildQuery('all').snapshots();
+    _loadName();
   }
 
   Query<Map<String, dynamic>> _buildQuery(String category) {
@@ -70,51 +89,22 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Bg.almond,
-      body: Stack(
-        children: [
-          Positioned.fill(
-            child: CustomPaint(painter: _FieldWavesPainter()),
-          ),
-          CustomScrollView(
+      body: FieldBackground(
+        child: CustomScrollView(
             slivers: [
-              // Header: greeting + category chips
+              // Header: same green wavy header as the other tabs, with a
+              // greeting as the title; filter chips sit below it.
               SliverToBoxAdapter(
-                child: Container(
-                  color: Bg.matchaDark,
-                  padding: EdgeInsets.fromLTRB(
-                    20,
-                    MediaQuery.of(context).padding.top + 16,
-                    20,
-                    16,
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        '$_greeting, $_firstName',
-                        style: TextStyle(
-                          fontSize: 13,
-                          color: Fg.matchaTint,
-                        ),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        "Explore what's new and what's next",
-                        style: TextStyle(
-                          fontSize: 22,
-                          fontWeight: FontWeight.w600,
-                          color: Fg.almond,
-                          letterSpacing: -0.3,
-                        ),
-                      ),
-                      const SizedBox(height: 16),
-                      SizedBox(
-                        height: 36,
-                        child: ListView.separated(
-                          scrollDirection: Axis.horizontal,
-                          itemCount: _categories.length,
-                          separatorBuilder: (_, __) =>
-                              const SizedBox(width: 8),
+                child: WavyPageHeader(title: '$_greeting, $_firstName'),
+              ),
+              SliverToBoxAdapter(
+                child: SizedBox(
+                  height: 36,
+                  child: ListView.separated(
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    scrollDirection: Axis.horizontal,
+                    itemCount: _categories.length,
+                    separatorBuilder: (_, __) => const SizedBox(width: 8),
                           itemBuilder: (_, i) {
                             final cat = _categories[i];
                             final selected = _selectedCategory == cat.id;
@@ -128,28 +118,18 @@ class _HomeScreenState extends State<HomeScreen> {
                                 padding: const EdgeInsets.symmetric(
                                     horizontal: 14, vertical: 8),
                                 decoration: BoxDecoration(
-                                  // Header chips: light pill when selected,
-                                  // frosted when not, in both light and dark mode.
-                                  color: selected
-                                      ? Fg.almond
-                                      : Colors.white.withOpacity(0.14),
+                                  color: selected ? Bg.matchaDark : Bg.surface,
                                   borderRadius: BorderRadius.circular(999),
                                   border: selected
                                       ? null
-                                      : Border.all(
-                                          color:
-                                              Colors.white.withOpacity(0.35),
-                                          width: 0.7,
-                                        ),
+                                      : Border.all(color: Bg.hairline, width: 0.8),
                                 ),
                                 child: Row(
                                   children: [
                                     Icon(
                                       cat.icon,
                                       size: 14,
-                                      color: selected
-                                          ? Bg.matchaDark
-                                          : Fg.almond,
+                                      color: selected ? Fg.almond : Fg.matcha,
                                     ),
                                     const SizedBox(width: 6),
                                     Text(
@@ -157,9 +137,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                       style: TextStyle(
                                         fontSize: 12,
                                         fontWeight: FontWeight.w500,
-                                        color: selected
-                                            ? Bg.matchaDark
-                                            : Fg.almond,
+                                        color: selected ? Fg.almond : Fg.ink,
                                       ),
                                     ),
                                   ],
@@ -167,12 +145,10 @@ class _HomeScreenState extends State<HomeScreen> {
                               ),
                             );
                           },
-                        ),
-                      ),
-                    ],
                   ),
                 ),
               ),
+              const SliverToBoxAdapter(child: SizedBox(height: 8)),
 
               StreamBuilder<QuerySnapshot>(
                 stream: _stream,
@@ -234,57 +210,10 @@ class _HomeScreenState extends State<HomeScreen> {
 
               const SliverToBoxAdapter(child: SizedBox(height: 24)),
             ],
-          ),
-        ],
+        ),
       ),
     );
   }
-}
-
-/// Layered soft rolling-field horizon behind the content — a subtle top
-/// curve and a subtle bottom curve, both single flat-color washes.
-class _FieldWavesPainter extends CustomPainter {
-  @override
-  void paint(Canvas canvas, Size size) {
-    final paint = Paint()..color = Bg.matchaTint.withOpacity(0.5);
-
-    final top = Path()
-      ..moveTo(0, size.height * 0.22)
-      ..cubicTo(
-        size.width * 0.19, size.height * 0.15,
-        size.width * 0.42, size.height * 0.25,
-        size.width * 0.61, size.height * 0.18,
-      )
-      ..cubicTo(
-        size.width * 0.78, size.height * 0.12,
-        size.width * 0.92, size.height * 0.16,
-        size.width, size.height * 0.14,
-      )
-      ..lineTo(size.width, 0)
-      ..lineTo(0, 0)
-      ..close();
-    canvas.drawPath(top, paint);
-
-    final bottom = Path()
-      ..moveTo(0, size.height * 0.82)
-      ..cubicTo(
-        size.width * 0.17, size.height * 0.76,
-        size.width * 0.36, size.height * 0.86,
-        size.width * 0.56, size.height * 0.79,
-      )
-      ..cubicTo(
-        size.width * 0.72, size.height * 0.74,
-        size.width * 0.86, size.height * 0.78,
-        size.width, size.height * 0.76,
-      )
-      ..lineTo(size.width, size.height)
-      ..lineTo(0, size.height)
-      ..close();
-    canvas.drawPath(bottom, paint);
-  }
-
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }
 
 /// Frosted glass surface with a glossy highlight band across the top.
