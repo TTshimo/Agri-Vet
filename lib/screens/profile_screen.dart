@@ -40,7 +40,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       backgroundColor: Bg.almond,
       body: FieldBackground(child: uid == null
           ? const Center(child: Text('Not signed in'))
-          : StreamBuilder<DocumentSnapshot<Map<String), dynamic>>>(
+          : StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
               stream: FirebaseFirestore.instance.collection('users').doc(uid).snapshots(),
               builder: (context, snapshot) {
                 final data = snapshot.data?.data() ?? const <String, dynamic>{};
@@ -77,7 +77,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   ),
                 );
               },
-            ),
+            )),
     );
   }
 
