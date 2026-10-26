@@ -24,7 +24,7 @@ class ProfileSocialMenu extends StatelessWidget {
     final uid = FirebaseAuth.instance.currentUser?.uid ?? '';
 
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      margin: EdgeInsets.zero, // the page already pads it; it sat narrower than the other cards
       decoration: BoxDecoration(
         color: cardColor,
         borderRadius: BorderRadius.circular(16),

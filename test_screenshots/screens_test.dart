@@ -92,7 +92,14 @@ final _shots = <_Shot>[
   _Shot('make_pal', () => const MakePalScreen()),
   _Shot('messaging', () => const MessagingScreen()),
   _Shot('notifications', () => const NotificationsScreen()),
-  _Shot('profile', () => const ProfileScreen()),
+  _Shot('profile', () => const ProfileScreen(previewData: {
+        'name': 'Tumisang Tshimologo',
+        'location': 'Maun, Botswana',
+        'farmerType': 'both',
+        'farmName': '',
+        'animalsKept': ['Cattle', 'Goats'],
+        'yearsFarming': '4',
+      })),
   _Shot('settings', () => const SettingsScreen()),
 ];
 
