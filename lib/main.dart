@@ -14,6 +14,7 @@ import 'firebase_options.dart';
 import 'package:provider/provider.dart';
 import 'providers/theme_provider.dart';
 import 'providers/language_provider.dart';
+import 'theme/palette.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -26,11 +27,14 @@ void main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
 
+  final language = LanguageProvider();
+  await language.ready;
+
   runApp(
     MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => ThemeProvider()),
-        ChangeNotifierProvider(create: (_) => LanguageProvider()),
+        ChangeNotifierProvider.value(value: language),
       ],
       child: const AgriVetApp(),
     ),
@@ -44,11 +48,26 @@ class AgriVetApp extends StatelessWidget {
   Widget build(BuildContext context) {
     final themeProvider = context.watch<ThemeProvider>();
 
+    // Screens read their colours from Palette (Bg/Fg) rather than the
+    // Theme, so when dark mode flips, repaint everything already on screen
+    // (navigation and form state are kept).
+    if (Palette.dark != themeProvider.isDark) {
+      Palette.dark = themeProvider.isDark;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!context.mounted) return;
+        void rebuild(Element element) {
+          element.markNeedsBuild();
+          element.visitChildren(rebuild);
+        }
+        (context as Element).visitChildren(rebuild);
+      });
+    }
+
     return MaterialApp(
       title: 'AgroLens',
       debugShowCheckedModeBanner: false,
-      theme: _buildLightTheme(),
-      darkTheme: _buildDarkTheme(),
+      theme: lightTheme(),
+      darkTheme: darkTheme(),
       themeMode: themeProvider.isDark ? ThemeMode.dark : ThemeMode.light,
       home: const SplashScreen(),
       routes: {
@@ -58,7 +77,9 @@ class AgriVetApp extends StatelessWidget {
     );
   }
 
-  ThemeData _buildLightTheme() {
+  /// The app's themes. [googleFonts] is off only in screenshot tests,
+  /// which can't download fonts.
+  static ThemeData lightTheme({bool googleFonts = true}) {
     return ThemeData(
       useMaterial3: true,
       brightness: Brightness.light,
@@ -68,7 +89,7 @@ class AgriVetApp extends StatelessWidget {
         surface: AppColors.background,
         error: AppColors.red,
       ),
-      textTheme: GoogleFonts.interTextTheme(),
+      textTheme: googleFonts ? GoogleFonts.interTextTheme() : null,
       scaffoldBackgroundColor: AppColors.background,
       appBarTheme: const AppBarTheme(
         backgroundColor: AppColors.greenDark,
@@ -98,32 +119,19 @@ class AgriVetApp extends StatelessWidget {
           side: const BorderSide(color: AppColors.border),
         ),
       ),
+      // Every screen styles its own field box (fill, border, rounding), so
+      // the theme must not add a second white, bordered box on top: that
+      // hid light text on the login screens and boxed fields twice.
       inputDecorationTheme: InputDecorationTheme(
-        filled: true,
-        fillColor: Colors.white,
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: AppColors.border),
-        ),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: AppColors.border),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide:
-              const BorderSide(color: AppColors.greenDark, width: 1.5),
-        ),
-        contentPadding: const EdgeInsets.symmetric(
-          horizontal: 14,
-          vertical: 12,
-        ),
+        filled: false,
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+        contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
       ),
     );
   }
 
  // Dark mode
-  ThemeData _buildDarkTheme() {
+  static ThemeData darkTheme({bool googleFonts = true}) {
     return ThemeData(
       useMaterial3: true,
       brightness: Brightness.dark,
@@ -133,7 +141,7 @@ class AgriVetApp extends StatelessWidget {
         surface: Color(0xFF1B1B1B),
         error: AppColors.red,
       ),
-      textTheme: GoogleFonts.interTextTheme(ThemeData.dark().textTheme),
+      textTheme: googleFonts ? GoogleFonts.interTextTheme(ThemeData.dark().textTheme) : null,
       scaffoldBackgroundColor: const Color(0xFF121212),
       appBarTheme: const AppBarTheme(
         backgroundColor: AppColors.greenDeep,
@@ -163,25 +171,13 @@ class AgriVetApp extends StatelessWidget {
           side: const BorderSide(color: Color(0xFF333333)),
         ),
       ),
+      // Every screen styles its own field box (fill, border, rounding), so
+      // the theme must not add a second white, bordered box on top: that
+      // hid light text on the login screens and boxed fields twice.
       inputDecorationTheme: InputDecorationTheme(
-        filled: true,
-        fillColor: const Color(0xFF1E1E1E),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: Color(0xFF333333)),
-        ),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: Color(0xFF333333)),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: AppColors.greenMid, width: 1.5),
-        ),
-        contentPadding: const EdgeInsets.symmetric(
-          horizontal: 14,
-          vertical: 12,
-        ),
+        filled: false,
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+        contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
       ),
     );
   }

@@ -22,10 +22,10 @@ service cloud.firestore {
     // workflow (web scraper) using the Firebase Admin SDK, which
     // authenticates as a service account and bypasses these rules
     // entirely — so no client create/update path is needed here.
-    // Documents carry a `category` field (alert, livestock, crop, weather,
-    // policy) that the Home screen filters/queries on client-side via
-    // `.where('category', isEqualTo: ...)`, rather than living in separate
-    // collections. The app only ever reads this collection.
+    // Documents carry `categories` (alert, livestock, crop, weather; the
+    // first is also stored as `category`) that the Home screen filters on
+    // via `.where('categories', arrayContains: ...)`, rather than living in
+    // separate collections. The app only ever reads this collection.
 
     match /news/{itemId} {
       allow read: if isSignedIn();
@@ -43,7 +43,24 @@ service cloud.firestore {
       allow read: if isSignedIn();
       allow create: if isOwner(uid);
       allow update: if isOwner(uid);
-      allow delete: if false;
+      allow delete: if isOwner(uid); // Settings → Delete account
+
+      // Owner-only: the user's notification switches.
+      match /private/{docId} {
+        allow read, write: if isOwner(uid);
+      }
+    }
+
+    // ── diagnoses ───────────────────────────────────────────────────────
+    // One doc per completed diagnosis, written by DiagnosisScreen and read
+    // back by the Profile stats card and "My diagnoses". Private to the
+    // farmer who ran it; history is immutable once saved.
+
+    match /diagnoses/{diagnosisId} {
+      allow read: if isOwner(resource.data.uid);
+      allow create: if isOwner(request.resource.data.uid);
+      allow update: if false;
+      allow delete: if isOwner(resource.data.uid);
     }
 
     // ── posts ────────────────────────────────────────────────────────────
@@ -70,6 +87,12 @@ service cloud.firestore {
         allow delete: if isOwner(resource.data.uid) ||
           isOwner(get(/databases/$(database)/documents/posts/$(postId)).data.uid);
       }
+    }
+
+    // Collection-group read of comments (Delete account finds the user's
+    // comments on other people's posts this way).
+    match /{path=**}/comments/{commentId} {
+      allow read: if isSignedIn();
     }
 
     // ── palRequests ──────────────────────────────────────────────────────
@@ -110,7 +133,10 @@ service cloud.firestore {
     // tradeoff for client-side writes without Cloud Functions.
 
     match /pals/{palId} {
+      // A missing doc must be readable too: Make a pal checks whether
+      // pals/{me}_{them} exists, and a refused read left it spinning.
       allow read: if isSignedIn() && (
+        resource == null ||
         request.auth.uid == resource.data.uid ||
         request.auth.uid == resource.data.otherUid
       );
@@ -137,11 +163,12 @@ service cloud.firestore {
       // unreadCounts.*, status (accept), archivedBy (arrayUnion/Remove
       // of their own uid only — enforced loosely here, tightened by the
       // fact that the client only ever writes its own uid).
-      allow update: if isParticipant(resource.data.participants);
+      allow update: if isParticipant(resource.data.participants) &&
+        request.resource.data.participants == resource.data.participants;
 
-      allow delete: if isSignedIn() &&
-        resource.data.status == 'pending' &&
-        request.auth.uid == resource.data.requestedBy;
+      // The requester can withdraw a pending request; any participant can
+      // delete the conversation when deleting their account.
+      allow delete: if isParticipant(resource.data.participants);
 
       match /messages/{messageId} {
         allow read: if isParticipant(
@@ -161,7 +188,10 @@ service cloud.firestore {
             get(/databases/$(database)/documents/conversations/$(conversationId)).data.requestedBy == request.auth.uid
           );
         allow update: if isOwner(resource.data.senderUid);
-        allow delete: if isOwner(resource.data.senderUid);
+        allow delete: if isOwner(resource.data.senderUid) ||
+          isParticipant(
+            get(/databases/$(database)/documents/conversations/$(conversationId)).data.participants
+          );
       }
     }
 
@@ -174,11 +204,21 @@ service cloud.firestore {
     // Locked to create-only so no one can read, edit, or delete another
     // user's notifications.
 
+    // Chat messages use ONE doc per conversation (msg_<conversationId>)
+    // that the sender overwrites with each new message, so the bell shows
+    // the latest message instead of filling up. Only the original sender
+    // of that doc may overwrite it, and only as a 'message' notification.
+
     match /notifications/{uid}/items/{itemId} {
       allow read: if isOwner(uid);
       allow create: if isSignedIn() && request.resource.data.fromUid == request.auth.uid;
-      allow update: if isOwner(uid) &&
-        request.resource.data.diff(resource.data).affectedKeys().hasOnly(['read']);
+      allow update: if (isOwner(uid) &&
+          request.resource.data.diff(resource.data).affectedKeys().hasOnly(['read'])) ||
+        (isSignedIn() &&
+          itemId.matches('msg_.*') &&
+          resource.data.fromUid == request.auth.uid &&
+          request.resource.data.fromUid == request.auth.uid &&
+          request.resource.data.type == 'message');
       allow delete: if isOwner(uid);
     }
   }

@@ -12,7 +12,20 @@
           "package_name": "com.tshimologo_intelligence.agri_vet"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "209258713628-l04r34oul4in7d9d46rmm9mrnia9nf79.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.tshimologo_intelligence.agri_vet",
+            "certificate_hash": "3e2cf0fc640c3ccaad3cef9c036ffe25261c9975"
+          }
+        },
+        {
+          "client_id": "209258713628-kos9u69ql8gq0uaag6rje7u4cmqu2jur.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyAYLKVMj8affZ3OfZTk2yodRnapZxRXSxc"
@@ -20,7 +33,19 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "209258713628-kos9u69ql8gq0uaag6rje7u4cmqu2jur.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "209258713628-l062kf3bnktrocjjibbsdu6f8u2f5drt.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.agriVet"
+              }
+            }
+          ]
         }
       }
     }

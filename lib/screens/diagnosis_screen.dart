@@ -8,31 +8,28 @@ import 'package:image/image.dart' as img;
 import 'package:tflite_flutter/tflite_flutter.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import '../../services/translation_service.dart';
-import '../../services/behavioural_score.dart';
+import 'package:provider/provider.dart';
+import '../providers/language_provider.dart';
+import '../widgets/language_chip.dart';
+import '../services/behavioural_score.dart';
+import '../theme/palette.dart';
 
 // Self-contained palette for the redesign — matcha green / almond / rust.
 // Matches the palette used across the other redesigned screens. Fold into
 // a shared AppColors in main.dart later if you want it app-wide.
-class _C {
-  static const matchaDark = Color(0xFF374530);
-  static const matchaHeader = Color(0xFF4A5B41);
-  static const matcha = Color(0xFF5C7148);
-  static const matchaTint = Color(0xFFD6E0C4);
-  static const almond = Color(0xFFF6EFE2);
-  static const ink = Color(0xFF2B2820);
-  static const inkSoft = Color(0xFF726C5C);
-  static const rust = Color(0xFFC1703E);
-  static const rustBg = Color(0xFFF1DECB);
-}
-
 enum DiagnosisType { animal, plant }
 
 enum _FlowStep { upload, profiling, result }
 
 class DiagnosisScreen extends StatefulWidget {
   final DiagnosisType? initialType;
-  const DiagnosisScreen({super.key, this.initialType});
+
+  /// Screenshot tests only: open straight on the result for this disease
+  /// key (from the knowledge base) instead of the photo step.
+  @visibleForTesting
+  final String? previewDisease;
+
+  const DiagnosisScreen({super.key, this.initialType, this.previewDisease});
 
   @override
   State<DiagnosisScreen> createState() => _DiagnosisScreenState();
@@ -44,7 +41,6 @@ class _DiagnosisScreenState extends State<DiagnosisScreen> {
   bool _analysing = false;
   _DiagnosisResult? _result;
   String _animalType = '';
-  bool _showSetswana = false;
   _FlowStep _step = _FlowStep.upload;
 
   Map<String, dynamic> _knowledgeBase = {};
@@ -53,7 +49,34 @@ class _DiagnosisScreenState extends State<DiagnosisScreen> {
   int _currentQuestion = 0;
 
   final _picker = ImagePicker();
-  final _translation = TranslationService();
+
+  // ── Language ──────────────────────────────────────────────────────────
+  // Everything the farmer reads comes through LanguageProvider, in the
+  // language chosen in Settings (English fallback for anything missing).
+  LanguageProvider get _i18n => context.read<LanguageProvider>();
+
+  String _t(String key, {Map<String, Object>? args}) => _i18n.t(key, args: args);
+
+  String get _kbBase {
+    final category = _result?.type == DiagnosisType.animal ? 'animals' : 'plants';
+    return 'kb.$category.${_result?.diseaseKey}';
+  }
+
+  String _english(Object? value) =>
+      value is Map ? (value['en']?.toString() ?? '') : (value?.toString() ?? '');
+
+  /// A knowledge-base field (display_name, affects, treatment, ...).
+  String _kb(Map<String, dynamic> data, String field) =>
+      _i18n.t('$_kbBase.$field', fallback: _english(data[field]));
+
+  String _questionText(Map<String, dynamic> q) =>
+      _i18n.t('$_kbBase.q.${q['id']}', fallback: _english(q['question']));
+
+  List<String> _optionsEn(Map<String, dynamic> q) =>
+      ((q['options'] as Map<String, dynamic>?)?['en'] as List?)?.cast<String>() ?? [];
+
+  String _optionText(Map<String, dynamic> q, int i) =>
+      _i18n.t('$_kbBase.q.${q['id']}.o$i', fallback: _optionsEn(q)[i]);
 
   @override
   void initState() {
@@ -64,7 +87,34 @@ class _DiagnosisScreenState extends State<DiagnosisScreen> {
 
   Future<void> _loadKnowledgeBase() async {
     final raw = await rootBundle.loadString('assets/data/disease_knowledge_base.json');
+    if (!mounted) return;
     setState(() => _knowledgeBase = json.decode(raw));
+    final preview = widget.previewDisease;
+    if (preview != null && _selectedType != null) {
+      final category = _selectedType == DiagnosisType.animal ? 'animals' : 'plants';
+      final data = (_knowledgeBase[category] as Map<String, dynamic>?)?[preview]
+              as Map<String, dynamic>? ??
+          {};
+      final questions =
+          (data['behavioral_questions'] as List? ?? []).cast<Map<String, dynamic>>();
+      setState(() {
+        _questions = questions;
+        for (final q in questions) {
+          final options = _optionsEn(q);
+          if (options.length > 1) _answers[q['id'] as String] = options[1];
+        }
+        _result = _DiagnosisResult(
+          diseaseKey: preview,
+          modelConfidence: 0.87,
+          diseaseData: data,
+          type: _selectedType!,
+          finalRiskLevel: 'high',
+          behavioralScore: 0.55,
+          answers: Map.of(_answers),
+        );
+        _step = _FlowStep.result;
+      });
+    }
   }
 
   Future<void> _pickImage(ImageSource source) async {
@@ -145,10 +195,11 @@ class _DiagnosisScreenState extends State<DiagnosisScreen> {
 
       if (questions.isEmpty) _saveToFirestore(_result!);
     } catch (e) {
+      debugPrint('Diagnosis failed: $e');
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          content: Text('Analysis failed: ${e.toString()}'),
-          backgroundColor: _C.rust,
+          content: Text(_t('ui.diag.analysis_failed')),
+          backgroundColor: Bg.rust,
         ));
       }
     } finally {
@@ -240,13 +291,14 @@ class _DiagnosisScreenState extends State<DiagnosisScreen> {
     await FirebaseFirestore.instance
         .collection('users')
         .doc(uid)
-        .update({'diagnosisCount': FieldValue.increment(1)});
+        .set({'diagnosisCount': FieldValue.increment(1)}, SetOptions(merge: true));
   }
 
   @override
   Widget build(BuildContext context) {
+    context.watch<LanguageProvider>(); // rebuild when the language changes
     return Scaffold(
-      backgroundColor: _C.almond,
+      backgroundColor: Bg.almond,
       body: Stack(
         children: [
           Positioned.fill(
@@ -277,20 +329,50 @@ class _DiagnosisScreenState extends State<DiagnosisScreen> {
     String title;
     switch (_step) {
       case _FlowStep.profiling:
-        title = _showSetswana ? 'Dipotso di seng mmalwa' : 'A few questions';
+        title = _t('ui.diag.questions_title');
         break;
       case _FlowStep.result:
-        title = _showSetswana ? 'Sepelo sa supego' : 'Diagnosis result';
+        title = _t('ui.diag.result_title');
         break;
       default:
         title = _selectedType == DiagnosisType.animal
-            ? (_showSetswana ? 'Supego ya leruo' : 'Animal diagnosis')
+            ? _t('ui.diag.animal_title')
             : _selectedType == DiagnosisType.plant
-                ? (_showSetswana ? 'Supego ya semela' : 'Plant diagnosis')
-                : (_showSetswana ? 'Supa' : 'Diagnose');
+                ? _t('ui.diag.plant_title')
+                : _t('ui.diag.title');
     }
 
     final showBack = widget.initialType != null || _step != _FlowStep.upload;
+
+    // Main tab: title + subtitle like Community and Learn.
+    if (!showBack) {
+      return _WavyHeader(
+        height: MediaQuery.of(context).padding.top + 80,
+        child: Padding(
+          padding: EdgeInsets.fromLTRB(
+            20,
+            MediaQuery.of(context).padding.top + 20,
+            20,
+            0,
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                title,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(
+                  fontSize: 22,
+                  fontWeight: FontWeight.w600,
+                  color: Fg.almond,
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
 
     return _WavyHeader(
       height: MediaQuery.of(context).padding.top + 100,
@@ -302,6 +384,7 @@ class _DiagnosisScreenState extends State<DiagnosisScreen> {
           0,
         ),
         child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             if (showBack)
               GestureDetector(
@@ -321,38 +404,30 @@ class _DiagnosisScreenState extends State<DiagnosisScreen> {
                     Navigator.of(context).pop();
                   }
                 },
-                child: const Icon(Icons.arrow_back_rounded,
-                    color: _C.almond, size: 22),
+                child: Icon(Icons.arrow_back_rounded,
+                    color: Fg.almond, size: 22),
               ),
             if (showBack) const SizedBox(width: 12),
-            Text(
-              title,
-              style: const TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.w600,
-                color: _C.almond,
-              ),
-            ),
-            const Spacer(),
-            if (_step != _FlowStep.upload)
-              GestureDetector(
-                onTap: () => setState(() => _showSetswana = !_showSetswana),
-                child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                  decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.16),
-                    borderRadius: BorderRadius.circular(999),
-                  ),
-                  child: Text(
-                    _showSetswana ? 'EN' : 'TN',
-                    style: const TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w600,
-                      color: _C.almond,
-                    ),
-                  ),
+            // Expanded + 2 lines: translated titles can be much longer
+            // than English and must never push the language chip off-screen.
+            Expanded(
+              child: Text(
+                title,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(
+                  // Same size as other pages opened with a back arrow.
+                  fontSize: 17,
+                  fontWeight: FontWeight.w600,
+                  color: Fg.almond,
+                  height: 1.2,
                 ),
               ),
+            ),
+            if (_step != _FlowStep.upload) ...[
+              const SizedBox(width: 8),
+              const LanguageChip(),
+            ],
           ],
         ),
       ),
@@ -366,8 +441,8 @@ class _DiagnosisScreenState extends State<DiagnosisScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'What are you diagnosing?',
-            style: TextStyle(fontSize: 15, fontWeight: FontWeight.w500, color: _C.ink),
+            _t('ui.diag.what_diagnosing'),
+            style: TextStyle(fontSize: 15, fontWeight: FontWeight.w500, color: Fg.ink),
           ),
           const SizedBox(height: 12),
           _TypeToggle(
@@ -408,7 +483,7 @@ class _DiagnosisScreenState extends State<DiagnosisScreen> {
               Expanded(
                 child: _SecondaryButton(
                   icon: Icons.camera_alt_outlined,
-                  label: 'Camera',
+                  label: _t('ui.diag.camera'),
                   onTap: () => _pickImage(ImageSource.camera),
                 ),
               ),
@@ -416,7 +491,7 @@ class _DiagnosisScreenState extends State<DiagnosisScreen> {
               Expanded(
                 child: _SecondaryButton(
                   icon: Icons.photo_library_outlined,
-                  label: 'Gallery',
+                  label: _t('ui.diag.gallery'),
                   onTap: () => _pickImage(ImageSource.gallery),
                 ),
               ),
@@ -425,8 +500,8 @@ class _DiagnosisScreenState extends State<DiagnosisScreen> {
           if (_selectedType == DiagnosisType.animal) ...[
             const SizedBox(height: 18),
             Text(
-              'Animal type',
-              style: TextStyle(fontSize: 13, fontWeight: FontWeight.w500, color: _C.ink),
+              _t('ui.diag.animal_type'),
+              style: TextStyle(fontSize: 13, fontWeight: FontWeight.w500, color: Fg.ink),
             ),
             const SizedBox(height: 8),
             _GlassCard(
@@ -436,18 +511,21 @@ class _DiagnosisScreenState extends State<DiagnosisScreen> {
                   child: DropdownButtonFormField<String>(
                     value: _animalType.isEmpty ? null : _animalType,
                     isExpanded: true,
-                    icon: Icon(Icons.keyboard_arrow_down_rounded, color: _C.inkSoft),
-                    style: TextStyle(fontSize: 13, color: _C.ink),
-                    dropdownColor: _C.almond,
+                    icon: Icon(Icons.keyboard_arrow_down_rounded, color: Fg.inkSoft),
+                    style: TextStyle(fontSize: 13, color: Fg.ink),
+                    dropdownColor: Bg.almond,
                     decoration: InputDecoration(
-                      hintText: 'Select animal type',
-                      hintStyle: TextStyle(fontSize: 13, color: _C.inkSoft),
+                      hintText: _t('ui.diag.select_animal_type'),
+                      hintStyle: TextStyle(fontSize: 13, color: Fg.inkSoft),
                       border: InputBorder.none,
                       contentPadding:
                           const EdgeInsets.symmetric(horizontal: 10, vertical: 12),
                     ),
                     items: ['Cattle', 'Goat', 'Poultry']
-                        .map((e) => DropdownMenuItem(value: e, child: Text(e)))
+                        .map((e) => DropdownMenuItem(
+                              value: e,
+                              child: Text(_t('ui.diag.animal_type.${e.toLowerCase()}')),
+                            ))
                         .toList(),
                     onChanged: (v) => setState(() => _animalType = v ?? ''),
                   ),
@@ -461,9 +539,10 @@ class _DiagnosisScreenState extends State<DiagnosisScreen> {
             child: ElevatedButton(
               onPressed: _selectedImage == null || _analysing ? null : _analyse,
               style: ElevatedButton.styleFrom(
-                backgroundColor: _C.rust,
-                disabledBackgroundColor: _C.rust.withOpacity(0.35),
-                foregroundColor: _C.rustBg,
+                backgroundColor: Bg.rust,
+                disabledBackgroundColor: Bg.rust.withOpacity(0.35),
+                disabledForegroundColor: Fg.almond.withOpacity(0.75),
+                foregroundColor: Fg.almond,
                 padding: const EdgeInsets.symmetric(vertical: 15),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(16),
@@ -471,21 +550,21 @@ class _DiagnosisScreenState extends State<DiagnosisScreen> {
                 elevation: 0,
               ),
               child: _analysing
-                  ? const Row(
+                  ? Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         SizedBox(
                           width: 18,
                           height: 18,
                           child: CircularProgressIndicator(
-                              strokeWidth: 2, color: _C.rustBg),
+                              strokeWidth: 2, color: Fg.almond),
                         ),
-                        SizedBox(width: 10),
-                        Text('Analysing...'),
+                        const SizedBox(width: 10),
+                        Text(_t('ui.diag.analysing')),
                       ],
                     )
-                  : const Text('Analyse photo',
-                      style: TextStyle(fontWeight: FontWeight.w600)),
+                  : Text(_t('ui.diag.analyse_photo'),
+                      style: const TextStyle(fontWeight: FontWeight.w600)),
             ),
           ),
         ],
@@ -498,19 +577,8 @@ class _DiagnosisScreenState extends State<DiagnosisScreen> {
 
     final q = _questions[_currentQuestion];
     final qId = q['id'] as String? ?? '';
-    final lang = _showSetswana ? 'tn' : 'en';
-
-    final questionText =
-        (q['question'] as Map<String, dynamic>?)?[lang]?.toString() ??
-        (q['question'] as Map<String, dynamic>?)?['en']?.toString() ??
-        '';
-
-    final optionsEn =
-        ((q['options'] as Map<String, dynamic>?)?['en'] as List?)
-            ?.cast<String>() ?? [];
-    final optionsTn =
-        ((q['options'] as Map<String, dynamic>?)?['tn'] as List?)
-            ?.cast<String>() ?? [];
+    final questionText = _questionText(q);
+    final optionsEn = _optionsEn(q);
 
     final currentAnswer = _answers[qId];
     final isLastQuestion = _currentQuestion == _questions.length - 1;
@@ -521,17 +589,18 @@ class _DiagnosisScreenState extends State<DiagnosisScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          if (_result != null) _buildDiseaseBanner(lang),
+          if (_result != null) _buildDiseaseBanner(),
 
           const SizedBox(height: 18),
 
           Row(
             children: [
               Text(
-                _showSetswana
-                    ? 'Potso ${_currentQuestion + 1} ya ${_questions.length}'
-                    : 'Question ${_currentQuestion + 1} of ${_questions.length}',
-                style: TextStyle(fontSize: 12, color: _C.inkSoft),
+                _t('ui.diag.question_of', args: {
+                  'current': _currentQuestion + 1,
+                  'total': _questions.length,
+                }),
+                style: TextStyle(fontSize: 12, color: Fg.inkSoft),
               ),
               const Spacer(),
               Text(
@@ -539,7 +608,7 @@ class _DiagnosisScreenState extends State<DiagnosisScreen> {
                 style: TextStyle(
                   fontSize: 12,
                   fontWeight: FontWeight.w600,
-                  color: _C.matcha,
+                  color: Fg.matcha,
                 ),
               ),
             ],
@@ -549,8 +618,8 @@ class _DiagnosisScreenState extends State<DiagnosisScreen> {
             borderRadius: BorderRadius.circular(4),
             child: LinearProgressIndicator(
               value: progress,
-              backgroundColor: Colors.white.withOpacity(0.6),
-              valueColor: AlwaysStoppedAnimation(_C.matcha),
+              backgroundColor: Bg.surface.withOpacity(0.6),
+              valueColor: AlwaysStoppedAnimation(Fg.matcha),
               minHeight: 6,
             ),
           ),
@@ -562,7 +631,7 @@ class _DiagnosisScreenState extends State<DiagnosisScreen> {
             style: TextStyle(
               fontSize: 17,
               fontWeight: FontWeight.w500,
-              color: _C.ink,
+              color: Fg.ink,
               height: 1.45,
             ),
           ),
@@ -571,9 +640,9 @@ class _DiagnosisScreenState extends State<DiagnosisScreen> {
 
           ...List.generate(optionsEn.length, (i) {
             final enOption = optionsEn[i];
-            final displayLabel = (_showSetswana && i < optionsTn.length)
-                ? optionsTn[i]
-                : enOption;
+            // Answers are stored by their English text (the scoring weights
+            // are keyed on it); only the label shown is translated.
+            final displayLabel = _optionText(q, i);
             final isSelected = currentAnswer == enOption;
 
             return Padding(
@@ -581,8 +650,8 @@ class _DiagnosisScreenState extends State<DiagnosisScreen> {
               child: GestureDetector(
                 onTap: () => _answerQuestion(qId, enOption),
                 child: _GlassCard(
-                  borderColor: isSelected ? _C.matcha.withOpacity(0.6) : null,
-                  glossTint: isSelected ? _C.matchaTint : null,
+                  borderColor: isSelected ? Bg.matcha.withOpacity(0.6) : null,
+                  glossTint: isSelected ? Bg.matchaTint : null,
                   child: Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
                     child: Row(
@@ -592,7 +661,7 @@ class _DiagnosisScreenState extends State<DiagnosisScreen> {
                             displayLabel,
                             style: TextStyle(
                               fontSize: 14,
-                              color: isSelected ? _C.matchaDark : _C.ink,
+                              color: isSelected ? Fg.matchaDark : Fg.ink,
                               fontWeight: isSelected ? FontWeight.w500 : FontWeight.w400,
                             ),
                           ),
@@ -601,7 +670,7 @@ class _DiagnosisScreenState extends State<DiagnosisScreen> {
                           isSelected
                               ? Icons.check_circle_rounded
                               : Icons.radio_button_unchecked_rounded,
-                          color: isSelected ? _C.matcha : _C.inkSoft.withOpacity(0.5),
+                          color: isSelected ? Fg.matcha : Fg.inkSoft.withOpacity(0.5),
                           size: 20,
                         ),
                       ],
@@ -621,14 +690,14 @@ class _DiagnosisScreenState extends State<DiagnosisScreen> {
                   child: OutlinedButton(
                     onPressed: _previousQuestion,
                     style: OutlinedButton.styleFrom(
-                      side: BorderSide(color: _C.inkSoft.withOpacity(0.3)),
+                      side: BorderSide(color: Bg.inkSoft.withOpacity(0.3)),
                       padding: const EdgeInsets.symmetric(vertical: 14),
                       shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(14)),
                     ),
                     child: Text(
-                      _showSetswana ? 'Moago' : 'Back',
-                      style: TextStyle(color: _C.inkSoft),
+                      _t('ui.diag.back'),
+                      style: TextStyle(color: Fg.inkSoft),
                     ),
                   ),
                 ),
@@ -639,9 +708,10 @@ class _DiagnosisScreenState extends State<DiagnosisScreen> {
                 child: ElevatedButton(
                   onPressed: currentAnswer == null ? null : _nextQuestion,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: _C.rust,
-                    disabledBackgroundColor: _C.rust.withOpacity(0.35),
-                    foregroundColor: _C.rustBg,
+                    backgroundColor: Bg.rust,
+                    disabledBackgroundColor: Bg.rust.withOpacity(0.35),
+                    disabledForegroundColor: Fg.almond.withOpacity(0.75),
+                    foregroundColor: Fg.almond,
                     padding: const EdgeInsets.symmetric(vertical: 14),
                     shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(14)),
@@ -649,8 +719,8 @@ class _DiagnosisScreenState extends State<DiagnosisScreen> {
                   ),
                   child: Text(
                     isLastQuestion
-                        ? (_showSetswana ? 'Bona supego' : 'See diagnosis')
-                        : (_showSetswana ? 'E e latelang' : 'Next'),
+                        ? _t('ui.diag.see_diagnosis')
+                        : _t('ui.diag.next'),
                     style: const TextStyle(fontWeight: FontWeight.w600),
                   ),
                 ),
@@ -664,12 +734,10 @@ class _DiagnosisScreenState extends State<DiagnosisScreen> {
             onTap: _finishProfiling,
             child: Center(
               child: Text(
-                _showSetswana
-                    ? 'Tlola dipotso tse di setseng'
-                    : 'Skip remaining questions',
+                _t('ui.diag.skip_questions'),
                 style: TextStyle(
                   fontSize: 13,
-                  color: _C.inkSoft,
+                  color: Fg.inkSoft,
                   decoration: TextDecoration.underline,
                 ),
               ),
@@ -682,33 +750,32 @@ class _DiagnosisScreenState extends State<DiagnosisScreen> {
     );
   }
 
-  Widget _buildDiseaseBanner(String lang) {
-    final nameMap = _result!.diseaseData['display_name'] as Map<String, dynamic>? ?? {};
-    final name = nameMap[lang]?.toString() ?? nameMap['en']?.toString() ?? _result!.diseaseKey;
+  Widget _buildDiseaseBanner() {
+    final name = _kb(_result!.diseaseData, 'display_name');
     final confidence = (_result!.modelConfidence * 100).toStringAsFixed(0);
 
     return _GlassCard(
-      borderColor: _C.matcha.withOpacity(0.35),
+      borderColor: Bg.matcha.withOpacity(0.35),
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
         child: Row(
           children: [
-            Icon(Icons.image_search_rounded, size: 18, color: _C.matchaDark),
+            Icon(Icons.image_search_rounded, size: 18, color: Fg.matchaDark),
             const SizedBox(width: 10),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    _showSetswana ? 'Semelo se se bonweng mo setshwantshong' : 'Detected from image',
-                    style: TextStyle(fontSize: 11, color: _C.inkSoft),
+                    _t('ui.diag.detected_from_image'),
+                    style: TextStyle(fontSize: 11, color: Fg.inkSoft),
                   ),
                   Text(
-                    '$name  ·  $confidence% match',
+                    '$name  ·  ${_t('ui.diag.match_percent', args: {'percent': confidence})}',
                     style: TextStyle(
                       fontSize: 13,
                       fontWeight: FontWeight.w600,
-                      color: _C.matchaDark,
+                      color: Fg.matchaDark,
                     ),
                   ),
                 ],
@@ -722,63 +789,48 @@ class _DiagnosisScreenState extends State<DiagnosisScreen> {
 
   Widget _buildResult() {
     final r = _result!;
-    final lang = _showSetswana ? 'tn' : 'en';
     final diseaseData = r.diseaseData;
     final riskLevel = r.finalRiskLevel;
-
-    final nameMap = diseaseData['display_name'] as Map<String, dynamic>? ?? {};
-    final displayName =
-        nameMap[lang]?.toString() ?? nameMap['en']?.toString() ?? r.diseaseKey;
+    final displayName = _kb(diseaseData, 'display_name');
 
     // Two-tone risk language, consistent with the rest of the app: only
     // "high" gets the rust warning treatment, everything else reads calm.
     final isHigh = riskLevel == 'high';
-    final riskColor = isHigh ? _C.rust : _C.matcha;
+    final riskColor = isHigh ? Bg.rust : Bg.matcha;
     String riskLabel;
     IconData riskIcon;
     switch (riskLevel) {
       case 'high':
-        riskLabel = _showSetswana ? 'Kotsing e kgolo' : 'High risk';
+        riskLabel = _t('ui.diag.risk_high');
         riskIcon = Icons.warning_rounded;
         break;
       case 'medium':
-        riskLabel = _showSetswana ? 'Lebelela' : 'Monitor';
+        riskLabel = _t('ui.diag.risk_monitor');
         riskIcon = Icons.info_rounded;
         break;
       case 'none':
-        riskLabel = _showSetswana ? 'E itekanetseng' : 'Healthy';
+        riskLabel = _t('ui.diag.risk_healthy');
         riskIcon = Icons.check_circle_rounded;
         break;
       default: // 'low'
-        riskLabel = _showSetswana ? 'Lebelela' : 'Low concern';
+        riskLabel = _t('ui.diag.risk_low');
         riskIcon = Icons.info_outline_rounded;
     }
 
-    String loc(String field) {
-      final val = diseaseData[field];
-      if (val is Map<String, dynamic>) {
-        return val[lang]?.toString() ?? val['en']?.toString() ?? '';
-      }
-      return val?.toString() ?? '';
-    }
+    String loc(String field) => _kb(diseaseData, field);
 
     final recKey = (riskLevel == 'low' || riskLevel == 'none') ? 'low' : riskLevel;
     final recommendation =
-        (diseaseData['recommendations'] as Map<String, dynamic>?)?[recKey]
-            as Map<String, dynamic>?;
-    final recommendationText =
-        recommendation?[lang]?.toString() ?? recommendation?['en']?.toString() ?? '';
+        (diseaseData['recommendations'] as Map<String, dynamic>?)?[recKey];
+    final recommendationText = recommendation == null
+        ? ''
+        : _i18n.t('$_kbBase.rec.$recKey', fallback: _english(recommendation));
 
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          _LangToggle(
-            showSetswana: _showSetswana,
-            onToggle: (v) => setState(() => _showSetswana = v),
-          ),
-          const SizedBox(height: 12),
 
           _GlassCard(
             borderColor: riskColor.withOpacity(0.35),
@@ -788,7 +840,7 @@ class _DiagnosisScreenState extends State<DiagnosisScreen> {
                   width: double.infinity,
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
-                    color: _C.matchaHeader.withOpacity(0.88),
+                    color: Bg.matchaHeader.withOpacity(0.88),
                     borderRadius: const BorderRadius.vertical(
                       top: Radius.circular(18),
                     ),
@@ -802,10 +854,10 @@ class _DiagnosisScreenState extends State<DiagnosisScreen> {
                           Expanded(
                             child: Text(
                               displayName,
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontSize: 18,
                                 fontWeight: FontWeight.w600,
-                                color: _C.almond,
+                                color: Fg.almond,
                                 letterSpacing: -0.3,
                               ),
                             ),
@@ -822,14 +874,14 @@ class _DiagnosisScreenState extends State<DiagnosisScreen> {
                             child: Row(
                               mainAxisSize: MainAxisSize.min,
                               children: [
-                                Icon(riskIcon, size: 13, color: _C.almond),
+                                Icon(riskIcon, size: 13, color: Fg.almond),
                                 const SizedBox(width: 4),
                                 Text(
                                   riskLabel,
-                                  style: const TextStyle(
+                                  style: TextStyle(
                                     fontSize: 11,
                                     fontWeight: FontWeight.w600,
-                                    color: _C.almond,
+                                    color: Fg.almond,
                                   ),
                                 ),
                               ],
@@ -839,13 +891,13 @@ class _DiagnosisScreenState extends State<DiagnosisScreen> {
                       ),
                       const SizedBox(height: 12),
                       _ConfidenceBar(
-                        label: _showSetswana ? 'Setshwantsho' : 'Image match',
+                        label: _t('ui.diag.image_match'),
                         value: r.modelConfidence,
                       ),
                       if (r.answers.isNotEmpty) ...[
                         const SizedBox(height: 6),
                         _ConfidenceBar(
-                          label: _showSetswana ? 'Maitshwaro' : 'Behavioural',
+                          label: _t('ui.diag.behavioural'),
                           value: (r.behavioralScore).clamp(0.0, 1.0),
                           trailingLabel: riskLabel,
                         ),
@@ -859,17 +911,17 @@ class _DiagnosisScreenState extends State<DiagnosisScreen> {
                     children: [
                       if (loc('affects').isNotEmpty && loc('affects') != 'N/A')
                         _InfoRow(
-                          label: _showSetswana ? 'E amana le' : 'Affects',
+                          label: _t('ui.diag.affects'),
                           value: loc('affects'),
                         ),
                       if (loc('spreads_by').isNotEmpty && loc('spreads_by') != 'N/A')
                         _InfoRow(
-                          label: _showSetswana ? 'E anamela ka' : 'Spreads by',
+                          label: _t('ui.diag.spreads_by'),
                           value: loc('spreads_by'),
                         ),
                       if (loc('visual_symptoms').isNotEmpty)
                         _InfoRow(
-                          label: _showSetswana ? 'Go bonala' : 'Visual signs',
+                          label: _t('ui.diag.visual_signs'),
                           value: loc('visual_symptoms'),
                           multiline: true,
                         ),
@@ -884,7 +936,7 @@ class _DiagnosisScreenState extends State<DiagnosisScreen> {
 
           if (recommendationText.isNotEmpty)
             _ActionCard(
-              title: _showSetswana ? 'Se o tshwanetse go se dira jaanong' : 'What to do now',
+              title: _t('ui.diag.what_to_do'),
               content: recommendationText,
               isHigh: isHigh,
             ),
@@ -895,17 +947,15 @@ class _DiagnosisScreenState extends State<DiagnosisScreen> {
             child: Column(
               children: [
                 _ExpandableSection(
-                  label: _showSetswana ? 'Kalafi' : 'Treatment',
+                  label: _t('ui.diag.treatment'),
                   content: loc('treatment'),
                 ),
                 _ExpandableSection(
-                  label: _showSetswana ? 'Thibelo' : 'Prevention',
+                  label: _t('ui.diag.prevention'),
                   content: loc('prevention'),
                 ),
                 _ExpandableSection(
-                  label: _showSetswana
-                      ? 'Leng o tshwanetse go leletsa ngaka'
-                      : 'When to call a vet',
+                  label: _t('ui.diag.when_to_call_vet'),
                   content: loc('when_to_call_vet'),
                   isLast: true,
                   highlight: isHigh,
@@ -916,7 +966,7 @@ class _DiagnosisScreenState extends State<DiagnosisScreen> {
 
           const SizedBox(height: 12),
 
-          if (r.answers.isNotEmpty) _buildAnswerSummary(lang),
+          if (r.answers.isNotEmpty) _buildAnswerSummary(),
 
           const SizedBox(height: 16),
 
@@ -929,13 +979,13 @@ class _DiagnosisScreenState extends State<DiagnosisScreen> {
               _currentQuestion = 0;
             }),
             style: OutlinedButton.styleFrom(
-              side: BorderSide(color: _C.inkSoft.withOpacity(0.3)),
+              side: BorderSide(color: Bg.inkSoft.withOpacity(0.3)),
               padding: const EdgeInsets.symmetric(vertical: 14),
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
             ),
             child: Text(
-              _showSetswana ? 'Tshwara supego e nngwe' : 'Diagnose again',
-              style: TextStyle(color: _C.inkSoft),
+              _t('ui.diag.diagnose_again'),
+              style: TextStyle(color: Fg.inkSoft),
             ),
           ),
         ],
@@ -943,7 +993,7 @@ class _DiagnosisScreenState extends State<DiagnosisScreen> {
     );
   }
 
-  Widget _buildAnswerSummary(String lang) {
+  Widget _buildAnswerSummary() {
     return _GlassCard(
       child: Padding(
         padding: const EdgeInsets.all(16),
@@ -951,11 +1001,11 @@ class _DiagnosisScreenState extends State<DiagnosisScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              _showSetswana ? 'Dikarabo tsa gago' : 'Your responses',
+              _t('ui.diag.your_responses'),
               style: TextStyle(
                 fontSize: 13,
                 fontWeight: FontWeight.w600,
-                color: _C.inkSoft,
+                color: Fg.inkSoft,
                 letterSpacing: 0.4,
               ),
             ),
@@ -965,21 +1015,9 @@ class _DiagnosisScreenState extends State<DiagnosisScreen> {
               final answer = _answers[id];
               if (answer == null) return const SizedBox.shrink();
 
-              final qText =
-                  (q['question'] as Map<String, dynamic>?)?[lang]?.toString() ??
-                  (q['question'] as Map<String, dynamic>?)?['en']?.toString() ??
-                  '';
-
-              final optionsEn =
-                  ((q['options'] as Map<String, dynamic>?)?['en'] as List?)
-                      ?.cast<String>() ?? [];
-              final optionsTn =
-                  ((q['options'] as Map<String, dynamic>?)?['tn'] as List?)
-                      ?.cast<String>() ?? [];
-              final idx = optionsEn.indexOf(answer);
-              final displayAnswer = (_showSetswana && idx >= 0 && idx < optionsTn.length)
-                  ? optionsTn[idx]
-                  : answer;
+              final qText = _questionText(q);
+              final idx = _optionsEn(q).indexOf(answer);
+              final displayAnswer = idx >= 0 ? _optionText(q, idx) : answer;
 
               return Padding(
                 padding: const EdgeInsets.only(bottom: 8),
@@ -988,15 +1026,15 @@ class _DiagnosisScreenState extends State<DiagnosisScreen> {
                   children: [
                     Text(
                       qText,
-                      style: TextStyle(fontSize: 12, color: _C.inkSoft, height: 1.3),
+                      style: TextStyle(fontSize: 12, color: Fg.inkSoft, height: 1.3),
                     ),
                     const SizedBox(height: 3),
                     Text(
                       displayAnswer,
                       style: TextStyle(
-                          fontSize: 13, fontWeight: FontWeight.w500, color: _C.ink),
+                          fontSize: 13, fontWeight: FontWeight.w500, color: Fg.ink),
                     ),
-                    Divider(height: 16, color: Colors.white.withOpacity(0.7)),
+                    Divider(height: 16, color: Bg.surface.withOpacity(0.7)),
                   ],
                 ),
               );
@@ -1062,7 +1100,7 @@ class _WavyHeader extends StatelessWidget {
         children: [
           ClipPath(
             clipper: _WavyHeaderClipper(),
-            child: Container(color: _C.matchaHeader.withOpacity(0.88)),
+            child: Container(color: Bg.matchaHeader.withOpacity(0.88)),
           ),
           child,
         ],
@@ -1101,7 +1139,7 @@ class _WavyHeaderClipper extends CustomClipper<Path> {
 class _BottomFieldWavePainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
-    final paint = Paint()..color = _C.matchaTint.withOpacity(0.5);
+    final paint = Paint()..color = Bg.matchaTint.withOpacity(0.5);
     final path = Path()
       ..moveTo(0, size.height * 0.82)
       ..cubicTo(
@@ -1144,10 +1182,10 @@ class _GlassCard extends StatelessWidget {
         filter: ImageFilter.blur(sigmaX: 18, sigmaY: 18),
         child: Container(
           decoration: BoxDecoration(
-            color: Colors.white.withOpacity(0.5),
+            color: Bg.surface.withOpacity(0.5),
             borderRadius: BorderRadius.circular(18),
             border: Border.all(
-              color: borderColor ?? Colors.white.withOpacity(0.85),
+              color: borderColor ?? Bg.surface.withOpacity(0.85),
               width: 0.8,
             ),
           ),
@@ -1161,7 +1199,7 @@ class _GlassCard extends StatelessWidget {
                   heightFactor: 0.4,
                   child: Container(
                     decoration: BoxDecoration(
-                      color: (glossTint ?? Colors.white).withOpacity(0.4),
+                      color: (glossTint ?? Bg.surface).withOpacity(0.4),
                       borderRadius: const BorderRadius.vertical(
                         top: Radius.circular(18),
                       ),
@@ -1186,6 +1224,7 @@ class _TypeToggle extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final i18n = context.watch<LanguageProvider>();
     return _GlassCard(
       child: Padding(
         padding: const EdgeInsets.all(5),
@@ -1194,7 +1233,7 @@ class _TypeToggle extends StatelessWidget {
             Expanded(
               child: _TypeSegment(
                 icon: Icons.pets_rounded,
-                label: 'Animal',
+                label: i18n.t('ui.diag.animal'),
                 selected: selected == DiagnosisType.animal,
                 onTap: () => onSelect(DiagnosisType.animal),
               ),
@@ -1202,7 +1241,7 @@ class _TypeToggle extends StatelessWidget {
             Expanded(
               child: _TypeSegment(
                 icon: Icons.eco_rounded,
-                label: 'Plant',
+                label: i18n.t('ui.diag.plant'),
                 selected: selected == DiagnosisType.plant,
                 onTap: () => onSelect(DiagnosisType.plant),
               ),
@@ -1234,19 +1273,19 @@ class _TypeSegment extends StatelessWidget {
         duration: const Duration(milliseconds: 200),
         padding: const EdgeInsets.symmetric(vertical: 13),
         decoration: BoxDecoration(
-          color: selected ? _C.matchaHeader : Colors.transparent,
+          color: selected ? Bg.matchaHeader : Colors.transparent,
           borderRadius: BorderRadius.circular(14),
         ),
         child: Column(
           children: [
-            Icon(icon, size: 19, color: selected ? _C.almond : _C.inkSoft),
+            Icon(icon, size: 19, color: selected ? Fg.almond : Fg.inkSoft),
             const SizedBox(height: 6),
             Text(
               label,
               style: TextStyle(
                 fontSize: 12,
                 fontWeight: FontWeight.w500,
-                color: selected ? _C.almond : _C.inkSoft,
+                color: selected ? Fg.almond : Fg.inkSoft,
               ),
             ),
           ],
@@ -1269,86 +1308,40 @@ class _ConfidenceBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
+    // Label and value above the bar (not beside it), so a long translated
+    // label never squeezes the bar away on a small phone.
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        Text(label, style: TextStyle(fontSize: 11, color: _C.matchaTint)),
-        const SizedBox(width: 8),
-        Expanded(
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(3),
-            child: LinearProgressIndicator(
-              value: value,
-              backgroundColor: Colors.white.withOpacity(0.15),
-              valueColor: AlwaysStoppedAnimation(_C.almond),
-              minHeight: 5,
-            ),
-          ),
-        ),
-        const SizedBox(width: 8),
-        Text(
-          trailingLabel ?? '${(value * 100).toStringAsFixed(0)}%',
-          style: TextStyle(
-              fontSize: 11, color: _C.matchaTint, fontWeight: FontWeight.w600),
-        ),
-      ],
-    );
-  }
-}
-
-class _LangToggle extends StatelessWidget {
-  final bool showSetswana;
-  final ValueChanged<bool> onToggle;
-  const _LangToggle({required this.showSetswana, required this.onToggle});
-
-  @override
-  Widget build(BuildContext context) {
-    return _GlassCard(
-      child: Padding(
-        padding: const EdgeInsets.all(3),
-        child: Row(
+        Row(
           children: [
             Expanded(
-              child: GestureDetector(
-                onTap: () => onToggle(false),
-                child: _LangBtn(label: 'English', active: !showSetswana),
+              child: Text(
+                label,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(fontSize: 11, color: Fg.matchaTint),
               ),
             ),
-            Expanded(
-              child: GestureDetector(
-                onTap: () => onToggle(true),
-                child: _LangBtn(label: 'Setswana', active: showSetswana),
-              ),
+            const SizedBox(width: 8),
+            Text(
+              trailingLabel ?? '${(value * 100).toStringAsFixed(0)}%',
+              style: TextStyle(
+                  fontSize: 11, color: Fg.matchaTint, fontWeight: FontWeight.w600),
             ),
           ],
         ),
-      ),
-    );
-  }
-}
-
-class _LangBtn extends StatelessWidget {
-  final String label;
-  final bool active;
-  const _LangBtn({required this.label, required this.active});
-
-  @override
-  Widget build(BuildContext context) {
-    return AnimatedContainer(
-      duration: const Duration(milliseconds: 200),
-      padding: const EdgeInsets.symmetric(vertical: 8),
-      decoration: BoxDecoration(
-        color: active ? _C.matchaHeader : Colors.transparent,
-        borderRadius: BorderRadius.circular(10),
-      ),
-      child: Text(
-        label,
-        textAlign: TextAlign.center,
-        style: TextStyle(
-          fontSize: 13,
-          fontWeight: FontWeight.w500,
-          color: active ? _C.almond : _C.inkSoft,
+        const SizedBox(height: 4),
+        ClipRRect(
+          borderRadius: BorderRadius.circular(3),
+          child: LinearProgressIndicator(
+            value: value,
+            backgroundColor: Colors.white.withOpacity(0.15),
+            valueColor: AlwaysStoppedAnimation(Fg.almond),
+            minHeight: 5,
+          ),
         ),
-      ),
+      ],
     );
   }
 }
@@ -1361,10 +1354,10 @@ class _ActionCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final accent = isHigh ? _C.rust : _C.matcha;
+    final accent = isHigh ? Bg.rust : Bg.matcha;
     return _GlassCard(
       borderColor: accent.withOpacity(0.5),
-      glossTint: isHigh ? _C.rustBg : _C.matchaTint,
+      glossTint: isHigh ? Bg.rustBg : Bg.matchaTint,
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
@@ -1391,7 +1384,7 @@ class _ActionCard extends StatelessWidget {
             const SizedBox(height: 8),
             Text(
               content,
-              style: TextStyle(fontSize: 13, color: _C.ink, height: 1.6),
+              style: TextStyle(fontSize: 13, color: Fg.ink, height: 1.6),
             ),
           ],
         ),
@@ -1412,11 +1405,13 @@ class _UploadZone extends StatelessWidget {
       child: _GlassCard(
         child: Container(
           height: 180,
+          width: double.infinity, // fill the card, not just the text width
           margin: const EdgeInsets.all(4),
+          padding: const EdgeInsets.symmetric(horizontal: 16),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(14),
             border: Border.all(
-              color: _C.matcha.withOpacity(0.4),
+              color: Bg.matcha.withOpacity(0.4),
               width: 1.5,
               style: BorderStyle.solid,
             ),
@@ -1424,18 +1419,18 @@ class _UploadZone extends StatelessWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(Icons.add_photo_alternate_outlined, size: 36, color: _C.matchaHeader),
+              Icon(Icons.add_photo_alternate_outlined, size: 36, color: Fg.matchaHeader),
               const SizedBox(height: 10),
               Text(
-                'Take a photo or upload from your gallery',
+                context.watch<LanguageProvider>().t('ui.diag.upload_prompt'),
                 textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 13, color: _C.ink),
+                style: TextStyle(fontSize: 13, color: Fg.ink),
               ),
               const SizedBox(height: 4),
               Text(
-                'Best results: clear lighting, close up of affected area',
+                context.watch<LanguageProvider>().t('ui.diag.upload_tip'),
                 textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 11, color: _C.inkSoft),
+                style: TextStyle(fontSize: 11, color: Fg.inkSoft),
               ),
             ],
           ),
@@ -1488,13 +1483,22 @@ class _SecondaryButton extends StatelessWidget {
       onTap: onTap,
       child: _GlassCard(
         child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 12),
+          padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 10),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(icon, size: 17, color: _C.matchaHeader),
+              Icon(icon, size: 17, color: Fg.matchaHeader),
               const SizedBox(width: 6),
-              Text(label, style: TextStyle(fontSize: 13, color: _C.ink)),
+              // Long translations wrap to a second line instead of overflowing.
+              Flexible(
+                child: Text(
+                  label,
+                  maxLines: 2,
+                  textAlign: TextAlign.center,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(fontSize: 13, color: Fg.ink),
+                ),
+              ),
             ],
           ),
         ),
@@ -1517,24 +1521,24 @@ class _InfoRow extends StatelessWidget {
           ? Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(label, style: TextStyle(fontSize: 12, color: _C.inkSoft)),
+                Text(label, style: TextStyle(fontSize: 12, color: Fg.inkSoft)),
                 const SizedBox(height: 4),
                 Text(
                   value,
                   style: TextStyle(
                     fontSize: 13,
                     fontWeight: FontWeight.w500,
-                    color: _C.ink,
+                    color: Fg.ink,
                     height: 1.5,
                   ),
                 ),
-                Divider(height: 16, color: Colors.white.withOpacity(0.7)),
+                Divider(height: 16, color: Bg.surface.withOpacity(0.7)),
               ],
             )
           : Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(label, style: TextStyle(fontSize: 13, color: _C.inkSoft)),
+                Text(label, style: TextStyle(fontSize: 13, color: Fg.inkSoft)),
                 const SizedBox(width: 12),
                 Flexible(
                   child: Text(
@@ -1543,7 +1547,7 @@ class _InfoRow extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 13,
                       fontWeight: FontWeight.w500,
-                      color: _C.ink,
+                      color: Fg.ink,
                     ),
                   ),
                 ),
@@ -1583,14 +1587,14 @@ class _ExpandableSectionState extends State<_ExpandableSection> {
             decoration: BoxDecoration(
               border: widget.isLast
                   ? null
-                  : Border(bottom: BorderSide(color: Colors.white.withOpacity(0.7))),
+                  : Border(bottom: BorderSide(color: Bg.surface.withOpacity(0.7))),
             ),
             child: Row(
               children: [
                 if (widget.highlight)
                   Padding(
                     padding: const EdgeInsets.only(right: 6),
-                    child: Icon(Icons.warning_amber_rounded, size: 16, color: _C.rust),
+                    child: Icon(Icons.warning_amber_rounded, size: 16, color: Fg.rust),
                   ),
                 Expanded(
                   child: Text(
@@ -1598,7 +1602,7 @@ class _ExpandableSectionState extends State<_ExpandableSection> {
                     style: TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.w500,
-                      color: widget.highlight ? _C.rust : _C.ink,
+                      color: widget.highlight ? Fg.rust : Fg.ink,
                     ),
                   ),
                 ),
@@ -1606,7 +1610,7 @@ class _ExpandableSectionState extends State<_ExpandableSection> {
                   _expanded
                       ? Icons.keyboard_arrow_up_rounded
                       : Icons.keyboard_arrow_down_rounded,
-                  color: _C.inkSoft,
+                  color: Fg.inkSoft,
                 ),
               ],
             ),
@@ -1618,7 +1622,7 @@ class _ExpandableSectionState extends State<_ExpandableSection> {
             padding: const EdgeInsets.fromLTRB(16, 0, 16, 14),
             child: Text(
               widget.content,
-              style: TextStyle(fontSize: 13, color: _C.inkSoft, height: 1.6),
+              style: TextStyle(fontSize: 13, color: Fg.inkSoft, height: 1.6),
             ),
           ),
       ],

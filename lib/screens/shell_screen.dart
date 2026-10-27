@@ -6,16 +6,10 @@ import 'diagnosis_screen.dart';
 import 'community_screen.dart';
 import 'learn_screen.dart';
 import 'profile_screen.dart';
-
-/// AgroLens palette — matcha green / almond / white, light module variant.
-class _C {
-  static const matcha = Color(0xFF5C7148);
-  static const ink = Color(0xFF2B2820);
-  static const inkSoft = Color(0xFF726C5C);
-  static const rust = Color(0xFFC1703E);
-  static const hairline = Color(0xFFEDE6D6);
-  static const danger = Color(0xFFC94C3F);
-}
+import 'notifications_screen.dart';
+import '../services/notification_service.dart';
+import '../services/profile_service.dart';
+import '../theme/palette.dart';
 
 class ShellScreen extends StatefulWidget {
   const ShellScreen({super.key});
@@ -26,6 +20,26 @@ class ShellScreen extends StatefulWidget {
 
 class _ShellScreenState extends State<ShellScreen> {
   int _currentIndex = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    // Signed in from here on: register this phone for push notifications.
+    // A tapped notification opens the in-app notification list.
+    NotificationService.instance.openNotifications = () {
+      if (!mounted) return;
+      Navigator.of(context).push(
+        MaterialPageRoute(builder: (_) => const NotificationsScreen()),
+      );
+    };
+    NotificationService.instance.start();
+    final user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      ProfileService.ensureProfile(user).catchError((Object e) {
+        debugPrint('Profile check failed: $e');
+      });
+    }
+  }
 
   final List<Widget> _screens = const [
     HomeScreen(),
@@ -97,9 +111,9 @@ class _AgroLensNavBar extends StatelessWidget {
 
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
-        border: const Border(
-          top: BorderSide(color: _C.hairline, width: 0.5),
+        color: Bg.surface,
+        border: Border(
+          top: BorderSide(color: Bg.hairline, width: 0.5),
         ),
         boxShadow: [
           BoxShadow(
@@ -182,7 +196,7 @@ class _NavTile extends StatelessWidget {
         curve: Curves.easeInOut,
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
         decoration: BoxDecoration(
-          color: active ? _C.rust.withOpacity(0.1) : Colors.transparent,
+          color: active ? Bg.rust.withOpacity(0.1) : Colors.transparent,
           borderRadius: BorderRadius.circular(12),
         ),
         child: Column(
@@ -197,7 +211,7 @@ class _NavTile extends StatelessWidget {
                     active ? item.activeIcon : item.icon,
                     key: ValueKey(active),
                     size: 24,
-                    color: active ? _C.rust : _C.inkSoft,
+                    color: active ? Fg.rust : Fg.inkSoft,
                   ),
                 ),
                 if (showBadge)
@@ -208,9 +222,9 @@ class _NavTile extends StatelessWidget {
                       width: 8,
                       height: 8,
                       decoration: BoxDecoration(
-                        color: _C.danger,
+                        color: Bg.danger,
                         shape: BoxShape.circle,
-                        border: Border.all(color: Colors.white, width: 1.5),
+                        border: Border.all(color: Bg.surface, width: 1.5),
                       ),
                     ),
                   ),
@@ -222,7 +236,7 @@ class _NavTile extends StatelessWidget {
               style: TextStyle(
                 fontSize: 10,
                 fontWeight: active ? FontWeight.w600 : FontWeight.w400,
-                color: active ? _C.rust : _C.inkSoft,
+                color: active ? Fg.rust : Fg.inkSoft,
               ),
             ),
           ],

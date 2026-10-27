@@ -2,22 +2,23 @@ import 'dart:convert';
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:provider/provider.dart';
+import '../providers/language_provider.dart';
+import '../theme/palette.dart';
+import '../widgets/language_chip.dart';
+
+/// Learn text in the language chosen in Settings (or the header chip);
+/// English from disease_info.json when a translation is missing.
+String _learn(BuildContext context, String disease, Map<String, dynamic> data, String field) =>
+    context.watch<LanguageProvider>().t('learn.$disease.$field',
+        fallback: (data[field] ?? (field == 'display_name' ? disease : '')).toString());
+
+String _ui(BuildContext context, String key) =>
+    context.watch<LanguageProvider>().t('ui.learn.$key');
 
 // Self-contained palette for the redesign — matcha green / almond / rust.
 // Matches the palette used in the redesigned home/news screen. Fold into
 // a shared AppColors in main.dart later if you want it app-wide.
-class _C {
-  static const matchaDark = Color(0xFF374530);
-  static const matchaHeader = Color(0xFF4A5B41);
-  static const matcha = Color(0xFF5C7148);
-  static const matchaTint = Color(0xFFD6E0C4);
-  static const almond = Color(0xFFF6EFE2);
-  static const ink = Color(0xFF2B2820);
-  static const inkSoft = Color(0xFF726C5C);
-  static const rust = Color(0xFFC1703E);
-  static const rustBg = Color(0xFFF1DECB);
-}
-
 class LearnScreen extends StatefulWidget {
   const LearnScreen({super.key});
 
@@ -55,6 +56,13 @@ class _LearnScreenState extends State<LearnScreen> {
     'sorghum anthracnose',
   ];
 
+  // Only list diseases that have an entry in disease_info.json; the rest
+  // (e.g. salmonella, coccidiosis) appear as soon as their info is added.
+  List<String> get _animalsWithInfo =>
+      _animalDiseases.where(_diseaseData.containsKey).toList();
+  List<String> get _cropsWithInfo =>
+      _cropDiseases.where(_diseaseData.containsKey).toList();
+
   @override
   void initState() {
     super.initState();
@@ -72,10 +80,10 @@ class _LearnScreenState extends State<LearnScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: _C.almond,
+      backgroundColor: Bg.almond,
       body: _loading
-          ? const Center(
-              child: CircularProgressIndicator(color: _C.matcha),
+          ? Center(
+              child: CircularProgressIndicator(color: Fg.matcha),
             )
           : Stack(
               children: [
@@ -86,7 +94,7 @@ class _LearnScreenState extends State<LearnScreen> {
                   slivers: [
                     SliverToBoxAdapter(
                       child: _WavyHeader(
-                        height: MediaQuery.of(context).padding.top + 118,
+                        height: MediaQuery.of(context).padding.top + 80, // same as Community
                         child: Padding(
                           padding: EdgeInsets.fromLTRB(
                             20,
@@ -94,25 +102,27 @@ class _LearnScreenState extends State<LearnScreen> {
                             20,
                             0,
                           ),
-                          child: const Column(
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Expanded(
+                                child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                'Learn',
+                                _ui(context, 'title'),
                                 style: TextStyle(
                                   fontSize: 22,
                                   fontWeight: FontWeight.w600,
-                                  color: _C.almond,
+                                  color: Fg.almond,
                                 ),
                               ),
-                              SizedBox(height: 6),
-                              Text(
-                                'Stay ahead of the season',
-                                style: TextStyle(
-                                  fontSize: 12,
-                                  color: _C.matchaTint,
-                                ),
+                            ],
+                          ),
                               ),
+                              const SizedBox(width: 8),
+                              // Language choice right here, same setting as Settings.
+                              const LanguageChip(),
                             ],
                           ),
                         ),
@@ -122,11 +132,11 @@ class _LearnScreenState extends State<LearnScreen> {
                       padding: const EdgeInsets.fromLTRB(16, 2, 16, 2),
                       sliver: SliverToBoxAdapter(
                         child: Text(
-                          'ANIMAL DISEASES',
+                          _ui(context, 'animal_diseases').toUpperCase(),
                           style: TextStyle(
                             fontSize: 11,
                             fontWeight: FontWeight.w600,
-                            color: _C.inkSoft,
+                            color: Fg.inkSoft,
                             letterSpacing: 0.9,
                           ),
                         ),
@@ -135,7 +145,7 @@ class _LearnScreenState extends State<LearnScreen> {
                     SliverList(
                       delegate: SliverChildBuilderDelegate(
                         (context, i) {
-                          final key = _animalDiseases[i];
+                          final key = _animalsWithInfo[i];
                           final data =
                               Map<String, dynamic>.from(_diseaseData[key] ?? {});
                           return Padding(
@@ -147,18 +157,18 @@ class _LearnScreenState extends State<LearnScreen> {
                             ),
                           );
                         },
-                        childCount: _animalDiseases.length,
+                        childCount: _animalsWithInfo.length,
                       ),
                     ),
                     SliverPadding(
                       padding: const EdgeInsets.fromLTRB(16, 10, 16, 2),
                       sliver: SliverToBoxAdapter(
                         child: Text(
-                          'CROP DISEASES',
+                          _ui(context, 'crop_diseases').toUpperCase(),
                           style: TextStyle(
                             fontSize: 11,
                             fontWeight: FontWeight.w600,
-                            color: _C.inkSoft,
+                            color: Fg.inkSoft,
                             letterSpacing: 0.9,
                           ),
                         ),
@@ -167,7 +177,7 @@ class _LearnScreenState extends State<LearnScreen> {
                     SliverList(
                       delegate: SliverChildBuilderDelegate(
                         (context, i) {
-                          final key = _cropDiseases[i];
+                          final key = _cropsWithInfo[i];
                           final data =
                               Map<String, dynamic>.from(_diseaseData[key] ?? {});
                           return Padding(
@@ -179,7 +189,7 @@ class _LearnScreenState extends State<LearnScreen> {
                             ),
                           );
                         },
-                        childCount: _cropDiseases.length,
+                        childCount: _cropsWithInfo.length,
                       ),
                     ),
                     const SliverToBoxAdapter(child: SizedBox(height: 24)),
@@ -209,7 +219,7 @@ class _WavyHeader extends StatelessWidget {
         children: [
           ClipPath(
             clipper: _WavyHeaderClipper(),
-            child: Container(color: _C.matchaHeader.withOpacity(0.88)),
+            child: Container(color: Bg.matchaHeader.withOpacity(0.88)),
           ),
           child,
         ],
@@ -248,7 +258,7 @@ class _WavyHeaderClipper extends CustomClipper<Path> {
 class _BottomFieldWavePainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
-    final paint = Paint()..color = _C.matchaTint.withOpacity(0.5);
+    final paint = Paint()..color = Bg.matchaTint.withOpacity(0.5);
     final path = Path()
       ..moveTo(0, size.height * 0.82)
       ..cubicTo(
@@ -293,10 +303,10 @@ class _GlassCard extends StatelessWidget {
         filter: ImageFilter.blur(sigmaX: 18, sigmaY: 18),
         child: Container(
           decoration: BoxDecoration(
-            color: Colors.white.withOpacity(0.5),
+            color: Bg.surface.withOpacity(0.5),
             borderRadius: BorderRadius.circular(18),
             border: Border.all(
-              color: borderColor ?? Colors.white.withOpacity(0.85),
+              color: borderColor ?? Bg.surface.withOpacity(0.85),
               width: 0.8,
             ),
           ),
@@ -310,7 +320,7 @@ class _GlassCard extends StatelessWidget {
                   heightFactor: 0.46,
                   child: Container(
                     decoration: BoxDecoration(
-                      color: (glossTint ?? Colors.white).withOpacity(0.4),
+                      color: (glossTint ?? Bg.surface).withOpacity(0.4),
                       borderRadius: const BorderRadius.vertical(
                         top: Radius.circular(18),
                       ),
@@ -339,7 +349,7 @@ class _DiseaseCard extends StatelessWidget {
   });
 
   bool get _highRisk => data['risk_level'] == 'high';
-  Color get _riskColor => _highRisk ? _C.rust : _C.matcha;
+  Color get _riskColor => _highRisk ? Bg.rust : Bg.matcha;
 
   @override
   Widget build(BuildContext context) {
@@ -377,24 +387,24 @@ class _DiseaseCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      data['display_name'] ?? diseaseKey,
-                      style: const TextStyle(
+                      _learn(context, diseaseKey, data, 'display_name'),
+                      style: TextStyle(
                         fontSize: 14,
-                        color: _C.ink,
+                        color: Fg.ink,
                       ),
                     ),
                     const SizedBox(height: 3),
                     Text(
-                      data['symptoms'] ?? '',
+                      _learn(context, diseaseKey, data, 'symptoms'),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
-                      style: TextStyle(fontSize: 11, color: _C.inkSoft),
+                      style: TextStyle(fontSize: 11, color: Fg.inkSoft),
                     ),
                   ],
                 ),
               ),
               const SizedBox(width: 8),
-              Icon(Icons.chevron_right_rounded, color: _C.inkSoft, size: 18),
+              Icon(Icons.chevron_right_rounded, color: Fg.inkSoft, size: 18),
             ],
           ),
         ),
@@ -415,12 +425,12 @@ class _DiseaseDetailScreen extends StatelessWidget {
   });
 
   bool get _highRisk => data['risk_level'] == 'high';
-  Color get _riskColor => _highRisk ? _C.rust : _C.matcha;
+  Color get _riskColor => _highRisk ? Bg.rust : Bg.matcha;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: _C.almond,
+      backgroundColor: Bg.almond,
       body: Stack(
         children: [
           Positioned.fill(
@@ -443,25 +453,25 @@ class _DiseaseDetailScreen extends StatelessWidget {
                       children: [
                         GestureDetector(
                           onTap: () => Navigator.of(context).pop(),
-                          child: const Icon(
+                          child: Icon(
                             Icons.arrow_back_rounded,
-                            color: _C.almond,
+                            color: Fg.almond,
                           ),
                         ),
                         const SizedBox(height: 14),
                         Text(
-                          data['display_name'] ?? diseaseKey,
-                          style: const TextStyle(
+                          _learn(context, diseaseKey, data, 'display_name'),
+                          style: TextStyle(
                             fontSize: 22,
                             fontWeight: FontWeight.w600,
-                            color: _C.almond,
+                            color: Fg.almond,
                             letterSpacing: -0.3,
                           ),
                         ),
                         const SizedBox(height: 6),
                         Text(
-                          isAnimal ? 'Animal disease' : 'Crop disease',
-                          style: TextStyle(fontSize: 12, color: _C.matchaTint),
+                          _ui(context, isAnimal ? 'animal_disease' : 'crop_disease'),
+                          style: TextStyle(fontSize: 12, color: Fg.matchaTint),
                         ),
                       ],
                     ),
@@ -473,34 +483,34 @@ class _DiseaseDetailScreen extends StatelessWidget {
                 sliver: SliverList(
                   delegate: SliverChildListDelegate([
                     _DetailSection(
-                      label: 'Symptoms',
-                      content: data['symptoms'] ?? '',
+                      label: _ui(context, 'symptoms'),
+                      content: _learn(context, diseaseKey, data, 'symptoms'),
                       icon: Icons.search_rounded,
                     ),
                     const SizedBox(height: 10),
                     _DetailSection(
-                      label: 'Affects',
-                      content: data['affects'] ?? '',
+                      label: _ui(context, 'affects'),
+                      content: _learn(context, diseaseKey, data, 'affects'),
                       icon: Icons.pets_rounded,
                     ),
                     const SizedBox(height: 10),
                     _DetailSection(
-                      label: 'How it spreads',
-                      content: data['spreads_by'] ?? '',
+                      label: _ui(context, 'spreads'),
+                      content: _learn(context, diseaseKey, data, 'spreads_by'),
                       icon: Icons.share_outlined,
                     ),
                     const SizedBox(height: 10),
                     _DetailSection(
-                      label: 'What to do',
-                      content: data['what_to_do'] ?? '',
+                      label: _ui(context, 'what_to_do'),
+                      content: _learn(context, diseaseKey, data, 'what_to_do'),
                       icon: Icons.medical_services_outlined,
                       highlight: true,
                       highlightColor: _riskColor,
                     ),
                     const SizedBox(height: 10),
                     _DetailSection(
-                      label: 'Prevention',
-                      content: data['prevention'] ?? '',
+                      label: _ui(context, 'prevention'),
+                      content: _learn(context, diseaseKey, data, 'prevention'),
                       icon: Icons.shield_outlined,
                     ),
                   ]),
@@ -531,10 +541,10 @@ class _DetailSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final accent = highlight ? (highlightColor ?? _C.rust) : _C.matcha;
+    final accent = highlight ? (highlightColor ?? Bg.rust) : Bg.matcha;
     return _GlassCard(
       borderColor: highlight ? accent.withOpacity(0.5) : null,
-      glossTint: highlight ? _C.rustBg : null,
+      glossTint: highlight ? Bg.rustBg : null,
       child: Padding(
         padding: const EdgeInsets.all(14),
         child: Column(
@@ -557,7 +567,7 @@ class _DetailSection extends StatelessWidget {
             const SizedBox(height: 8),
             Text(
               content,
-              style: TextStyle(fontSize: 13.5, color: _C.ink, height: 1.5),
+              style: TextStyle(fontSize: 13.5, color: Fg.ink, height: 1.5),
             ),
           ],
         ),

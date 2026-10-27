@@ -22,6 +22,11 @@ dependencies:
   firebase_auth: ^4.17.9
   cloud_firestore: ^4.15.9
   firebase_storage: ^11.6.10
+  firebase_messaging: ^14.9.4
+  google_sign_in: ^6.1.0
+
+  # Notifications shown while the app is open (Android)
+  flutter_local_notifications: ^18.0.1
 
   # UI
   google_fonts: ^6.2.1
@@ -34,12 +39,15 @@ dependencies:
   uuid: ^4.3.3
   url_launcher: ^6.2.5
   http: ^1.2.0
+  share_plus: ^9.0.0
 
   provider: ^6.1.2
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
+  # Firebase stubs for the screenshot tests (test_screenshots/)
+  firebase_core_platform_interface: ^5.0.0
   flutter_lints: ^3.0.0
   flutter_launcher_icons: ^0.13.1
 
@@ -54,7 +62,7 @@ flutter:
     - assets/data/plant_classes.json
     - assets/data/disease_info.json
     - assets/data/disease_knowledge_base.json
-    - assets/translation/setswana.json
+    - assets/i18n/
 
 flutter_launcher_icons:
   android: true
@@ -62,4 +70,6 @@ flutter_launcher_icons:
   image_path: "assets/icon/app_icon.png"
   min_sdk_android: 21
   adaptive_icon_background: "#1B5E3A"
-  adaptive_icon_foreground: "assets/icon/app_icon.png"
+  # Leaf only, at 46% of the canvas so launchers that crop to a circle or
+  # squircle keep it inside the safe zone (the full app_icon.png is too big).
+  adaptive_icon_foreground: "assets/icon/app_icon_foreground.png"

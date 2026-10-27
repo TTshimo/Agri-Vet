@@ -3,39 +3,10 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:intl/intl.dart';
 import 'chat_screen.dart';
+import '../theme/palette.dart';
+import '../theme/header_wave.dart';
+import '../widgets/field_background.dart';
 
-/// AgroLens palette — matcha green / almond / white, light module variant.
-class _C {
-  static const matchaDark = Color(0xFF374530);
-  static const matcha = Color(0xFF5C7148);
-  static const matchaLight = Color(0xFFD6E0C4);
-  static const almond = Color(0xFFF6EFE2);
-  static const ink = Color(0xFF2B2820);
-  static const inkSoft = Color(0xFF726C5C);
-  static const rust = Color(0xFFC1703E);
-  static const hairline = Color(0xFFEDE6D6);
-}
-
-/// Bottom wave finishing off the dark matcha header band — same shape
-/// used across the other restyled screens for a consistent silhouette.
-class _HeaderWaveClipper extends CustomClipper<Path> {
-  @override
-  Path getClip(Size size) {
-    final path = Path()
-      ..lineTo(0, size.height * 0.62)
-      ..cubicTo(
-        size.width * 0.32, size.height,
-        size.width * 0.66, size.height * 0.4,
-        size.width, size.height * 0.68,
-      )
-      ..lineTo(size.width, 0)
-      ..close();
-    return path;
-  }
-
-  @override
-  bool shouldReclip(covariant CustomClipper<Path> oldClipper) => false;
-}
 
 class MessagingScreen extends StatefulWidget {
   const MessagingScreen({super.key});
@@ -76,44 +47,41 @@ class _MessagingScreenState extends State<MessagingScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: _C.almond,
-      body: CustomScrollView(
+      backgroundColor: Bg.almond,
+      body: FieldBackground(child: CustomScrollView(
         slivers: [
           // Header
           SliverToBoxAdapter(
             child: ClipPath(
-              clipper: _HeaderWaveClipper(),
+              clipper: const HeaderWaveClipper(),
               child: Container(
-                color: _C.matchaDark,
+                color: Bg.matchaDark,
+                // Same header as the other pages opened from Profile
+                // (Settings, Notifications, Pals): back arrow + 17px title.
                 padding: EdgeInsets.fromLTRB(
-                  20,
-                  MediaQuery.of(context).padding.top + 16,
-                  20,
-                  36,
+                  8,
+                  MediaQuery.of(context).padding.top + 8,
+                  16,
+                  48,
                 ),
                 child: Row(
                   children: [
+                    if (Navigator.of(context).canPop())
+                      IconButton(
+                        icon: Icon(Icons.arrow_back_ios_new_rounded,
+                            color: Fg.almond, size: 18),
+                        onPressed: () => Navigator.pop(context),
+                      )
+                    else
+                      const SizedBox(width: 12),
                     Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Messages',
-                            style: TextStyle(
-                              fontSize: 20,
-                              fontWeight: FontWeight.w600,
-                              color: _C.almond,
-                            ),
-                          ),
-                          const SizedBox(height: 2),
-                          Text(
-                            'Direct messages with other farmers',
-                            style: TextStyle(
-                              fontSize: 12.5,
-                              color: _C.matchaLight,
-                            ),
-                          ),
-                        ],
+                      child: Text(
+                        'Messages',
+                        style: TextStyle(
+                          fontSize: 17,
+                          fontWeight: FontWeight.w600,
+                          color: Fg.almond,
+                        ),
                       ),
                     ),
                     GestureDetector(
@@ -122,18 +90,18 @@ class _MessagingScreenState extends State<MessagingScreen> {
                         padding: const EdgeInsets.symmetric(
                             horizontal: 14, vertical: 8),
                         decoration: BoxDecoration(
-                          color: _C.rust,
+                          color: Bg.rust,
                           borderRadius: BorderRadius.circular(20),
                         ),
                         child: Row(
                           children: [
                             Icon(Icons.edit_outlined,
-                                color: _C.almond, size: 16),
+                                color: Fg.almond, size: 16),
                             const SizedBox(width: 4),
                             Text(
                               'New',
                               style: TextStyle(
-                                color: _C.almond,
+                                color: Fg.almond,
                                 fontSize: 13,
                                 fontWeight: FontWeight.w500,
                               ),
@@ -159,7 +127,7 @@ class _MessagingScreenState extends State<MessagingScreen> {
               if (snapshot.connectionState == ConnectionState.waiting) {
                 return SliverFillRemaining(
                   child: Center(
-                    child: CircularProgressIndicator(color: _C.matcha),
+                    child: CircularProgressIndicator(color: Fg.matcha),
                   ),
                 );
               }
@@ -176,13 +144,13 @@ class _MessagingScreenState extends State<MessagingScreen> {
                           width: 64,
                           height: 64,
                           decoration: BoxDecoration(
-                            color: _C.matchaLight.withOpacity(0.5),
+                            color: Bg.matchaLight.withOpacity(0.5),
                             shape: BoxShape.circle,
                           ),
                           child: Icon(
                             Icons.chat_bubble_outline_rounded,
                             size: 26,
-                            color: _C.matcha.withOpacity(0.7),
+                            color: Fg.matcha.withOpacity(0.7),
                           ),
                         ),
                         const SizedBox(height: 14),
@@ -191,12 +159,12 @@ class _MessagingScreenState extends State<MessagingScreen> {
                           style: TextStyle(
                               fontSize: 15,
                               fontWeight: FontWeight.w500,
-                              color: _C.ink),
+                              color: Fg.ink),
                         ),
                         const SizedBox(height: 4),
                         Text(
                           'Tap New to start a conversation.',
-                          style: TextStyle(fontSize: 13, color: _C.inkSoft),
+                          style: TextStyle(fontSize: 13, color: Fg.inkSoft),
                         ),
                         const SizedBox(height: 20),
                         GestureDetector(
@@ -205,13 +173,13 @@ class _MessagingScreenState extends State<MessagingScreen> {
                             padding: const EdgeInsets.symmetric(
                                 horizontal: 20, vertical: 10),
                             decoration: BoxDecoration(
-                              color: _C.rust,
+                              color: Bg.rust,
                               borderRadius: BorderRadius.circular(20),
                             ),
                             child: Text(
                               'Start a conversation',
                               style: TextStyle(
-                                color: _C.almond,
+                                color: Fg.almond,
                                 fontSize: 14,
                                 fontWeight: FontWeight.w500,
                               ),
@@ -257,7 +225,7 @@ class _MessagingScreenState extends State<MessagingScreen> {
                           return Container(
                             margin: const EdgeInsets.only(bottom: 10),
                             decoration: BoxDecoration(
-                              color: Colors.white,
+                              color: Bg.surface,
                               borderRadius: BorderRadius.circular(16),
                             ),
                             child: InkWell(
@@ -282,13 +250,13 @@ class _MessagingScreenState extends State<MessagingScreen> {
                                   children: [
                                     CircleAvatar(
                                       radius: 22,
-                                      backgroundColor: _C.matchaLight,
+                                      backgroundColor: Bg.matchaLight,
                                       child: Text(
                                         _initials(otherName),
                                         style: TextStyle(
                                           fontSize: 13,
                                           fontWeight: FontWeight.w600,
-                                          color: _C.matchaDark,
+                                          color: Fg.matchaDark,
                                         ),
                                       ),
                                     ),
@@ -308,7 +276,7 @@ class _MessagingScreenState extends State<MessagingScreen> {
                                                     fontWeight: unreadCount > 0
                                                         ? FontWeight.w600
                                                         : FontWeight.w500,
-                                                    color: _C.ink,
+                                                    color: Fg.ink,
                                                   ),
                                                 ),
                                               ),
@@ -318,8 +286,8 @@ class _MessagingScreenState extends State<MessagingScreen> {
                                                 style: TextStyle(
                                                   fontSize: 11.5,
                                                   color: unreadCount > 0
-                                                      ? _C.rust
-                                                      : _C.inkSoft,
+                                                      ? Fg.rust
+                                                      : Fg.inkSoft,
                                                   fontWeight: unreadCount > 0
                                                       ? FontWeight.w600
                                                       : FontWeight.w400,
@@ -339,8 +307,8 @@ class _MessagingScreenState extends State<MessagingScreen> {
                                                   style: TextStyle(
                                                     fontSize: 12.5,
                                                     color: unreadCount > 0
-                                                        ? _C.ink
-                                                        : _C.inkSoft,
+                                                        ? Fg.ink
+                                                        : Fg.inkSoft,
                                                     fontWeight: unreadCount > 0
                                                         ? FontWeight.w500
                                                         : FontWeight.w400,
@@ -356,7 +324,7 @@ class _MessagingScreenState extends State<MessagingScreen> {
                                                           horizontal: 7,
                                                           vertical: 2),
                                                   decoration: BoxDecoration(
-                                                    color: _C.rust,
+                                                    color: Bg.rust,
                                                     borderRadius:
                                                         BorderRadius.circular(
                                                             10),
@@ -365,7 +333,7 @@ class _MessagingScreenState extends State<MessagingScreen> {
                                                     '$unreadCount',
                                                     style: TextStyle(
                                                       fontSize: 11,
-                                                      color: _C.almond,
+                                                      color: Fg.almond,
                                                       fontWeight:
                                                           FontWeight.w600,
                                                     ),
@@ -393,7 +361,7 @@ class _MessagingScreenState extends State<MessagingScreen> {
 
           const SliverToBoxAdapter(child: SizedBox(height: 24)),
         ],
-      ),
+      )),
     );
   }
 }
@@ -468,7 +436,7 @@ class _NewConversationSheetState extends State<_NewConversationSheet> {
       padding:
           EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
       decoration: BoxDecoration(
-        color: _C.almond,
+        color: Bg.almond,
         borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
       ),
       child: Column(
@@ -479,7 +447,7 @@ class _NewConversationSheetState extends State<_NewConversationSheet> {
             width: 36,
             height: 4,
             decoration: BoxDecoration(
-              color: _C.hairline,
+              color: Bg.hairline,
               borderRadius: BorderRadius.circular(2),
             ),
           ),
@@ -495,13 +463,13 @@ class _NewConversationSheetState extends State<_NewConversationSheet> {
                     style: TextStyle(
                       fontSize: 17,
                       fontWeight: FontWeight.w600,
-                      color: _C.ink,
+                      color: Fg.ink,
                     ),
                   ),
                 ),
                 GestureDetector(
                   onTap: () => Navigator.pop(context),
-                  child: Icon(Icons.close_rounded, color: _C.inkSoft),
+                  child: Icon(Icons.close_rounded, color: Fg.inkSoft),
                 ),
               ],
             ),
@@ -514,20 +482,20 @@ class _NewConversationSheetState extends State<_NewConversationSheet> {
             child: TextField(
               controller: _searchController,
               autofocus: true,
-              style: TextStyle(color: _C.ink, fontSize: 14),
+              style: TextStyle(color: Fg.ink, fontSize: 14),
               decoration: InputDecoration(
                 hintText: 'Search farmers...',
-                hintStyle: TextStyle(color: _C.inkSoft, fontSize: 14),
-                prefixIcon: Icon(Icons.search, size: 20, color: _C.inkSoft),
+                hintStyle: TextStyle(color: Fg.inkSoft, fontSize: 14),
+                prefixIcon: Icon(Icons.search, size: 20, color: Fg.inkSoft),
                 filled: true,
-                fillColor: Colors.white,
+                fillColor: Bg.surface,
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide(color: _C.hairline),
+                  borderSide: BorderSide(color: Bg.hairline),
                 ),
                 enabledBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide(color: _C.hairline),
+                  borderSide: BorderSide(color: Bg.hairline),
                 ),
                 contentPadding:
                     const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
@@ -562,7 +530,7 @@ class _NewConversationSheetState extends State<_NewConversationSheet> {
                       _query.isNotEmpty
                           ? 'No farmers found'
                           : 'No other users yet',
-                      style: TextStyle(fontSize: 14, color: _C.inkSoft),
+                      style: TextStyle(fontSize: 14, color: Fg.inkSoft),
                     ),
                   );
                 }
@@ -580,13 +548,13 @@ class _NewConversationSheetState extends State<_NewConversationSheet> {
                     return ListTile(
                       contentPadding: EdgeInsets.zero,
                       leading: CircleAvatar(
-                        backgroundColor: _C.matchaLight,
+                        backgroundColor: Bg.matchaLight,
                         child: Text(
                           _initials(name),
                           style: TextStyle(
                             fontSize: 13,
                             fontWeight: FontWeight.w600,
-                            color: _C.matchaDark,
+                            color: Fg.matchaDark,
                           ),
                         ),
                       ),
@@ -595,13 +563,13 @@ class _NewConversationSheetState extends State<_NewConversationSheet> {
                         style: TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.w500,
-                          color: _C.ink,
+                          color: Fg.ink,
                         ),
                       ),
                       subtitle: data['location'] != null
                           ? Text(
                               data['location'],
-                              style: TextStyle(fontSize: 12, color: _C.inkSoft),
+                              style: TextStyle(fontSize: 12, color: Fg.inkSoft),
                             )
                           : null,
                       onTap: () =>

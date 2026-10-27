@@ -7,16 +7,7 @@ import 'pals_screen.dart';
 import 'blocked_list_screen.dart';
 import 'notifications_screen.dart';
 import 'messaging_screen.dart';
-
-/// Matcha accent used for icons and badge fills — restyled from the
-/// original AppColors.greenDark to match the new palette.
-class _C {
-  static const matcha = Color(0xFF5C7148);
-  static const rust = Color(0xFFC1703E);
-  static const almond = Color(0xFFF6EFE2);
-  static const ink = Color(0xFF2B2820);
-  static const inkSoft = Color(0xFF726C5C);
-}
+import '../theme/palette.dart';
 
 class ProfileSocialMenu extends StatelessWidget {
   final Color cardColor;
@@ -33,7 +24,7 @@ class ProfileSocialMenu extends StatelessWidget {
     final uid = FirebaseAuth.instance.currentUser?.uid ?? '';
 
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      margin: EdgeInsets.zero, // the page already pads it; it sat narrower than the other cards
       decoration: BoxDecoration(
         color: cardColor,
         borderRadius: BorderRadius.circular(16),
@@ -163,15 +154,15 @@ class _MenuRow extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
         child: Row(
           children: [
-            Icon(icon, size: 20, color: _C.matcha),
+            Icon(icon, size: 20, color: Fg.matcha),
             const SizedBox(width: 16),
             Expanded(
               child: Text(
                 label,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.w500,
-                  color: _C.ink,
+                  color: Fg.ink,
                 ),
               ),
             ),
@@ -181,8 +172,8 @@ class _MenuRow extends StatelessWidget {
                 builder: (context, snap) {
                   final count = snap.data ?? 0;
                   if (count == 0 && !showCountAlways) {
-                    return const Icon(Icons.chevron_right_rounded,
-                        color: _C.inkSoft, size: 20);
+                    return Icon(Icons.chevron_right_rounded,
+                        color: Fg.inkSoft, size: 20);
                   }
                   return Row(
                     mainAxisSize: MainAxisSize.min,
@@ -193,7 +184,7 @@ class _MenuRow extends StatelessWidget {
                         decoration: BoxDecoration(
                           color: showCountAlways
                               ? borderColor.withOpacity(0.5)
-                              : _C.rust,
+                              : Bg.rust,
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: Text(
@@ -201,20 +192,20 @@ class _MenuRow extends StatelessWidget {
                           style: TextStyle(
                             fontSize: 12,
                             fontWeight: FontWeight.w600,
-                            color: showCountAlways ? _C.inkSoft : _C.almond,
+                            color: showCountAlways ? Fg.inkSoft : Fg.almond,
                           ),
                         ),
                       ),
                       const SizedBox(width: 6),
-                      const Icon(Icons.chevron_right_rounded,
-                          color: _C.inkSoft, size: 20),
+                      Icon(Icons.chevron_right_rounded,
+                          color: Fg.inkSoft, size: 20),
                     ],
                   );
                 },
               )
             else
-              const Icon(Icons.chevron_right_rounded,
-                  color: _C.inkSoft, size: 20),
+              Icon(Icons.chevron_right_rounded,
+                  color: Fg.inkSoft, size: 20),
           ],
         ),
       ),

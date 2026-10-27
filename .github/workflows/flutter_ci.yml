@@ -1,0 +1,51 @@
+name: Flutter CI
+
+# Static analysis + unit tests on every pull request.
+on:
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: flutter-ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  analyze-and-test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      - name: Install packages
+        run: |
+          set +e
+          flutter pub get > pub.txt 2>&1
+          status=$?
+          cat pub.txt
+          if [ $status -ne 0 ]; then
+            msg=$(tail -40 pub.txt | sed 's/%/%25/g' | sed ':a;N;$!ba;s/\n/%0A/g')
+            echo "::error title=flutter pub get failed::$msg"
+          fi
+          exit $status
+
+      - name: Analyze
+        run: |
+          set +e
+          flutter analyze --no-fatal-infos --no-fatal-warnings > analyze.txt 2>&1
+          status=$?
+          cat analyze.txt
+          # Surface errors/warnings as annotations on the PR's Files tab.
+          grep -E "^\s*(error|warning) • " analyze.txt | while IFS='•' read -r level msg loc rule; do
+            level=$(echo "$level" | xargs); msg=$(echo "$msg" | xargs)
+            file=$(echo "$loc" | xargs | cut -d: -f1); line=$(echo "$loc" | xargs | cut -d: -f2)
+            echo "::${level} file=${file},line=${line}::${msg} [$(echo "$rule" | xargs)]"
+          done
+          exit $status
+
+      - name: Test
+        run: flutter test --reporter=github

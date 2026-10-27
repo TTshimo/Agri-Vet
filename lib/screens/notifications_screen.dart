@@ -2,41 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:intl/intl.dart';
+import 'chat_screen.dart';
 import 'user_profile_screen.dart';
+import '../theme/palette.dart';
+import '../theme/header_wave.dart';
+import '../widgets/field_background.dart';
 
-/// AgroLens palette — matcha green / almond / white, light module variant.
-class _C {
-  static const matchaDark = Color(0xFF374530);
-  static const matcha = Color(0xFF5C7148);
-  static const matchaLight = Color(0xFFD6E0C4);
-  static const almond = Color(0xFFF6EFE2);
-  static const ink = Color(0xFF2B2820);
-  static const inkSoft = Color(0xFF726C5C);
-  static const rust = Color(0xFFC1703E);
-  static const hairline = Color(0xFFEDE6D6);
-  static const danger = Color(0xFFC94C3F);
-}
-
-/// Bottom wave finishing off the dark matcha header band — same shape
-/// used across the other restyled screens for a consistent silhouette.
-class _HeaderWaveClipper extends CustomClipper<Path> {
-  @override
-  Path getClip(Size size) {
-    final path = Path()
-      ..lineTo(0, size.height * 0.62)
-      ..cubicTo(
-        size.width * 0.32, size.height,
-        size.width * 0.66, size.height * 0.4,
-        size.width, size.height * 0.68,
-      )
-      ..lineTo(size.width, 0)
-      ..close();
-    return path;
-  }
-
-  @override
-  bool shouldReclip(covariant CustomClipper<Path> oldClipper) => false;
-}
 
 enum NotificationType {
   like,
@@ -46,6 +17,7 @@ enum NotificationType {
   palAccept,
   msgRequest,
   msgAccept,
+  message,
   unknown,
 }
 
@@ -65,6 +37,8 @@ NotificationType _typeFromString(String? raw) {
       return NotificationType.msgRequest;
     case 'msg_accept':
       return NotificationType.msgAccept;
+    case 'message':
+      return NotificationType.message;
     default:
       return NotificationType.unknown;
   }
@@ -153,10 +127,19 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
 
       case NotificationType.msgRequest:
       case NotificationType.msgAccept:
+      case NotificationType.message:
+        final conversationId = data['conversationId'] as String?;
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (_) => UserProfileScreen(profileUid: fromUid),
+            builder: (_) => conversationId != null
+                ? ChatScreen(
+                    conversationId: conversationId,
+                    currentUid: _uid,
+                    otherUid: fromUid,
+                    otherName: (data['fromName'] as String?) ?? 'Farmer',
+                  )
+                : UserProfileScreen(profileUid: fromUid),
           ),
         );
         break;
@@ -182,6 +165,8 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
         return Icons.mark_email_unread_rounded;
       case NotificationType.msgAccept:
         return Icons.check_circle_rounded;
+      case NotificationType.message:
+        return Icons.chat_rounded;
       case NotificationType.unknown:
         return Icons.notifications_rounded;
     }
@@ -190,19 +175,21 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
   Color _iconColorFor(NotificationType type) {
     switch (type) {
       case NotificationType.like:
-        return _C.danger;
+        return Bg.danger;
       case NotificationType.palRequest:
       case NotificationType.palAccept:
-        return _C.matcha;
+        return Bg.matcha;
       case NotificationType.msgRequest:
       case NotificationType.msgAccept:
-        return _C.rust;
+      case NotificationType.message:
+        return Bg.rust;
       default:
-        return _C.inkSoft;
+        return Bg.inkSoft;
     }
   }
 
-  String _messageFor(NotificationType type, String fromName) {
+  String _messageFor(NotificationType type, String fromName,
+      [Map<String, dynamic>? data]) {
     switch (type) {
       case NotificationType.like:
         return '$fromName liked your post';
@@ -218,6 +205,11 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
         return '$fromName sent you a message request';
       case NotificationType.msgAccept:
         return '$fromName accepted your message request';
+      case NotificationType.message:
+        final preview = (data?['preview'] as String?) ?? '';
+        return preview.isEmpty
+            ? '$fromName sent you a message'
+            : '$fromName: $preview';
       case NotificationType.unknown:
         return 'New notification';
     }
@@ -239,25 +231,25 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
         .limit(100);
 
     return Scaffold(
-      backgroundColor: _C.almond,
-      body: CustomScrollView(
+      backgroundColor: Bg.almond,
+      body: FieldBackground(child: CustomScrollView(
         slivers: [
           SliverToBoxAdapter(
             child: ClipPath(
-              clipper: _HeaderWaveClipper(),
+              clipper: const HeaderWaveClipper(),
               child: Container(
-                color: _C.matchaDark,
+                color: Bg.matchaDark,
                 padding: EdgeInsets.fromLTRB(
                   8,
                   MediaQuery.of(context).padding.top + 8,
                   16,
-                  40,
+                  48,
                 ),
                 child: Row(
                   children: [
                     IconButton(
                       icon: Icon(Icons.arrow_back_ios_new_rounded,
-                          color: _C.almond, size: 18),
+                          color: Fg.almond, size: 18),
                       onPressed: () => Navigator.pop(context),
                     ),
                     Expanded(
@@ -266,7 +258,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                         style: TextStyle(
                           fontSize: 17,
                           fontWeight: FontWeight.w600,
-                          color: _C.almond,
+                          color: Fg.almond,
                         ),
                       ),
                     ),
@@ -283,7 +275,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                           child: Text(
                             'Mark all read',
                             style: TextStyle(
-                              color: _C.matchaLight,
+                              color: Fg.matchaLight,
                               fontSize: 12,
                               fontWeight: FontWeight.w500,
                             ),
@@ -303,7 +295,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
               if (snapshot.connectionState == ConnectionState.waiting) {
                 return SliverFillRemaining(
                   child: Center(
-                    child: CircularProgressIndicator(color: _C.matcha),
+                    child: CircularProgressIndicator(color: Fg.matcha),
                   ),
                 );
               }
@@ -320,13 +312,13 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                           width: 64,
                           height: 64,
                           decoration: BoxDecoration(
-                            color: _C.matchaLight.withOpacity(0.5),
+                            color: Bg.matchaLight.withOpacity(0.5),
                             shape: BoxShape.circle,
                           ),
                           child: Icon(
                             Icons.notifications_none_rounded,
                             size: 26,
-                            color: _C.matcha.withOpacity(0.7),
+                            color: Fg.matcha.withOpacity(0.7),
                           ),
                         ),
                         const SizedBox(height: 14),
@@ -335,7 +327,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                           style: TextStyle(
                               fontSize: 15,
                               fontWeight: FontWeight.w500,
-                              color: _C.ink),
+                              color: Fg.ink),
                         ),
                       ],
                     ),
@@ -359,13 +351,13 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                         margin: const EdgeInsets.only(bottom: 10),
                         decoration: BoxDecoration(
                           color: isRead
-                              ? Colors.white
-                              : _C.matchaLight.withOpacity(0.35),
+                              ? Bg.surface
+                              : Bg.matchaLight.withOpacity(0.35),
                           borderRadius: BorderRadius.circular(16),
                           border: isRead
                               ? null
                               : Border.all(
-                                  color: _C.matcha.withOpacity(0.25)),
+                                  color: Bg.matcha.withOpacity(0.25)),
                         ),
                         child: InkWell(
                           borderRadius: BorderRadius.circular(16),
@@ -379,13 +371,13 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                                   children: [
                                     CircleAvatar(
                                       radius: 20,
-                                      backgroundColor: _C.matchaLight,
+                                      backgroundColor: Bg.matchaLight,
                                       child: Text(
                                         _initials(fromName),
                                         style: TextStyle(
                                           fontSize: 12,
                                           fontWeight: FontWeight.w600,
-                                          color: _C.matchaDark,
+                                          color: Fg.matchaDark,
                                         ),
                                       ),
                                     ),
@@ -395,10 +387,10 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                                       child: Container(
                                         padding: const EdgeInsets.all(3),
                                         decoration: BoxDecoration(
-                                          color: Colors.white,
+                                          color: Bg.surface,
                                           shape: BoxShape.circle,
                                           border: Border.all(
-                                              color: _C.almond, width: 2),
+                                              color: Bg.almond, width: 2),
                                         ),
                                         child: Icon(
                                           _iconFor(type),
@@ -412,13 +404,13 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                                 const SizedBox(width: 12),
                                 Expanded(
                                   child: Text(
-                                    _messageFor(type, fromName),
+                                    _messageFor(type, fromName, data),
                                     style: TextStyle(
                                       fontSize: 13.5,
                                       fontWeight: isRead
                                           ? FontWeight.w400
                                           : FontWeight.w500,
-                                      color: _C.ink,
+                                      color: Fg.ink,
                                       height: 1.4,
                                     ),
                                   ),
@@ -428,7 +420,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                                   _timeAgo(ts),
                                   style: TextStyle(
                                     fontSize: 11,
-                                    color: _C.inkSoft,
+                                    color: Fg.inkSoft,
                                   ),
                                 ),
                               ],
@@ -446,7 +438,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
 
           const SliverToBoxAdapter(child: SizedBox(height: 24)),
         ],
-      ),
+      )),
     );
   }
 }

@@ -1,39 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:intl/intl.dart';
+import '../theme/palette.dart';
+import '../theme/header_wave.dart';
+import '../widgets/field_background.dart';
 
-/// AgroLens palette — matcha green / almond / white, light module variant.
-class _C {
-  static const matchaDark = Color(0xFF374530);
-  static const matcha = Color(0xFF5C7148);
-  static const matchaLight = Color(0xFFD6E0C4);
-  static const almond = Color(0xFFF6EFE2);
-  static const ink = Color(0xFF2B2820);
-  static const inkSoft = Color(0xFF726C5C);
-  static const rust = Color(0xFFC1703E);
-  static const hairline = Color(0xFFEDE6D6);
-}
-
-/// Bottom wave finishing off the dark matcha header band — same shape
-/// used across the other restyled screens for a consistent silhouette.
-class _HeaderWaveClipper extends CustomClipper<Path> {
-  @override
-  Path getClip(Size size) {
-    final path = Path()
-      ..lineTo(0, size.height * 0.62)
-      ..cubicTo(
-        size.width * 0.32, size.height,
-        size.width * 0.66, size.height * 0.4,
-        size.width, size.height * 0.68,
-      )
-      ..lineTo(size.width, 0)
-      ..close();
-    return path;
-  }
-
-  @override
-  bool shouldReclip(covariant CustomClipper<Path> oldClipper) => false;
-}
 
 enum ActivityType { posts, diagnoses }
 
@@ -56,25 +27,25 @@ class UserActivityScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: _C.almond,
-      body: CustomScrollView(
+      backgroundColor: Bg.almond,
+      body: FieldBackground(child: CustomScrollView(
         slivers: [
           SliverToBoxAdapter(
             child: ClipPath(
-              clipper: _HeaderWaveClipper(),
+              clipper: const HeaderWaveClipper(),
               child: Container(
-                color: _C.matchaDark,
+                color: Bg.matchaDark,
                 padding: EdgeInsets.fromLTRB(
                   8,
                   MediaQuery.of(context).padding.top + 8,
                   16,
-                  40,
+                  48,
                 ),
                 child: Row(
                   children: [
                     IconButton(
                       icon: Icon(Icons.arrow_back_ios_new_rounded,
-                          color: _C.almond, size: 18),
+                          color: Fg.almond, size: 18),
                       onPressed: () => Navigator.pop(context),
                     ),
                     Text(
@@ -82,7 +53,7 @@ class UserActivityScreen extends StatelessWidget {
                       style: TextStyle(
                         fontSize: 17,
                         fontWeight: FontWeight.w600,
-                        color: _C.almond,
+                        color: Fg.almond,
                       ),
                     ),
                   ],
@@ -100,7 +71,7 @@ class UserActivityScreen extends StatelessWidget {
               if (snapshot.connectionState == ConnectionState.waiting) {
                 return SliverFillRemaining(
                   child: Center(
-                    child: CircularProgressIndicator(color: _C.matcha),
+                    child: CircularProgressIndicator(color: Fg.matcha),
                   ),
                 );
               }
@@ -117,7 +88,7 @@ class UserActivityScreen extends StatelessWidget {
                           width: 64,
                           height: 64,
                           decoration: BoxDecoration(
-                            color: _C.matchaLight.withOpacity(0.5),
+                            color: Bg.matchaLight.withOpacity(0.5),
                             shape: BoxShape.circle,
                           ),
                           child: Icon(
@@ -125,7 +96,7 @@ class UserActivityScreen extends StatelessWidget {
                                 ? Icons.article_outlined
                                 : Icons.biotech_outlined,
                             size: 26,
-                            color: _C.matcha.withOpacity(0.7),
+                            color: Fg.matcha.withOpacity(0.7),
                           ),
                         ),
                         const SizedBox(height: 14),
@@ -136,7 +107,7 @@ class UserActivityScreen extends StatelessWidget {
                           style: TextStyle(
                               fontSize: 15,
                               fontWeight: FontWeight.w500,
-                              color: _C.ink),
+                              color: Fg.ink),
                         ),
                       ],
                     ),
@@ -165,7 +136,7 @@ class UserActivityScreen extends StatelessWidget {
           ),
           const SliverToBoxAdapter(child: SizedBox(height: 24)),
         ],
-      ),
+      )),
     );
   }
 }
@@ -183,7 +154,7 @@ class _PostCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Bg.surface,
         borderRadius: BorderRadius.circular(16),
       ),
       child: Column(
@@ -196,10 +167,10 @@ class _PostCard extends StatelessWidget {
                 style: TextStyle(
                     fontSize: 14.5,
                     fontWeight: FontWeight.w600,
-                    color: _C.ink),
+                    color: Fg.ink),
               ),
             ),
-            Text(dateStr, style: TextStyle(fontSize: 11, color: _C.inkSoft)),
+            Text(dateStr, style: TextStyle(fontSize: 11, color: Fg.inkSoft)),
           ]),
           if ((data['body'] ?? '').isNotEmpty) ...[
             const SizedBox(height: 6),
@@ -207,7 +178,7 @@ class _PostCard extends StatelessWidget {
               data['body'],
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
-              style: TextStyle(fontSize: 13, color: _C.inkSoft),
+              style: TextStyle(fontSize: 13, color: Fg.inkSoft),
             ),
           ],
           if (tags.isNotEmpty) ...[
@@ -219,27 +190,27 @@ class _PostCard extends StatelessWidget {
                         padding: const EdgeInsets.symmetric(
                             horizontal: 8, vertical: 3),
                         decoration: BoxDecoration(
-                          color: _C.matchaLight.withOpacity(0.6),
+                          color: Bg.matchaLight.withOpacity(0.6),
                           borderRadius: BorderRadius.circular(20),
                         ),
                         child: Text(t,
                             style: TextStyle(
-                                fontSize: 11, color: _C.matchaDark)),
+                                fontSize: 11, color: Fg.matchaDark)),
                       ))
                   .toList(),
             ),
           ],
           const SizedBox(height: 8),
           Row(children: [
-            Icon(Icons.thumb_up_outlined, size: 14, color: _C.inkSoft),
+            Icon(Icons.thumb_up_outlined, size: 14, color: Fg.inkSoft),
             const SizedBox(width: 4),
             Text('${data['likes'] ?? 0}',
-                style: TextStyle(fontSize: 12, color: _C.inkSoft)),
+                style: TextStyle(fontSize: 12, color: Fg.inkSoft)),
             const SizedBox(width: 14),
-            Icon(Icons.comment_outlined, size: 14, color: _C.inkSoft),
+            Icon(Icons.comment_outlined, size: 14, color: Fg.inkSoft),
             const SizedBox(width: 4),
             Text('${data['commentCount'] ?? 0}',
-                style: TextStyle(fontSize: 12, color: _C.inkSoft)),
+                style: TextStyle(fontSize: 12, color: Fg.inkSoft)),
           ]),
         ],
       ),
@@ -261,7 +232,7 @@ class _DiagnosisCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Bg.surface,
         borderRadius: BorderRadius.circular(16),
       ),
       child: Column(
@@ -274,16 +245,16 @@ class _DiagnosisCard extends StatelessWidget {
                 style: TextStyle(
                     fontSize: 14.5,
                     fontWeight: FontWeight.w600,
-                    color: _C.ink),
+                    color: Fg.ink),
               ),
             ),
-            Text(dateStr, style: TextStyle(fontSize: 11, color: _C.inkSoft)),
+            Text(dateStr, style: TextStyle(fontSize: 11, color: Fg.inkSoft)),
           ]),
           const SizedBox(height: 6),
           Text(
             data['prediction'] ?? 'No result',
             style: TextStyle(
-                fontSize: 14, fontWeight: FontWeight.w500, color: _C.matcha),
+                fontSize: 14, fontWeight: FontWeight.w500, color: Fg.matcha),
           ),
           const SizedBox(height: 8),
           Row(children: [
@@ -303,7 +274,7 @@ class _DiagnosisCard extends StatelessWidget {
             ),
             const Spacer(),
             Text('$confidence% confidence',
-                style: TextStyle(fontSize: 11, color: _C.inkSoft)),
+                style: TextStyle(fontSize: 11, color: Fg.inkSoft)),
           ]),
         ],
       ),
@@ -315,9 +286,9 @@ class _DiagnosisCard extends StatelessWidget {
   Color _severityColor(String s) {
     switch (s.toLowerCase()) {
       case 'high':
-        return _C.rust;
+        return Bg.rust;
       default:
-        return _C.matcha;
+        return Bg.matcha;
     }
   }
 }

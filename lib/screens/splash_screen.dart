@@ -2,15 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'login_screen.dart';
 import 'shell_screen.dart';
-
-/// AgroLens palette — matcha green / almond / white, dark splash variant.
-class _C {
-  static const matchaDark = Color(0xFF374530);
-  static const matcha = Color(0xFF5C7148);
-  static const matchaLight = Color(0xFFD6E0C4);
-  static const almond = Color(0xFFF6EFE2);
-  static const rust = Color(0xFFC1703E);
-}
+import '../theme/palette.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -70,7 +62,7 @@ class _SplashScreenState extends State<SplashScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: _C.matchaDark,
+      backgroundColor: Bg.matchaDark,
       body: Center(
         child: AnimatedBuilder(
           animation: _controller,
@@ -85,13 +77,13 @@ class _SplashScreenState extends State<SplashScreen>
                     width: 96,
                     height: 96,
                     decoration: BoxDecoration(
-                      color: _C.rust,
+                      color: Bg.rust,
                       borderRadius: BorderRadius.circular(28),
                     ),
                     child: Icon(
                       Icons.eco_rounded,
                       size: 52,
-                      color: _C.almond,
+                      color: Fg.almond,
                     ),
                   ),
                   const SizedBox(height: 20),
@@ -101,7 +93,7 @@ class _SplashScreenState extends State<SplashScreen>
                     style: TextStyle(
                       fontSize: 34,
                       fontWeight: FontWeight.w600,
-                      color: _C.almond,
+                      color: Fg.almond,
                       letterSpacing: -0.5,
                     ),
                   ),
@@ -111,7 +103,7 @@ class _SplashScreenState extends State<SplashScreen>
                     'The Vet In Your Pocket.',
                     style: TextStyle(
                       fontSize: 14,
-                      color: _C.matchaLight,
+                      color: Fg.matchaLight,
                       fontWeight: FontWeight.w400,
                     ),
                   ),
@@ -122,7 +114,7 @@ class _SplashScreenState extends State<SplashScreen>
                     height: 24,
                     child: CircularProgressIndicator(
                       strokeWidth: 2,
-                      color: _C.matchaLight,
+                      color: Fg.matchaLight,
                     ),
                   ),
                 ],

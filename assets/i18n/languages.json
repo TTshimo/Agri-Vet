@@ -1,0 +1,12 @@
+[
+  {"code": "en", "name": "English", "native": "English", "nllb": "eng_Latn"},
+  {"code": "tn", "name": "Setswana", "native": "Setswana", "nllb": "tsn_Latn"},
+  {"code": "af", "name": "Afrikaans", "native": "Afrikaans", "nllb": "afr_Latn"},
+  {"code": "zu", "name": "isiZulu", "native": "isiZulu", "nllb": "zul_Latn"},
+  {"code": "st", "name": "Sesotho", "native": "Sesotho", "nllb": "sot_Latn"},
+  {"code": "sn", "name": "Shona", "native": "chiShona", "nllb": "sna_Latn"},
+  {"code": "sw", "name": "Swahili", "native": "Kiswahili", "nllb": "swh_Latn"},
+  {"code": "pt", "name": "Portuguese", "native": "Português", "nllb": "por_Latn"},
+  {"code": "fr", "name": "French", "native": "Français", "nllb": "fra_Latn"},
+  {"code": "es", "name": "Spanish", "native": "Español", "nllb": "spa_Latn"}
+]

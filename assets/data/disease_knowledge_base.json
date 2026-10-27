@@ -2,44 +2,30 @@
   "animals": {
     "foot and mouth": {
       "display_name": {
-        "en": "Foot and Mouth Disease",
-        "tn": "Bolwetsi jwa Tlhako le Molomo",
-        "sw": "Ugonjwa wa Miguu na Mdomo",
-        "pt": "Febre Aftosa"
+        "en": "Foot and Mouth Disease"
       },
       "risk_level": "high",
       "affects": {
-        "en": "Cattle, goats, sheep, pigs",
-        "tn": "Dikgomo, dipodi, dinku, dikolobe",
-        "sw": "Ng'ombe, mbuzi, kondoo, nguruwe",
-        "pt": "Bovinos, caprinos, ovinos, suínos"
+        "en": "Cattle, goats, sheep, pigs"
       },
       "spreads_by": {
-        "en": "Direct contact, contaminated surfaces, air",
-        "tn": "Go amana ga leruo le le lwalang, mafelo a a konaletsweng, phefo",
-        "sw": "Mawasiliano ya moja kwa moja, nyuso zilizochafuliwa, hewa",
-        "pt": "Contacto directo, superfícies contaminadas, ar"
+        "en": "Direct contact, contaminated surfaces, air"
       },
       "visual_symptoms": {
-        "en": "Blisters and sores on hooves, mouth, tongue and teats. Excessive drooling. Lameness.",
-        "tn": "Mabutswi le dintho mo ditlhakong, molomo, lelémeng le mabeleng. Molapo o feteletseng. Go lepelela ga leruo.",
-        "sw": "Malengelenge na vidonda kwenye kwato, mdomo, ulimi na chuchu. Mate mengi kupita kiasi. Kulegea kwa miguu.",
-        "pt": "Bolhas e feridas nos cascos, boca, língua e tetas. Salivação excessiva. Coxeira."
+        "en": "Blisters and sores on hooves, mouth, tongue and teats. Excessive drooling. Lameness."
       },
       "behavioral_questions": [
         {
           "id": "eating",
           "question": {
-            "en": "Is the animal eating and drinking normally?",
-            "tn": "A leruo le ja kana le nwa metsi jaaka tlwaelo?",
-            "sw": "Je, mnyama anakula na kunywa kawaida?",
-            "pt": "O animal está a comer e a beber normalmente?"
+            "en": "Is the animal eating and drinking normally?"
           },
           "options": {
-            "en": ["Yes, normally", "Eating less than usual", "Refused food completely"],
-            "tn": ["Ee", "E ja go le gonnye", "E gana dijo gotlhe"],
-            "sw": ["Ndiyo, kawaida", "Anakula kidogo kuliko kawaida", "Amekataa chakula kabisa"],
-            "pt": ["Sim, normalmente", "A comer menos do que o habitual", "Recusou comida completamente"]
+            "en": [
+              "Yes, normally",
+              "Eating less than usual",
+              "Refused food completely"
+            ]
           },
           "weights": {
             "Yes, normally": 0,
@@ -50,16 +36,14 @@
         {
           "id": "mobility",
           "question": {
-            "en": "How is the animal moving?",
-            "tn": "Leruo le tsamaya jang?",
-            "sw": "Mnyama anatembea vipi?",
-            "pt": "Como é que o animal se está a mover?"
+            "en": "How is the animal moving?"
           },
           "options": {
-            "en": ["Moving normally", "Limping slightly", "Severely lame or not moving"],
-            "tn": ["E tsamaya ka tshwano", "E a tlhotsa go le go nnye", "E tlhoka mo go tseneletseng kana ha e tsamaye gotlhelele"],
-            "sw": ["Anatembea kawaida", "Anachechemea kidogo", "Amelegea sana au hatembei kabisa"],
-            "pt": ["A mover-se normalmente", "Ligeiramente coxo", "Muito coxo ou sem se mover"]
+            "en": [
+              "Moving normally",
+              "Limping slightly",
+              "Severely lame or not moving"
+            ]
           },
           "weights": {
             "Moving normally": 0,
@@ -70,16 +54,14 @@
         {
           "id": "spread",
           "question": {
-            "en": "Are other animals in the herd showing similar symptoms?",
-            "tn": "A leruo le lengwe mo sakeng le supa maitemogelo a tshwanang?",
-            "sw": "Je, wanyama wengine kwenye kundi wanaonyesha dalili sawa?",
-            "pt": "Outros animais do rebanho apresentam sintomas semelhantes?"
+            "en": "Are other animals in the herd showing similar symptoms?"
           },
           "options": {
-            "en": ["No, only this one", "1-2 others affected", "Many animals affected"],
-            "tn": ["Nnyaa, fela yone e", "1-2 tse dingwe di amegile", "Leruo le le lentsi le amegile"],
-            "sw": ["Hapana, huyu pekee", "Wanyama 1-2 wengine wameathirika", "Wanyama wengi wameathirika"],
-            "pt": ["Não, apenas este", "1-2 outros afectados", "Muitos animais afectados"]
+            "en": [
+              "No, only this one",
+              "1-2 others affected",
+              "Many animals affected"
+            ]
           },
           "weights": {
             "No, only this one": 0,
@@ -90,16 +72,15 @@
         {
           "id": "duration",
           "question": {
-            "en": "How long have you noticed these symptoms?",
-            "tn": "O lemogile matshwao a go simololola leng?",
-            "sw": "Umegundua dalili hizi tangu lini?",
-            "pt": "Há quanto tempo notou estes sintomas?"
+            "en": "How long have you noticed these symptoms?"
           },
           "options": {
-            "en": ["Just noticed today", "1-2 days", "3-5 days", "More than 5 days"],
-            "tn": ["Ke lemogile gompieno", "Malatsi a le 1-2", "Malatsi a le 3-5", "Go feta malatsi a le 5"],
-            "sw": ["Nimegundua leo", "Siku 1-2", "Siku 3-5", "Zaidi ya siku 5"],
-            "pt": ["Notei hoje mesmo", "1-2 dias", "3-5 dias", "Mais de 5 dias"]
+            "en": [
+              "Just noticed today",
+              "1-2 days",
+              "3-5 days",
+              "More than 5 days"
+            ]
           },
           "weights": {
             "Just noticed today": 0,
@@ -111,16 +92,14 @@
         {
           "id": "saliva",
           "question": {
-            "en": "Is there excessive drooling or foaming from the mouth?",
-            "tn": "A go na le mathe a feteletseng kgotsa marothodi go tswa molomong wa leruo?",
-            "sw": "Je, kuna mate mengi kupita kiasi au povu mdomoni?",
-            "pt": "Existe salivação excessiva ou espuma na boca?"
+            "en": "Is there excessive drooling or foaming from the mouth?"
           },
           "options": {
-            "en": ["No", "Some drooling", "Heavy drooling or foaming"],
-            "tn": ["Nnyaa", "Go na le moathenyana", "Mathe a teng a elela ka selekanyo se se heteletseng"],
-            "sw": ["Hapana", "Mate kiasi", "Mate mengi sana au povu"],
-            "pt": ["Não", "Alguma salivação", "Salivação intensa ou espuma"]
+            "en": [
+              "No",
+              "Some drooling",
+              "Heavy drooling or foaming"
+            ]
           },
           "weights": {
             "No": 0,
@@ -136,84 +115,51 @@
       },
       "recommendations": {
         "low": {
-          "en": "Early signs detected. Isolate this animal from the rest of the herd immediately as a precaution. Monitor closely for the next 24 hours. Check all other animals for similar symptoms.",
-          "tn": "Matshwao a ntlha a bonwe. Arola leruo le le amegileng gone foo. Lebelela ka kelotlhoko maatla mo diureng tse 24 tse di latelang. Lekola leruo le lengwe go bona matshwao a tshwanang.",
-          "sw": "Dalili za awali zimegunduliwa. Tenga mnyama huyu kutoka kwa kundi mara moja kama tahadhari. Fuatilia kwa karibu kwa masaa 24 yajayo. Angalia wanyama wengine wote kwa dalili zinazofanana.",
-          "pt": "Sinais iniciais detectados. Isole este animal do resto do rebanho imediatamente como precaução. Monitorize de perto nas próximas 24 horas. Verifique todos os outros animais quanto a sintomas semelhantes."
+          "en": "Early signs detected. Isolate this animal from the rest of the herd immediately as a precaution. Monitor closely for the next 24 hours. Check all other animals for similar symptoms."
         },
         "medium": {
-          "en": "Moderate concern. Isolate the animal immediately. Contact your local DVS office or vet within 24 hours. Do not move any animals off the farm. FMD is a notifiable disease, you are legally required to report it.",
-          "tn": "Dikgang tsa bogare. Arola leruo ka bonako. Ikgolaganya le ofisi ya DVS ya gago kgotsa ngaka ya leruo mo diureng tse 24. Se ntse leruo le le amegileng mo sakeng. Bolwetse jwa Tlhako le Molomo bo a begiwang, ka ha molaong o tswanentse go bo bega.",
-          "sw": "Wasiwasi wa wastani. Tenga mnyama mara moja. Wasiliana na ofisi yako ya DVS ya eneo au daktari wa mifugo ndani ya masaa 24. Usisogeze wanyama yoyote kutoka shambani. FMD ni ugonjwa unaopaswa kuripotiwa kisheria.",
-          "pt": "Preocupação moderada. Isole o animal imediatamente. Contacte o seu escritório local dos Serviços Veterinários ou veterinário no prazo de 24 horas. Não mova animais para fora da quinta. A febre aftosa é uma doença de declaração obrigatória."
+          "en": "Moderate concern. Isolate the animal immediately. Contact your local DVS office or vet within 24 hours. Do not move any animals off the farm. FMD is a notifiable disease, you are legally required to report it."
         },
         "high": {
-          "en": "URGENT: Strong indicators of Foot and Mouth Disease. Isolate ALL animals immediately. Call DVS emergency line now. Do not move animals, vehicles or people between farms. This is a national emergency disease.",
-          "tn": "BOFEFO: Matshwao a maatsi a Bolwetsi jwa Dinao le Molomo. Arola leruo lotlhe ka bonako. Leletsa mola wa tshoganyetso wa DVS jaanong. Se sutisi leruo, dikoloi le batho magareng ga masaka. Ke bolwetsi jwa tshoganyetso ya lefatshe.",
-          "sw": "HARAKA: Dalili kali za Ugonjwa wa Miguu na Mdomo. Tenga wanyama WOTE mara moja. Piga simu ya dharura ya DVS sasa hivi. Usisogeze wanyama, magari au watu kati ya mashamba. Huu ni ugonjwa wa dharura wa kitaifa.",
-          "pt": "URGENTE: Fortes indicadores de Febre Aftosa. Isole TODOS os animais imediatamente. Ligue já para a linha de emergência dos Serviços Veterinários. Não mova animais, veículos ou pessoas entre quintas. Esta é uma doença de emergência nacional."
+          "en": "URGENT: Strong indicators of Foot and Mouth Disease. Isolate ALL animals immediately. Call DVS emergency line now. Do not move animals, vehicles or people between farms. This is a national emergency disease."
         }
       },
       "treatment": {
-        "en": "There is no specific cure for FMD. Treatment is supportive: clean and disinfect sores, provide soft feed and clean water, use anti-inflammatory medication under vet guidance, and keep animals comfortable.",
-        "tn": "Ga go na kalafi e e rileng ya bolwetsi jwa Tlhako le Molomo. Kalafi ke ya go thusa: phepafatsa dintho, fa leruo dijo tse di boleta le metsi a a phepa, dirisa meriana ya go fokotsa go baba go tswa mo kaelong ya ngaka ya leruo, abo o lesa leruo le ikhusa.",
-        "sw": "Hakuna tiba mahususi ya FMD. Matibabu ni ya kusaidia tu: safisha na disinfekti vidonda, toa chakula laini na maji safi, tumia dawa za kupunguza uvimbe kwa mwongozo wa daktari wa mifugo, na hakikisha mnyama yuko vizuri.",
-        "pt": "Não existe cura específica para a febre aftosa. O tratamento é apenas de suporte: limpe e desinfecte as feridas, forneça alimento macio e água limpa, use medicação anti-inflamatória sob orientação veterinária, e mantenha o animal confortável."
+        "en": "There is no specific cure for FMD. Treatment is supportive: clean and disinfect sores, provide soft feed and clean water, use anti-inflammatory medication under vet guidance, and keep animals comfortable."
       },
       "prevention": {
-        "en": "Vaccinate all susceptible animals annually. Restrict movement of animals, people and vehicles. Maintain strict biosecurity. Report any suspicious cases immediately to DVS.",
-        "tn": "Ha leruo mokento ngwaga le ngwaga. Thibelela go tsamaisa leruo, batho le dikoloi. Boloka tshireletso e e tiileng ya botshelo. Bega matsatsa otlhe a a belaelwang ka bonako ko DVS.",
-        "sw": "Chanja wanyama wote walio katika hatari kila mwaka. Punguza usafiri wa wanyama, watu na magari. Dumisha usalama wa kibiolojia mkali. Ripoti visa vyovyote vya tuhuma mara moja kwa DVS.",
-        "pt": "Vacine anualmente todos os animais susceptíveis. Restrinja a circulação de animais, pessoas e veículos. Mantenha uma biossegurança rigorosa. Reporte imediatamente quaisquer casos suspeitos aos Serviços Veterinários."
+        "en": "Vaccinate all susceptible animals annually. Restrict movement of animals, people and vehicles. Maintain strict biosecurity. Report any suspicious cases immediately to DVS."
       },
       "when_to_call_vet": {
-        "en": "Call a vet or DVS IMMEDIATELY. FMD is a notifiable disease. Do not wait.",
-        "tn": "Leletsa ngaka ya leruo kgotsa DVS KA BONAKO. Bolwetsi jwa tlhako le molomo ke bolwetsi jo bo begiwang. Se eme.",
-        "sw": "Mpigie daktari wa mifugo au DVS MARA MOJA. FMD ni ugonjwa unaopaswa kuripotiwa. Usisubiri.",
-        "pt": "Ligue para um veterinário ou para os Serviços Veterinários IMEDIATAMENTE. A febre aftosa é uma doença de declaração obrigatória. Não espere."
+        "en": "Call a vet or DVS IMMEDIATELY. FMD is a notifiable disease. Do not wait."
       }
     },
-
     "lumpy cow disease": {
       "display_name": {
-        "en": "Lumpy Skin Disease",
-        "tn": "Bolwetsi jwa Ditshwepe tsa Letlalo",
-        "sw": "Ugonjwa wa Uvimbe wa Ngozi ya Ng'ombe",
-        "pt": "Dermatose Nodular Contagiosa"
+        "en": "Lumpy Skin Disease"
       },
       "risk_level": "medium",
       "affects": {
-        "en": "Cattle",
-        "tn": "Dikgomo",
-        "sw": "Ng'ombe",
-        "pt": "Bovinos"
+        "en": "Cattle"
       },
       "spreads_by": {
-        "en": "Insect bites (mosquitoes, flies, ticks), direct contact",
-        "tn": "Go lomiwa ke diphologotswana (menang, dintsi, dikgaka), kopano e tshwanang",
-        "sw": "Kuumwa na wadudu (mbu, nzi, kupe), mawasiliano ya moja kwa moja",
-        "pt": "Picadas de insectos (mosquitos, moscas, carraças), contacto directo"
+        "en": "Insect bites (mosquitoes, flies, ticks), direct contact"
       },
       "visual_symptoms": {
-        "en": "Raised circular skin nodules 2-5cm across the entire body. Nodules may weep fluid. Swollen lymph nodes visible on neck and legs.",
-        "tn": "Ditshwepe tse di phahamileng tsa go bopama tsa 2-5cm mo mmeleng wotlhe. Ditshwepe di ka tsholola metsi. Maotwana a a rulagantsweng a bonala mo molaleng le maotong.",
-        "sw": "Vinundu vya ngozi vyenye mviringo vyenye ukubwa wa sm 2-5 mwilini mzima. Vinundu vinaweza kutoa majimaji. Tezi za limfu zilizovimba zinaonekana shingoni na miguuni.",
-        "pt": "Nódulos cutâneos circulares elevados de 2-5cm em todo o corpo. Os nódulos podem libertar líquido. Gânglios linfáticos inchados visíveis no pescoço e nas pernas."
+        "en": "Raised circular skin nodules 2-5cm across the entire body. Nodules may weep fluid. Swollen lymph nodes visible on neck and legs."
       },
       "behavioral_questions": [
         {
           "id": "fever",
           "question": {
-            "en": "Does the animal feel hot to touch or appear feverish?",
-            "tn": "A leruo le utlwala le hisa kgotsa le bonala le na le gotetse?",
-            "sw": "Je, mnyama anahisi joto akiguswa au anaonekana kuwa na homa?",
-            "pt": "O animal está quente ao toque ou parece ter febre?"
+            "en": "Does the animal feel hot to touch or appear feverish?"
           },
           "options": {
-            "en": ["No fever signs", "Slightly warm", "Clearly feverish and lethargic"],
-            "tn": ["Ga go na matshwao a kgotelo", "Go gotela go le gonye", "Go gotela mo go bonala le go lapa"],
-            "sw": ["Hakuna dalili za homa", "Joto kidogo", "Ana homa wazi na uchovu"],
-            "pt": ["Sem sinais de febre", "Ligeiramente quente", "Claramente febril e letárgico"]
+            "en": [
+              "No fever signs",
+              "Slightly warm",
+              "Clearly feverish and lethargic"
+            ]
           },
           "weights": {
             "No fever signs": 0,
@@ -224,16 +170,14 @@
         {
           "id": "milk",
           "question": {
-            "en": "Has milk production dropped significantly?",
-            "tn": "A go bonala ha leruo le fokoditse go dira mashi?",
-            "sw": "Je, uzalishaji wa maziwa umepungua kwa kiasi kikubwa?",
-            "pt": "A produção de leite diminuiu significativamente?"
+            "en": "Has milk production dropped significantly?"
           },
           "options": {
-            "en": ["No change", "Slight reduction", "Significant drop or stopped completely"],
-            "tn": ["Ga go a fetoge sepe", "Go fokotsegilwe go le gonye", "Go fokotsegile thata kgotsa go emisitswe gotlhe"],
-            "sw": ["Hakuna mabadiliko", "Upunguzaji kidogo", "Upungufu mkubwa au umesimama kabisa"],
-            "pt": ["Sem alteração", "Ligeira redução", "Queda significativa ou parou completamente"]
+            "en": [
+              "No change",
+              "Slight reduction",
+              "Significant drop or stopped completely"
+            ]
           },
           "weights": {
             "No change": 0,
@@ -244,16 +188,14 @@
         {
           "id": "nodules_spread",
           "question": {
-            "en": "Where are the nodules located?",
-            "tn": "Ditshwepe di tswa ha kae?",
-            "sw": "Vinundu viko wapi?",
-            "pt": "Onde estão localizados os nódulos?"
+            "en": "Where are the nodules located?"
           },
           "options": {
-            "en": ["One area only", "Several areas on the body", "All over the body including face and legs"],
-            "tn": ["Mo lefelong le le lengwe", "Mafelo a mmalwa mo mmeleng", "Mo mmeleng otlhe go akaretsa sefahlego le maoto"],
-            "sw": ["Eneo moja tu", "Maeneo kadhaa mwilini", "Mwili mzima ikiwa ni pamoja na uso na miguu"],
-            "pt": ["Apenas uma área", "Várias áreas do corpo", "Por todo o corpo, incluindo cara e pernas"]
+            "en": [
+              "One area only",
+              "Several areas on the body",
+              "All over the body including face and legs"
+            ]
           },
           "weights": {
             "One area only": 0,
@@ -264,16 +206,14 @@
         {
           "id": "insects",
           "question": {
-            "en": "Have you noticed many insects around your animals recently?",
-            "tn": "A o lemogile ditshidi di le dintsi di foka fa gare ga leruo la gago?",
-            "sw": "Je, umegundua wadudu wengi karibu na wanyama wako hivi karibuni?",
-            "pt": "Notou muitos insectos perto dos seus animais recentemente?"
+            "en": "Have you noticed many insects around your animals recently?"
           },
           "options": {
-            "en": ["No unusual insects", "Some insects", "Heavy insect activity"],
-            "tn": ["Ga go na ditshidi tse di sa tlwaelegang", "Ditshidi dingwe", "Ditshidi di le mmalwa"],
-            "sw": ["Hakuna wadudu wasio wa kawaida", "Wadudu kadhaa", "Shughuli kubwa za wadudu"],
-            "pt": ["Sem insectos invulgares", "Alguns insectos", "Forte actividade de insectos"]
+            "en": [
+              "No unusual insects",
+              "Some insects",
+              "Heavy insect activity"
+            ]
           },
           "weights": {
             "No unusual insects": 0,
@@ -289,84 +229,51 @@
       },
       "recommendations": {
         "low": {
-          "en": "Mild nodules detected. Isolate the animal and monitor daily. Apply insect repellent to all animals. Check other cattle for similar nodules. Contact a vet if symptoms worsen within 48 hours.",
-          "tn": "Ditshwepe tse di boleta di a bonagala. Arola leruo mme o lebelele letsatsi le letsatsi. Tshasa leruo molemo yo kobang ditshidi. Lekola dikgomo tse dingwe go bona ditshwepe tse di tshwanang. Ikgolaganya le ngaka ya leruo fa matshwao a bola mo diureng tse 48.",
-          "sw": "Vinundu vidogo vimegunduliwa. Tenga mnyama na ufuatilie kila siku. Paka dawa ya kufukuza wadudu kwa wanyama wote. Angalia ng'ombe wengine kwa vinundu vinavyofanana. Wasiliana na daktari wa mifugo ikiwa dalili zinazidi ndani ya masaa 48.",
-          "pt": "Nódulos ligeiros detectados. Isole o animal e monitorize diariamente. Aplique repelente de insectos a todos os animais. Verifique outros bovinos quanto a nódulos semelhantes. Contacte um veterinário se os sintomas piorarem no prazo de 48 horas."
+          "en": "Mild nodules detected. Isolate the animal and monitor daily. Apply insect repellent to all animals. Check other cattle for similar nodules. Contact a vet if symptoms worsen within 48 hours."
         },
         "medium": {
-          "en": "Multiple nodules with behavioral changes. Isolate immediately. Start supportive care, anti-inflammatory medication, wound care for open nodules, fly control. Contact the vet within 24 hours for diagnosis confirmation and treatment plan.",
-          "tn": "Ditshwepe di le dintsi le diphetogo tsa maitshwaro. Arola leruo ka bonako. Simolola tlhokomelo ya go thusa, tshasa leruo meriana ya go fokotsa go baba, tlhokomelo ya dintho tse di buletsweng, taolo ya ditshidi. Ikgolaganya le ngaka ya leruo mo diureng tse 24 go netefatsa supego le lenaneo la kalafi.",
-          "sw": "Vinundu vingi pamoja na mabadiliko ya tabia. Tenga mara moja. Anza huduma ya kusaidia, dawa za kupunguza uvimbe, utunzaji wa vidonda vilivyo wazi, udhibiti wa nzi. Wasiliana na daktari wa mifugo ndani ya masaa 24 kuthibitisha uchunguzi na mpango wa matibabu.",
-          "pt": "Múltiplos nódulos com alterações comportamentais. Isole imediatamente. Inicie cuidados de suporte, medicação anti-inflamatória, tratamento de feridas para nódulos abertos, controlo de moscas. Contacte o veterinário no prazo de 24 horas para confirmação do diagnóstico e plano de tratamento."
+          "en": "Multiple nodules with behavioral changes. Isolate immediately. Start supportive care, anti-inflammatory medication, wound care for open nodules, fly control. Contact the vet within 24 hours for diagnosis confirmation and treatment plan."
         },
         "high": {
-          "en": "Severe Lumpy Skin Disease presentation. Immediate vet consultation required. Isolate all affected animals. Begin aggressive insect control across the farm. Vaccinate unaffected animals. Document and photograph all cases.",
-          "tn": "Bontsha jwa Bolwetsi jwa Ditshwepe jwa go tlhoka. Go hlokafalela ga go bua le ngaka ka bonako. Arola leruo lotlhe le le amegileng. Simolola taolo ya ditshidi mo tshimong yotlhe. Kenta leruo le le sa amegang ka molemo wa bolwetsi jo. Kwala mme o tsaaye ditshwantsho tsa matsatsa otlhe.",
-          "sw": "Dalili kali za Ugonjwa wa Uvimbe wa Ngozi. Mashauriano ya haraka ya daktari wa mifugo yanahitajika. Tenga wanyama wote walioathirika. Anza udhibiti mkali wa wadudu shambani kote. Chanja wanyama wasioathirika. Andika na piga picha visa vyote.",
-          "pt": "Apresentação grave de Dermatose Nodular Contagiosa. É necessária consulta veterinária imediata. Isole todos os animais afectados. Inicie controlo agressivo de insectos em toda a quinta. Vacine os animais não afectados. Documente e fotografe todos os casos."
+          "en": "Severe Lumpy Skin Disease presentation. Immediate vet consultation required. Isolate all affected animals. Begin aggressive insect control across the farm. Vaccinate unaffected animals. Document and photograph all cases."
         }
       },
       "treatment": {
-        "en": "No specific antiviral treatment exists. Supportive care includes: anti-inflammatory drugs, antibiotics to prevent secondary infections, wound dressing for open nodules, and good nutrition. Insect control is critical to prevent spread.",
-        "tn": "Ga go na kalafi e e rileng ya antiviral. Tlhokomelo ya go thusa e akaretsa: meriana ya go fokotsa go baba, dikhemikhale tsa bolwetsi go thibela dikgwaetso tsa bobedi, go apesa dintho tse di buletsweng, le dijo tse di siameng. Taolo ya ditshidi ke ya botlhokwa go thibela go anamela.",
-        "sw": "Hakuna matibabu mahususi ya antiviral. Huduma ya kusaidia inajumuisha: dawa za kupunguza uvimbe, antibiotiki kuzuia maambukizi ya pili, kuvaa vidonda vilivyo wazi, na lishe bora. Udhibiti wa wadudu ni muhimu sana kuzuia kuenea.",
-        "pt": "Não existe tratamento antiviral específico. Os cuidados de suporte incluem: medicamentos anti-inflamatórios, antibióticos para prevenir infecções secundárias, tratamento de feridas para nódulos abertos, e boa nutrição. O controlo de insectos é fundamental para prevenir a propagação."
+        "en": "No specific antiviral treatment exists. Supportive care includes: anti-inflammatory drugs, antibiotics to prevent secondary infections, wound dressing for open nodules, and good nutrition. Insect control is critical to prevent spread."
       },
       "prevention": {
-        "en": "Annual vaccination with registered LSD vaccine. Maintain insect control programs. Quarantine new animals for 28 days. Avoid moving animals during outbreaks.",
-        "tn": "Kenta leruo ka mokento wa LSD yo kwadisitswengya ngwaga le ngwaga. Boloka mananeo a taolo ya ditshidi. Arola leruo le le sha malatsi a 28.Ikgaphe mo go tsamaiseng leruo ha gare ga malwetsi.",
-        "sw": "Chanjo ya kila mwaka na chanjo iliyosajiliwa ya LSD. Dumisha mipango ya udhibiti wa wadudu. Tenga wanyama wapya kwa siku 28. Epuka kusogeza wanyama wakati wa milipuko.",
-        "pt": "Vacinação anual com vacina registada para a DNC. Mantenha programas de controlo de insectos. Coloque os novos animais em quarentena durante 28 dias. Evite mover animais durante surtos."
+        "en": "Annual vaccination with registered LSD vaccine. Maintain insect control programs. Quarantine new animals for 28 days. Avoid moving animals during outbreaks."
       },
       "when_to_call_vet": {
-        "en": "Contact a vet within 24 hours. Call immediately if the animal stops eating, develops severe fever, or nodules open and become infected.",
-        "tn": "Ikgolaganya le ngaka mo diureng tse 24. Leletsa ba bonako fa leruo le emisa go ja, o bona kgotelo e masisi, kgotsa ditshwepe di bula mme di konaletsiwa.",
-        "sw": "Wasiliana na daktari wa mifugo ndani ya masaa 24. Piga simu mara moja ikiwa mnyama ataacha kula, atapata homa kali, au vinundu vitafunguka na kuambukizwa.",
-        "pt": "Contacte um veterinário no prazo de 24 horas. Ligue imediatamente se o animal deixar de comer, desenvolver febre grave, ou se os nódulos abrirem e ficarem infectados."
+        "en": "Contact a vet within 24 hours. Call immediately if the animal stops eating, develops severe fever, or nodules open and become infected."
       }
     },
-
     "goat pox": {
       "display_name": {
-        "en": "Goat Pox",
-        "tn": "Lerwalwa la Dipodi",
-        "sw": "Ndui ya Mbuzi",
-        "pt": "Varíola Caprina"
+        "en": "Goat Pox"
       },
       "risk_level": "medium",
       "affects": {
-        "en": "Goats, sheep",
-        "tn": "Dipodi, dinku",
-        "sw": "Mbuzi, kondoo",
-        "pt": "Caprinos, ovinos"
+        "en": "Goats, sheep"
       },
       "spreads_by": {
-        "en": "Direct contact, respiratory secretions, contaminated equipment",
-        "tn": "Kopano e tshwanang, ditshengwa tsa go hema, dithulaganyo tse di konaletsweng",
-        "sw": "Mawasiliano ya moja kwa moja, majimaji ya kupumua, vifaa vilivyochafuliwa",
-        "pt": "Contacto directo, secreções respiratórias, equipamento contaminado"
+        "en": "Direct contact, respiratory secretions, contaminated equipment"
       },
       "visual_symptoms": {
-        "en": "Raised skin lesions on hairless areas; inside ears, groin, armpits, around eyes and mouth. Lesions progress from raised red spots to vesicles to crusted scabs.",
-        "tn": "Dintho tse di phahamileng tsa letlalo mo mafelong a se nang boya; ka fa teng ga ditsebe, fa fatshe ga mpa, fa fa tlase ga maphago, gaufi le matlho le molomo. Dintho di nna go tswa mo dintsheng tse di mfwifi tse di phahamileng go ya mo mabutswing go ya mo dikometeng.",
-        "sw": "Vidonda vya ngozi vilivyoinuka kwenye maeneo yasiyo na manyoya; ndani ya masikio, kinena, kwapani, karibu na macho na mdomo. Vidonda hubadilika kutoka madoa mekundu yaliyoinuka hadi malengelenge hadi kaa ngumu.",
-        "pt": "Lesões cutâneas elevadas em zonas sem pêlo; dentro das orelhas, virilha, axilas, à volta dos olhos e da boca. As lesões evoluem de manchas vermelhas elevadas para vesículas e depois para crostas."
+        "en": "Raised skin lesions on hairless areas; inside ears, groin, armpits, around eyes and mouth. Lesions progress from raised red spots to vesicles to crusted scabs."
       },
       "behavioral_questions": [
         {
           "id": "breathing",
           "question": {
-            "en": "Is the animal having difficulty breathing or showing nasal discharge?",
-            "tn": "A phoofolo e na le bothata jwa go hema kgotsa e bontsha go ntsha mo nokeng?",
-            "sw": "Je, mnyama ana shida ya kupumua au anatoa majimaji puani?",
-            "pt": "O animal está com dificuldade em respirar ou apresenta corrimento nasal?"
+            "en": "Is the animal having difficulty breathing or showing nasal discharge?"
           },
           "options": {
-            "en": ["Breathing normally", "Some nasal discharge", "Laboured breathing or heavy discharge"],
-            "tn": ["E hema ka tshwano", "Go ntsha go ne go ne mo nokeng", "Go hema ka thata kgotsa go ntsha go gontsi"],
-            "sw": ["Anapumua kawaida", "Majimaji kidogo puani", "Kupumua kwa shida au majimaji mengi"],
-            "pt": ["A respirar normalmente", "Algum corrimento nasal", "Respiração difícil ou corrimento abundante"]
+            "en": [
+              "Breathing normally",
+              "Some nasal discharge",
+              "Laboured breathing or heavy discharge"
+            ]
           },
           "weights": {
             "Breathing normally": 0,
@@ -377,16 +284,14 @@
         {
           "id": "lesion_stage",
           "question": {
-            "en": "What do the skin lesions look like?",
-            "tn": "Dintho tsa letlalo di bonala jang?",
-            "sw": "Vidonda vya ngozi vinaonekanaje?",
-            "pt": "Como são as lesões cutâneas?"
+            "en": "What do the skin lesions look like?"
           },
           "options": {
-            "en": ["Raised red spots only", "Fluid-filled blisters", "Crusted scabs or open sores"],
-            "tn": ["Fela dintsi tse di mfwifi tse di phahamileng", "Mabutswi a a tletseng metsi", "Dikome tse di agilweng kgotsa dintho tse di buletsweng"],
-            "sw": ["Madoa mekundu yaliyoinuka tu", "Malengelenge yenye majimaji", "Kaa ngumu au vidonda vilivyo wazi"],
-            "pt": ["Apenas manchas vermelhas elevadas", "Bolhas cheias de líquido", "Crostas ou feridas abertas"]
+            "en": [
+              "Raised red spots only",
+              "Fluid-filled blisters",
+              "Crusted scabs or open sores"
+            ]
           },
           "weights": {
             "Raised red spots only": 0,
@@ -397,16 +302,14 @@
         {
           "id": "new_animals",
           "question": {
-            "en": "Have any new animals been introduced to the herd recently?",
-            "tn": "A go na le diphoofolo tse di tshang tse di tsenngwang mo lolelong moragonyana?",
-            "sw": "Je, kuna wanyama wapya walioletwa kwenye kundi hivi karibuni?",
-            "pt": "Foram introduzidos animais novos no rebanho recentemente?"
+            "en": "Have any new animals been introduced to the herd recently?"
           },
           "options": {
-            "en": ["No new animals", "Yes, within the last 2 weeks", "Yes, within the last month"],
-            "tn": ["Ga go na diphoofolo tse di tshang", "Ee, mo dibikeng tse 2 tse di fetileng", "Ee, mo kgweding e e fetileng"],
-            "sw": ["Hakuna wanyama wapya", "Ndiyo, ndani ya wiki 2 zilizopita", "Ndiyo, ndani ya mwezi mmoja uliopita"],
-            "pt": ["Sem animais novos", "Sim, nas últimas 2 semanas", "Sim, no último mês"]
+            "en": [
+              "No new animals",
+              "Yes, within the last 2 weeks",
+              "Yes, within the last month"
+            ]
           },
           "weights": {
             "No new animals": 0,
@@ -422,134 +325,94 @@
       },
       "recommendations": {
         "low": {
-          "en": "Early stage lesions. Isolate the affected animal. Monitor other goats closely. Ensure clean housing and reduce stress on animals.",
-          "tn": "Dintho tsa seemo sa ntlha. Arola phoofolo e e amegeng. Lebelela dipodi tse dingwe ka kelotlhoko. Netefatsa madulo a a hlwekisitsweng le go fokotsa kgateletso mo diphoofolo.",
-          "sw": "Vidonda vya hatua ya awali. Tenga mnyama aliyeathirika. Fuatilia mbuzi wengine kwa karibu. Hakikisha makazi safi na punguza msongo wa mawazo kwa wanyama.",
-          "pt": "Lesões em fase inicial. Isole o animal afectado. Monitorize os outros caprinos de perto. Garanta alojamento limpo e reduza o stress nos animais."
+          "en": "Early stage lesions. Isolate the affected animal. Monitor other goats closely. Ensure clean housing and reduce stress on animals."
         },
         "medium": {
-          "en": "Active Goat Pox infection. Isolate all affected animals. Contact a vet for antiviral treatment and to vaccinate healthy animals. Disinfect housing and equipment. Restrict movement of animals.",
-          "tn": "Tshwaetso e e tshwereng ya Lerwalwa la Dipodi. Arola diphoofolo tsotlhe tse di amegeng. Ikgolaganya le ngaka ya diphoofolo go bona kalafi ya antiviral le go enta diphoofolo tse di itekanetse. Tshidisa madulo le dithulaganyo. Thibelela go tsamaisa diphoofolo.",
-          "sw": "Maambukizi hai ya Ndui ya Mbuzi. Tenga wanyama wote walioathirika. Wasiliana na daktari wa mifugo kwa matibabu ya antiviral na kuchanja wanyama wenye afya. Disinfekti makazi na vifaa. Punguza usafiri wa wanyama.",
-          "pt": "Infecção activa de Varíola Caprina. Isole todos os animais afectados. Contacte um veterinário para tratamento antiviral e para vacinar os animais saudáveis. Desinfecte o alojamento e o equipamento. Restrinja a circulação de animais."
+          "en": "Active Goat Pox infection. Isolate all affected animals. Contact a vet for antiviral treatment and to vaccinate healthy animals. Disinfect housing and equipment. Restrict movement of animals."
         },
         "high": {
-          "en": "Severe Goat Pox outbreak. Emergency vet consultation needed. Isolate entire herd from outside contact. Begin vaccination of unaffected animals immediately. Notify local veterinary authorities.",
-          "tn": "Maaka a masisi a Lerwalwa la Dipodi. Go hlokafalela ga go bua le ngaka ya diphoofolo ka tshoganyetso. Arola lolelo lotlhe go tswa mo kopanong ya kwa ntle. Simolola entiwa ya diphoofolo tse di sa amegwang ka bonako. Begela balaodi ba diphoofolo ba lefelo.",
-          "sw": "Mlipuko mkali wa Ndui ya Mbuzi. Mashauriano ya dharura ya daktari wa mifugo yanahitajika. Tenga kundi lote kutoka kwa mawasiliano ya nje. Anza chanjo ya wanyama wasioathirika mara moja. Arifu mamlaka za mifugo za eneo.",
-          "pt": "Surto grave de Varíola Caprina. É necessária consulta veterinária de emergência. Isole todo o rebanho de contacto externo. Inicie imediatamente a vacinação dos animais não afectados. Notifique as autoridades veterinárias locais."
+          "en": "Severe Goat Pox outbreak. Emergency vet consultation needed. Isolate entire herd from outside contact. Begin vaccination of unaffected animals immediately. Notify local veterinary authorities."
         }
       },
       "treatment": {
-        "en": "Supportive treatment only. Antiviral drugs may be prescribed by a vet. Clean and disinfect lesions daily. Provide good nutrition and clean water. Separate young animals from adults as kids are more vulnerable.",
-        "tn": "Kalafi ya go thusa fela. Meriana ya antiviral e ka laelwa ke ngaka ya diphoofolo. Hlwekisa mme o tshidise dintho letsatsi le letsatsi. Fa dijo tse di siameng le metsi a a hlwekisitsweng. Arola diphokojwe go tswa go bagolo fa diphokojwe di na le kotsing e ntsi.",
-        "sw": "Matibabu ya kusaidia tu. Dawa za antiviral zinaweza kuagizwa na daktari wa mifugo. Safisha na disinfekti vidonda kila siku. Toa lishe bora na maji safi. Tenganisha wanyama wachanga kutoka kwa wakubwa kwani wachanga wako katika hatari zaidi.",
-        "pt": "Apenas tratamento de suporte. Os medicamentos antivirais podem ser prescritos por um veterinário. Limpe e desinfecte as lesões diariamente. Forneça boa nutrição e água limpa. Separe os animais jovens dos adultos, pois as crias são mais vulneráveis."
+        "en": "Supportive treatment only. Antiviral drugs may be prescribed by a vet. Clean and disinfect lesions daily. Provide good nutrition and clean water. Separate young animals from adults as kids are more vulnerable."
       },
       "prevention": {
-        "en": "Annual vaccination. Quarantine new animals for at least 3 weeks. Avoid contact with infected herds. Maintain clean housing and reduce overcrowding.",
-        "tn": "Entiwa ya ngwaga le ngwaga. Goga diphoofolo tse di tshang go ya bonnye dibeke tse 3. Efoga kopano le majalo a a lweleng. Boloka madulo a a hlwekisitsweng le go fokotsa go tletlega.",
-        "sw": "Chanjo ya kila mwaka. Tenga wanyama wapya kwa angalau wiki 3. Epuka mawasiliano na makundi yaliyoambukizwa. Dumisha makazi safi na punguza msongamano.",
-        "pt": "Vacinação anual. Coloque os animais novos em quarentena durante pelo menos 3 semanas. Evite o contacto com rebanhos infectados. Mantenha o alojamento limpo e reduza a sobrelotação."
+        "en": "Annual vaccination. Quarantine new animals for at least 3 weeks. Avoid contact with infected herds. Maintain clean housing and reduce overcrowding."
       },
       "when_to_call_vet": {
-        "en": "Contact a vet within 24 hours. Call immediately if breathing difficulties develop or lesions become severely infected.",
-        "tn": "Ikgolaganya le ngaka mo diureng tse 24. Leletsa ka bonako fa go boa bothata jwa go hema kgotsa dintho di konaletsiwa thata.",
-        "sw": "Wasiliana na daktari wa mifugo ndani ya masaa 24. Piga simu mara moja ikiwa shida za kupumua zitatokea au vidonda vitaambukizwa vibaya.",
-        "pt": "Contacte um veterinário no prazo de 24 horas. Ligue imediatamente se surgirem dificuldades respiratórias ou se as lesões ficarem gravemente infectadas."
+        "en": "Contact a vet within 24 hours. Call immediately if breathing difficulties develop or lesions become severely infected."
       }
     },
-
     "healthy": {
       "display_name": {
-        "en": "Healthy Animal",
-        "tn": "Phoofolo e e Itekanetseng",
-        "sw": "Mnyama Mwenye Afya",
-        "pt": "Animal Saudável"
+        "en": "Healthy Animal"
       },
       "risk_level": "none",
-      "affects": { "en": "N/A", "tn": "Ga go amege sepe", "sw": "Haitumiki", "pt": "N/A" },
-      "spreads_by": { "en": "N/A", "tn": "Ga go anamele sepe", "sw": "Haitumiki", "pt": "N/A" },
+      "affects": {
+        "en": "N/A"
+      },
+      "spreads_by": {
+        "en": "N/A"
+      },
       "visual_symptoms": {
-        "en": "No disease symptoms detected. Animal appears healthy.",
-        "tn": "Ga go na matshwao a bolwetsi a bonweng. Leruo le bonagala le itekanetseng.",
-        "sw": "Hakuna dalili za ugonjwa zilizogunduliwa. Mnyama anaonekana mwenye afya.",
-        "pt": "Não foram detectados sintomas de doença. O animal parece saudável."
+        "en": "No disease symptoms detected. Animal appears healthy."
       },
       "behavioral_questions": [],
-      "risk_thresholds": { "low": 0, "medium": 0, "high": 1 },
+      "risk_thresholds": {
+        "low": 0,
+        "medium": 0,
+        "high": 1
+      },
       "recommendations": {
         "low": {
-          "en": "Your animal appears healthy! Provide clean water, balanced nutrition, and regular parasite control (deworming, tick treatment). Keep vaccinations up to date and schedule a routine vet checkup every 6 months.",
-          "tn": "Leruo la gago le bonala le itekanetseng! Le fe metsi a a phepa, dijo tse di kgotlang, le taolo ya boko ka metlha (go ntsha diboko, kalafi ya dikgaka). Boloka diente di ntse di samaela mme o beele tlhatlhobo ya tlwaelo ya ngaka dikgwedi tse 6 le dikgwedi tse 6.",
-          "sw": "Mnyama wako anaonekana mwenye afya! Mpatie maji safi, lishe bora, na udhibiti wa mara kwa mara wa vimelea (kutoa minyoo, matibabu ya kupe). Hakikisha chanjo ziko sasa na panga uchunguzi wa kawaida wa daktari wa mifugo kila miezi 6.",
-          "pt": "O seu animal parece saudável! Forneça água limpa, nutrição equilibrada e controlo regular de parasitas (desparasitação, tratamento de carraças). Mantenha as vacinas actualizadas e agende uma consulta veterinária de rotina a cada 6 meses."
+          "en": "Your animal appears healthy! Provide clean water, balanced nutrition, and regular parasite control (deworming, tick treatment). Keep vaccinations up to date and schedule a routine vet checkup every 6 months."
         },
-        "medium": { "en": "", "tn": "", "sw": "", "pt": "" },
-        "high": { "en": "", "tn": "", "sw": "", "pt": "" }
+        "medium": {
+          "en": ""
+        },
+        "high": {
+          "en": ""
+        }
       },
       "treatment": {
-        "en": "No treatment needed.",
-        "tn": "Ga go hlokafalele kalafi.",
-        "sw": "Hakuna matibabu yanayohitajika.",
-        "pt": "Não é necessário tratamento."
+        "en": "No treatment needed."
       },
       "prevention": {
-        "en": "Maintain regular vaccinations, deworming, tick control, and annual vet checks.",
-        "tn": "Kenta leruo ka melemo ya kganelo ya malwetsi ka metlha, go ntsha diboko, taolo ya dikgaka, le ditlhatlhobo tsa ngaka tsa ngwaga le ngwaga.",
-        "sw": "Dumisha chanjo za mara kwa mara, kutoa minyoo, udhibiti wa kupe, na uchunguzi wa kila mwaka wa daktari wa mifugo.",
-        "pt": "Mantenha vacinações regulares, desparasitação, controlo de carraças e consultas veterinárias anuais."
+        "en": "Maintain regular vaccinations, deworming, tick control, and annual vet checks."
       },
       "when_to_call_vet": {
-        "en": "Schedule a routine checkup every 6 months. Call immediately if you notice sudden changes in behaviour, eating, mobility, or appearance.",
-        "tn": "Beela tlhatlhobo ya metlha dikgwedi tse 6 le dikgwedi tse 6. Leletsa ka bonako fa o lemoga diphetogo tse di bonako mo maitshwarong, go ja, go tsamaya, kgotsa go bonala.",
-        "sw": "Panga uchunguzi wa kawaida kila miezi 6. Piga simu mara moja ikiwa utagundua mabadiliko ya ghafla katika tabia, ulaji, utembeaji, au mwonekano.",
-        "pt": "Agende uma consulta de rotina a cada 6 meses. Ligue imediatamente se notar alterações súbitas no comportamento, alimentação, mobilidade ou aparência."
+        "en": "Schedule a routine checkup every 6 months. Call immediately if you notice sudden changes in behaviour, eating, mobility, or appearance."
       }
     }
   },
-
   "plants": {
     "watermelon mosaic virus": {
       "display_name": {
-        "en": "Watermelon Mosaic Virus",
-        "tn": "Bolwetsi jwa Mosaic jwa Legapu",
-        "sw": "Virusi vya Mosaic ya Tikiti",
-        "pt": "Vírus do Mosaico da Melancia"
+        "en": "Watermelon Mosaic Virus"
       },
       "risk_level": "medium",
       "affects": {
-        "en": "Watermelon, cucumber, squash, pumpkin",
-        "tn": "Melegapu, magaka, mabungu, mapompone",
-        "sw": "Tikiti maji, matango, boga, malenge",
-        "pt": "Melancia, pepino, abóbora, abóbora-menina"
+        "en": "Watermelon, cucumber, squash, pumpkin"
       },
       "spreads_by": {
-        "en": "Aphid insects, infected plant material, grafting tools",
-        "tn": "Dikeledi tsa aphid, dimela tse di konaletsweng, didirisiwa tsa go tlhoma",
-        "sw": "Wadudu aphid, sehemu za mimea zilizoambukizwa, vifaa vya kuunganisha",
-        "pt": "Insectos afídeos, material vegetal infectado, ferramentas de enxertia"
+        "en": "Aphid insects, infected plant material, grafting tools"
       },
       "visual_symptoms": {
-        "en": "Yellow-green mosaic mottling on leaves. Leaf distortion and curling. Fruit with uneven colour, small size or warty surface. Stunted plant growth.",
-        "tn": "Go mmina ga mmala wa botala jo bo sootho-botala mo matlharen. Go phatalogana le go phetologa ga matlhare. Leungo le le nang le mmala o o sa lekalekang, bogolo jo bonnyane kgotsa bogobe mo go jona. Go gola go emeng ga semela.",
-        "sw": "Madoa ya manjano-kijani kama mosaic kwenye majani. Majani yaliyopinda na kujikunja. Tunda lenye rangi isiyo sawa, ukubwa mdogo au uso wenye vinundu. Ukuaji uliodumaa wa mmea.",
-        "pt": "Mosqueado em mosaico amarelo-esverdeado nas folhas. Distorção e enrolamento das folhas. Fruto com cor irregular, tamanho pequeno ou superfície verrugosa. Crescimento atrofiado da planta."
+        "en": "Yellow-green mosaic mottling on leaves. Leaf distortion and curling. Fruit with uneven colour, small size or warty surface. Stunted plant growth."
       },
       "behavioral_questions": [
         {
           "id": "leaf_pattern",
           "question": {
-            "en": "What does the leaf discolouration pattern look like?",
-            "tn": "Setshwantsho sa go fetoga ga mmala wa matlhare se bonala jang?",
-            "sw": "Mfumo wa mabadiliko ya rangi ya majani unaonekanaje?",
-            "pt": "Como é o padrão de descoloração das folhas?"
+            "en": "What does the leaf discolouration pattern look like?"
           },
           "options": {
-            "en": ["Uniform yellowing", "Mosaic/mottled pattern of light and dark green", "Brown or black lesions"],
-            "tn": ["Go ntshwa ga mmala o tshwanang", "Setshwantsho sa mosaic/go mmina ga botala jo bosweu le jo bo fifetseng", "Dintho tse di tshweu kgotsa tse di ntsho"],
-            "sw": ["Manjano sawasawa", "Mfumo wa mosaic/madoa ya kijani kilicho hafifu na kilichokoza", "Vidonda vya hudhurungi au vyeusi"],
-            "pt": ["Amarelecimento uniforme", "Padrão em mosaico de verde claro e escuro", "Lesões castanhas ou pretas"]
+            "en": [
+              "Uniform yellowing",
+              "Mosaic/mottled pattern of light and dark green",
+              "Brown or black lesions"
+            ]
           },
           "weights": {
             "Uniform yellowing": 0,
@@ -560,16 +423,14 @@
         {
           "id": "plant_spread",
           "question": {
-            "en": "How many plants are affected?",
-            "tn": "Dimela di le kae tse di amegeng?",
-            "sw": "Ni mimea mingapi iliyoathirika?",
-            "pt": "Quantas plantas estão afectadas?"
+            "en": "How many plants are affected?"
           },
           "options": {
-            "en": ["Just one plant", "A few plants in one area", "Many plants across the field"],
-            "tn": ["Fela semela se le sengwe", "Dimela di sele mo lefelong le le lengwe", "Dimela di le dintsi mo tshimong yotlhe"],
-            "sw": ["Mmea mmoja tu", "Mimea michache eneo moja", "Mimea mingi katika shamba lote"],
-            "pt": ["Apenas uma planta", "Algumas plantas numa área", "Muitas plantas em todo o campo"]
+            "en": [
+              "Just one plant",
+              "A few plants in one area",
+              "Many plants across the field"
+            ]
           },
           "weights": {
             "Just one plant": 0,
@@ -580,16 +441,14 @@
         {
           "id": "aphids",
           "question": {
-            "en": "Can you see small insects on the underside of leaves?",
-            "tn": "A o ka bona dikeledi tse dinnye mo tlase ga matlhare?",
-            "sw": "Je, unaweza kuona wadudu wadogo chini ya majani?",
-            "pt": "Consegue ver pequenos insectos na parte inferior das folhas?"
+            "en": "Can you see small insects on the underside of leaves?"
           },
           "options": {
-            "en": ["No insects visible", "A few insects", "Heavy infestation of small insects"],
-            "tn": ["Ga go na dikeledi tse di bonalang", "Dikeledi di sele", "Go tlhagela go gontsi ga dikeledi tse dinnye"],
-            "sw": ["Hakuna wadudu wanaoonekana", "Wadudu wachache", "Mashambulizi makubwa ya wadudu wadogo"],
-            "pt": ["Sem insectos visíveis", "Alguns insectos", "Forte infestação de pequenos insectos"]
+            "en": [
+              "No insects visible",
+              "A few insects",
+              "Heavy infestation of small insects"
+            ]
           },
           "weights": {
             "No insects visible": 0,
@@ -600,16 +459,14 @@
         {
           "id": "fruit_quality",
           "question": {
-            "en": "How does the fruit look on affected plants?",
-            "tn": "Leungo le bonala jang mo dimeleng tse di amegeng?",
-            "sw": "Tunda linaonekanaje kwenye mimea iliyoathirika?",
-            "pt": "Como é o aspecto do fruto nas plantas afectadas?"
+            "en": "How does the fruit look on affected plants?"
           },
           "options": {
-            "en": ["No fruit yet", "Fruit looks normal", "Fruit is small, misshapen or has bumpy skin"],
-            "tn": ["Ga go na leungo le legeso", "Leungo le bonala le tlwaelekile", "Leungo le le nnye, le le fetotsegileng kgotsa le na le letlalo le le bogobe"],
-            "sw": ["Hakuna tunda bado", "Tunda linaonekana kawaida", "Tunda ni dogo, lisilo na umbo sahihi au lenye ngozi yenye vinundu"],
-            "pt": ["Ainda sem fruto", "O fruto parece normal", "O fruto é pequeno, deformado ou com a casca irregular"]
+            "en": [
+              "No fruit yet",
+              "Fruit looks normal",
+              "Fruit is small, misshapen or has bumpy skin"
+            ]
           },
           "weights": {
             "No fruit yet": 0,
@@ -625,84 +482,51 @@
       },
       "recommendations": {
         "low": {
-          "en": "Early mosaic virus signs on a few plants. Remove and destroy affected leaves. Apply insecticide to control aphid vectors. Do not work on healthy plants after touching affected ones without washing hands. Monitor other plants daily.",
-          "tn": "Matshwao a ntlha a bolwetsi jwa mosaic mo dimeleng di sele. Tlose mme o senya matlhare a a amegeng. Diriisa setlhare sa go bolaya dikeledi go laola diaflid. O se ka wa dira mo dimeleng tse di itekanetse morago ga go ama tse di amegeng ntle le go tlhapa diatla. Lebelela dimela tse dingwe letsatsi le letsatsi.",
-          "sw": "Dalili za awali za virusi vya mosaic kwenye mimea michache. Ondoa na uharibu majani yaliyoathirika. Paka dawa ya wadudu kudhibiti wabebaji wa aphid. Usishughulikie mimea yenye afya baada ya kugusa iliyoathirika bila kunawa mikono. Fuatilia mimea mingine kila siku.",
-          "pt": "Sinais iniciais do vírus do mosaico em algumas plantas. Remova e destrua as folhas afectadas. Aplique insecticida para controlar os vectores afídeos. Não trabalhe em plantas saudáveis depois de tocar nas afectadas sem lavar as mãos. Monitorize as outras plantas diariamente."
+          "en": "Early mosaic virus signs on a few plants. Remove and destroy affected leaves. Apply insecticide to control aphid vectors. Do not work on healthy plants after touching affected ones without washing hands. Monitor other plants daily."
         },
         "medium": {
-          "en": "Moderate mosaic virus spread. Remove all visibly infected plants and destroy them away from the field. Spray remaining plants with recommended insecticide for aphid control. Do not replant cucurbits in this area this season. Consider reflective mulch to deter aphids.",
-          "tn": "Go anamela ga bolwetsi jwa mosaic jwa bogare. Tlose dimela tsotlhe tse di bonalang di konaletsiwa mme o di senya kwa ntle ga tshimo. Kofa dimela tse di setseng ka setlhare se se kailweng sa go bolaya dikeledi go laola diaflid. O se ka wa jala dimela tse di tshwanang mo lefelong leno dikgwedi tse di latelang. Nayang malwethi a a nyenyang matlhare go thibela diaflid.",
-          "sw": "Kuenea kwa wastani kwa virusi vya mosaic. Ondoa mimea yote iliyoambukizwa wazi na uiharibu mbali na shamba. Nyunyizia mimea iliyobaki dawa ya wadudu inayopendekezwa kudhibiti aphid. Usipande tena matikiti katika eneo hili msimu huu. Fikiria matandazo ya kuakisi kuzuia aphid.",
-          "pt": "Propagação moderada do vírus do mosaico. Remova todas as plantas visivelmente infectadas e destrua-as longe do campo. Pulverize as plantas restantes com insecticida recomendado para controlo de afídeos. Não replante curcubitáceas nesta área esta época. Considere cobertura reflectora para afastar afídeos."
+          "en": "Moderate mosaic virus spread. Remove all visibly infected plants and destroy them away from the field. Spray remaining plants with recommended insecticide for aphid control. Do not replant cucurbits in this area this season. Consider reflective mulch to deter aphids."
         },
         "high": {
-          "en": "Severe outbreak across the field. Remove and burn all infected plants. Do NOT compost them. Apply systemic insecticide. Do not plant cucurbit crops in this field for at least one season. Source virus-resistant varieties for replanting.",
-          "tn": "Maaka a masisi mo tshimong yotlhe. Tlose mme o tshube dimela tsotlhe tse di konaletsweng. O SE ka wa di bea mo dirakeng. Diriisa setlhare sa go bolaya dikeledi sa systemic. O se ka wa jala dibjalo tse di tshwanang mo tshimong eno go ya bonnye go ya go kotulo e e latelang. Batlhela mefuta e e ganang bolwetsi go jala gape.",
-          "sw": "Mlipuko mkali katika shamba lote. Ondoa na uchome mimea yote iliyoambukizwa. USITENGENEZE mboji kutoka kwayo. Paka dawa ya wadudu ya kimfumo. Usipande mazao ya matikiti katika shamba hili kwa angalau msimu mmoja. Tafuta aina zinazostahimili virusi kwa kupanda tena.",
-          "pt": "Surto grave em todo o campo. Remova e queime todas as plantas infectadas. NÃO as compostam. Aplique insecticida sistémico. Não plante culturas de cucurbitáceas neste campo durante pelo menos uma época. Procure variedades resistentes ao vírus para replantação."
+          "en": "Severe outbreak across the field. Remove and burn all infected plants. Do NOT compost them. Apply systemic insecticide. Do not plant cucurbit crops in this field for at least one season. Source virus-resistant varieties for replanting."
         }
       },
       "treatment": {
-        "en": "No cure for viral infections. Management only: remove infected plants, control aphid vectors with insecticide (e.g. imidacloprid, pyrethroids), use reflective mulches, and plant resistant varieties in future seasons.",
-        "tn": "Ga go na kalafi ya tshwaetso ya borokgwe. Taolo fela: tlose dimela tse di konaletsweng, laola diaflid ka setlhare sa go bolaya dikeledi (e.g. imidacloprid, pyrethroids), diriisa malwethi a a nyenyang matlhare, le go jala mefuta e e ganang bolwetsi mo dikgweding tse di latelang.",
-        "sw": "Hakuna tiba ya maambukizi ya virusi. Usimamizi tu: ondoa mimea iliyoambukizwa, dhibiti wabebaji wa aphid kwa dawa ya wadudu (mf. imidacloprid, pyrethroids), tumia matandazo ya kuakisi, na panda aina zinazostahimili katika misimu ijayo.",
-        "pt": "Não existe cura para infecções virais. Apenas gestão: remova as plantas infectadas, controle os vectores afídeos com insecticida (ex: imidaclopride, piretróides), use coberturas reflectoras, e plante variedades resistentes nas épocas futuras."
+        "en": "No cure for viral infections. Management only: remove infected plants, control aphid vectors with insecticide (e.g. imidacloprid, pyrethroids), use reflective mulches, and plant resistant varieties in future seasons."
       },
       "prevention": {
-        "en": "Plant virus-resistant varieties. Use reflective silver mulch to confuse aphids. Apply preventive insecticides. Remove and destroy weeds around the field. Avoid planting near infected cucurbit fields.",
-        "tn": "Jala mefuta e e ganang bolwetsi. Diriisa malwethi a selefera a a nyenyang matlhare go dida diaflid. Diriisa dikhemikele tsa thibelo. Tlose mme o senya magora gaufi le tshimo. Efoga go jala gaufi le mafelo a tshimo a a konaletsweng.",
-        "sw": "Panda aina zinazostahimili virusi. Tumia matandazo ya fedha ya kuakisi kuwachanganya aphid. Paka dawa za kuzuia wadudu. Ondoa na uharibu magugu karibu na shamba. Epuka kupanda karibu na mashamba ya matikiti yaliyoambukizwa.",
-        "pt": "Plante variedades resistentes ao vírus. Use cobertura reflectora prateada para confundir os afídeos. Aplique insecticidas preventivos. Remova e destrua as ervas daninhas à volta do campo. Evite plantar perto de campos de cucurbitáceas infectados."
+        "en": "Plant virus-resistant varieties. Use reflective silver mulch to confuse aphids. Apply preventive insecticides. Remove and destroy weeds around the field. Avoid planting near infected cucurbit fields."
       },
       "when_to_call_vet": {
-        "en": "Consult an agricultural extension officer if more than 20% of your crop is affected, or if you need help identifying the correct insecticide.",
-        "tn": "Bua le mokwaledi wa temo fa go feta 20% ya dibjalo tsa gago di amegile, kgotsa fa o tlhoka thuso go tlhagisa setlhare se se nepileng sa go bolaya dikeledi.",
-        "sw": "Wasiliana na afisa ugani wa kilimo ikiwa zaidi ya 20% ya mazao yako yameathirika, au ikiwa unahitaji msaada kutambua dawa sahihi ya wadudu.",
-        "pt": "Consulte um técnico de extensão agrícola se mais de 20% da sua cultura estiver afectada, ou se precisar de ajuda para identificar o insecticida correcto."
+        "en": "Consult an agricultural extension officer if more than 20% of your crop is affected, or if you need help identifying the correct insecticide."
       }
     },
-
     "sorghum cereal grain mold": {
       "display_name": {
-        "en": "Sorghum Grain Mould",
-        "tn": "Bolwetsi jwa Mooko wa Mabele a Sorghum",
-        "sw": "Ukungu wa Nafaka ya Mtama",
-        "pt": "Bolor do Grão de Sorgo"
+        "en": "Sorghum Grain Mould"
       },
       "risk_level": "medium",
       "affects": {
-        "en": "Sorghum",
-        "tn": "Mabele a sorghum",
-        "sw": "Mtama",
-        "pt": "Sorgo"
+        "en": "Sorghum"
       },
       "spreads_by": {
-        "en": "Fungal spores carried by wind and rain, insect damage to grain creates entry points",
-        "tn": "Dipora tsa obomela tse di isiswang ke mowa le pula, go gobala ga lebese ke dikeledi go tlhoma mafelo a a tsenang",
-        "sw": "Spora za fangasi zinazobebwa na upepo na mvua, uharibifu wa wadudu kwenye nafaka huunda njia za kuingia",
-        "pt": "Esporos fúngicos transportados pelo vento e pela chuva, danos causados por insectos no grão criam pontos de entrada"
+        "en": "Fungal spores carried by wind and rain, insect damage to grain creates entry points"
       },
       "visual_symptoms": {
-        "en": "Pink, red, grey or black discolouration on grain heads. Shrivelled or discoloured individual grain kernels. White or grey fungal growth visible between grain kernels.",
-        "tn": "Go mmina ga mmala wa boshibidu, bohibidu, botlhoki kgotsa boso mo dihlohlong tsa lebese. Lebese le le kgontshitsweng kgotsa le le fetotsegileng mmala. Go gola ga obomela o o tshweu kgotsa o o botlhoki o o bonalang gare ga dikone tsa lebese.",
-        "sw": "Mabadiliko ya rangi ya waridi, mekundu, kijivu au meusi kwenye vichwa vya nafaka. Punje za nafaka zilizokunjamana au kubadilika rangi. Ukuaji wa fangasi mweupe au kijivu unaoonekana kati ya punje za nafaka.",
-        "pt": "Descoloração rosa, vermelha, cinzenta ou preta nas espigas de grão. Grãos individuais encarquilhados ou descolorados. Crescimento fúngico branco ou cinzento visível entre os grãos."
+        "en": "Pink, red, grey or black discolouration on grain heads. Shrivelled or discoloured individual grain kernels. White or grey fungal growth visible between grain kernels."
       },
       "behavioral_questions": [
         {
           "id": "weather",
           "question": {
-            "en": "What has the weather been like during grain filling and maturity?",
-            "tn": "Bosa bo ne jang nakong ya go tlala le go gola ga lebese?",
-            "sw": "Hali ya hewa ilikuwaje wakati wa kujaza na kukomaa kwa nafaka?",
-            "pt": "Como tem estado o tempo durante o enchimento e a maturação do grão?"
+            "en": "What has the weather been like during grain filling and maturity?"
           },
           "options": {
-            "en": ["Dry and sunny", "Some rain during grain fill", "Frequent rain and high humidity"],
-            "tn": ["Go oma le letsatsi", "Pula e sele nakong ya go tlala ga lebese", "Pula e gantsi le bomolelo jo bogolo"],
-            "sw": ["Kavu na yenye jua", "Mvua kidogo wakati wa kujaza nafaka", "Mvua za mara kwa mara na unyevu mwingi"],
-            "pt": ["Seco e ensolarado", "Alguma chuva durante o enchimento do grão", "Chuva frequente e humidade elevada"]
+            "en": [
+              "Dry and sunny",
+              "Some rain during grain fill",
+              "Frequent rain and high humidity"
+            ]
           },
           "weights": {
             "Dry and sunny": 0,
@@ -713,16 +537,14 @@
         {
           "id": "mold_coverage",
           "question": {
-            "en": "How much of the grain head is affected?",
-            "tn": "Kae ga hlogo ya lebese e amegile?",
-            "sw": "Ni kiasi gani cha kichwa cha nafaka kilichoathirika?",
-            "pt": "Que parte da espiga de grão está afectada?"
+            "en": "How much of the grain head is affected?"
           },
           "options": {
-            "en": ["Less than 25%", "25-50% affected", "More than 50% affected"],
-            "tn": ["Ka fa tlase ga 25%", "25-50% e amegile", "Go feta 50% e amegile"],
-            "sw": ["Chini ya 25%", "25-50% imeathirika", "Zaidi ya 50% imeathirika"],
-            "pt": ["Menos de 25%", "25-50% afectado", "Mais de 50% afectado"]
+            "en": [
+              "Less than 25%",
+              "25-50% affected",
+              "More than 50% affected"
+            ]
           },
           "weights": {
             "Less than 25%": 0.1,
@@ -733,16 +555,14 @@
         {
           "id": "harvest_timing",
           "question": {
-            "en": "Is the crop ready for harvest or past maturity?",
-            "tn": "A dibjalo di sesiwa go kotulwa kgotsa di feta bogolo?",
-            "sw": "Je, zao liko tayari kwa mavuno au limepita ukomavu?",
-            "pt": "A cultura está pronta para a colheita ou já passou da maturação?"
+            "en": "Is the crop ready for harvest or past maturity?"
           },
           "options": {
-            "en": ["Still 2-4 weeks from harvest", "Ready to harvest now", "Past optimal harvest time"],
-            "tn": ["Di sale dibeke tse 2-4 go fitlha go kotulo", "Di sesiwa go kotulwa jaanong", "Di feta nako e e siameng ya kotulo"],
-            "sw": ["Bado wiki 2-4 hadi mavuno", "Tayari kuvuna sasa", "Imepita wakati bora wa mavuno"],
-            "pt": ["Ainda 2-4 semanas até à colheita", "Pronto para colher agora", "Já passou do tempo ideal de colheita"]
+            "en": [
+              "Still 2-4 weeks from harvest",
+              "Ready to harvest now",
+              "Past optimal harvest time"
+            ]
           },
           "weights": {
             "Still 2-4 weeks from harvest": 0.1,
@@ -758,84 +578,51 @@
       },
       "recommendations": {
         "low": {
-          "en": "Early mould signs detected. If close to harvest, harvest early to prevent spread. Ensure good air circulation around grain heads. Apply fungicide if crop is still weeks from harvest and conditions remain wet.",
-          "tn": "Matshwao a ntlha a mooko a bonwe. Fa go le gaufi le kotulo, kotula pele go thibela go anamela. Netefatsa go gololosega ga mowa o o siameng gaufi le dihlohlong tsa lebese. Diriisa setlhare sa obomela fa dibjalo di sale dibeke go fitlha go kotulo mme maemo a ntse a na le metsi.",
-          "sw": "Dalili za awali za ukungu zimegunduliwa. Ikiwa karibu na mavuno, vuna mapema kuzuia kuenea. Hakikisha mzunguko mzuri wa hewa karibu na vichwa vya nafaka. Paka dawa ya fangasi ikiwa zao bado liko wiki kadhaa kabla ya mavuno na hali zinaendelea kuwa na unyevu.",
-          "pt": "Sinais iniciais de bolor detectados. Se estiver perto da colheita, colha cedo para evitar a propagação. Garanta boa circulação de ar à volta das espigas. Aplique fungicida se a cultura ainda estiver a semanas da colheita e as condições continuarem húmidas."
+          "en": "Early mould signs detected. If close to harvest, harvest early to prevent spread. Ensure good air circulation around grain heads. Apply fungicide if crop is still weeks from harvest and conditions remain wet."
         },
         "medium": {
-          "en": "Moderate grain mould. Harvest as soon as possible — do not wait. Dry harvested grain immediately to below 13% moisture. Separate mouldy grain from healthy grain. Do not feed heavily moulded grain to animals as mycotoxins can be harmful.",
-          "tn": "Mooko wa lebese wa bogare. Kotula ka bonako kamoka — se letele. Omisa lebese le le kotulwang ka bonako go ya ka fa tlase ga 13% ya metsi. Arola lebese le le konaletsweng ke mooko go tswa go lebese le le itekanetse. O se ka wa fepa diphoofolo lebese le le konaletsweng thata ke mooko fa mycotoxins e ka nna ya kotsi.",
-          "sw": "Ukungu wa wastani wa nafaka. Vuna haraka iwezekanavyo — usisubiri. Kausha nafaka iliyovunwa mara moja hadi chini ya unyevu wa 13%. Tenganisha nafaka yenye ukungu kutoka kwa nafaka yenye afya. Usilishe wanyama nafaka yenye ukungu mwingi kwani mycotoxins zinaweza kuwa hatari.",
-          "pt": "Bolor moderado no grão. Colha o mais rapidamente possível — não espere. Seque imediatamente o grão colhido para abaixo de 13% de humidade. Separe o grão bolorento do grão saudável. Não dê grão muito bolorento aos animais, pois as micotoxinas podem ser prejudiciais."
+          "en": "Moderate grain mould. Harvest as soon as possible — do not wait. Dry harvested grain immediately to below 13% moisture. Separate mouldy grain from healthy grain. Do not feed heavily moulded grain to animals as mycotoxins can be harmful."
         },
         "high": {
-          "en": "Severe grain mould. Harvest immediately regardless of maturity stage. Heavily moulded grain is not suitable for human consumption or animal feed due to mycotoxins. Contact agricultural extension for grain disposal advice. Source mould-resistant varieties for next season.",
-          "tn": "Mooko o masisi wa lebese. Kotula ka bonako go baakanywa ga seemo sa bogolo. Lebese le le konaletsweng thata ke mooko ga le tshwanela go jewa ke batho kgotsa go fepiwa diphoofolo ka ntlha ya mycotoxins. Ikgolaganya le mokwaledi wa temo go bona kgakololo ya go lahlela lebese. Batlhela mefuta e e ganang mooko go kotulo e e latelang.",
-          "sw": "Ukungu mkali wa nafaka. Vuna mara moja bila kujali hatua ya ukomavu. Nafaka yenye ukungu mwingi haifai kwa matumizi ya binadamu au chakula cha wanyama kutokana na mycotoxins. Wasiliana na ugani wa kilimo kwa ushauri wa kutupa nafaka. Tafuta aina zinazostahimili ukungu kwa msimu ujao.",
-          "pt": "Bolor grave no grão. Colha imediatamente, independentemente da fase de maturação. O grão muito bolorento não é adequado para consumo humano ou ração animal devido às micotoxinas. Contacte a extensão agrícola para aconselhamento sobre a eliminação do grão. Procure variedades resistentes ao bolor para a próxima época."
+          "en": "Severe grain mould. Harvest immediately regardless of maturity stage. Heavily moulded grain is not suitable for human consumption or animal feed due to mycotoxins. Contact agricultural extension for grain disposal advice. Source mould-resistant varieties for next season."
         }
       },
       "treatment": {
-        "en": "Once grain mould is established, fungicide has limited effect. Preventive fungicide application during flowering (e.g. propiconazole) is most effective. Harvest early in wet seasons. Store grain at below 13% moisture to prevent post-harvest mould.",
-        "tn": "Fa mooko wa lebese o sena go tlhagela, setlhare sa obomela se na le ditlamorago tse di fokotsegeng. Go diriisa setlhare sa thibelo sa obomela nakong ya go thunya (e.g. propiconazole) ke go nepagala thata. Kotula pele mo dikgweding tse di na le pula. Boloka lebese ka fa tlase ga 13% ya metsi go thibela mooko morago ga kotulo.",
-        "sw": "Mara ukungu wa nafaka ukishaanzishwa, dawa ya fangasi ina athari ndogo. Matumizi ya kuzuia ya dawa ya fangasi wakati wa maua (mf. propiconazole) ndiyo yenye ufanisi zaidi. Vuna mapema katika misimu yenye unyevu. Hifadhi nafaka chini ya unyevu wa 13% kuzuia ukungu baada ya mavuno.",
-        "pt": "Uma vez estabelecido o bolor do grão, o fungicida tem efeito limitado. A aplicação preventiva de fungicida durante a floração (ex: propiconazol) é mais eficaz. Colha cedo em épocas húmidas. Armazene o grão abaixo de 13% de humidade para prevenir o bolor pós-colheita."
+        "en": "Once grain mould is established, fungicide has limited effect. Preventive fungicide application during flowering (e.g. propiconazole) is most effective. Harvest early in wet seasons. Store grain at below 13% moisture to prevent post-harvest mould."
       },
       "prevention": {
-        "en": "Plant mould-resistant sorghum varieties. Apply fungicide at 50% flowering stage. Harvest promptly at maturity. Avoid late planting which delays harvest into wet season. Ensure proper grain storage conditions.",
-        "tn": "Jala mefuta ya sorghum e e ganang mooko. Diriisa setlhare sa obomela mo seheng sa 50% sa go thunya. Kotula ka bonako fa go boa bogolo. Efoga go jala morago ga nako go go diegelang kotulo go ya mo go kotulo e nang le pula. Netefatsa maemo a a siameng a poloko ya lebese.",
-        "sw": "Panda aina za mtama zinazostahimili ukungu. Paka dawa ya fangasi katika hatua ya 50% ya maua. Vuna haraka wakati wa ukomavu. Epuka kupanda kwa kuchelewa kunakosogeza mavuno hadi msimu wa unyevu. Hakikisha hali nzuri za uhifadhi wa nafaka.",
-        "pt": "Plante variedades de sorgo resistentes ao bolor. Aplique fungicida na fase de 50% de floração. Colha prontamente na maturação. Evite plantação tardia que atrase a colheita para a época húmida. Garanta condições adequadas de armazenamento do grão."
+        "en": "Plant mould-resistant sorghum varieties. Apply fungicide at 50% flowering stage. Harvest promptly at maturity. Avoid late planting which delays harvest into wet season. Ensure proper grain storage conditions."
       },
       "when_to_call_vet": {
-        "en": "Contact your local agricultural extension officer or Ministry of Agriculture if mould affects more than 30% of your crop or if you suspect mycotoxin contamination.",
-        "tn": "Ikgolaganya le mokwaledi wa temo wa gago wa lefelo kgotsa le Lefapha la Temo fa mooko o amega go feta 30% ya dibjalo tsa gago kgotsa fa o belaela tshwaetso ya mycotoxin.",
-        "sw": "Wasiliana na afisa ugani wa kilimo wa eneo lako au Wizara ya Kilimo ikiwa ukungu unaathiri zaidi ya 30% ya mazao yako au ikiwa unashuku uchafuzi wa mycotoxin.",
-        "pt": "Contacte o seu técnico de extensão agrícola local ou o Ministério da Agricultura se o bolor afectar mais de 30% da sua cultura ou se suspeitar de contaminação por micotoxinas."
+        "en": "Contact your local agricultural extension officer or Ministry of Agriculture if mould affects more than 30% of your crop or if you suspect mycotoxin contamination."
       }
     },
-
     "potato late blight": {
       "display_name": {
-        "en": "Potato Late Blight",
-        "tn": "Bolwetsi jwa Blight ya Mabela a Lefatshe",
-        "sw": "Ugonjwa wa Baka Marehemu wa Viazi",
-        "pt": "Míldio da Batata"
+        "en": "Potato Late Blight"
       },
       "risk_level": "high",
       "affects": {
-        "en": "Potatoes, tomatoes",
-        "tn": "Mabela a lefatshe, dimatamatisi",
-        "sw": "Viazi, nyanya",
-        "pt": "Batatas, tomates"
+        "en": "Potatoes, tomatoes"
       },
       "spreads_by": {
-        "en": "Wind-borne spores, water splash, infected seed tubers, infected transplants",
-        "tn": "Dipora tse di isiswang ke mowa, go tshilafala ga metsi, mabela a peo a a konaletsweng, dipuno tse di konaletsweng",
-        "sw": "Spora zinazobebwa na upepo, kurusha kwa maji, viazi vya mbegu vilivyoambukizwa, miche iliyoambukizwa",
-        "pt": "Esporos transportados pelo vento, salpicos de água, tubérculos-semente infectados, plantas transplantadas infectadas"
+        "en": "Wind-borne spores, water splash, infected seed tubers, infected transplants"
       },
       "visual_symptoms": {
-        "en": "Greasy dark water-soaked lesions on leaves, often starting at leaf edges. White mould visible on leaf undersides in humid conditions. Dark lesions on stems. Tubers show reddish-brown dry rot beneath the skin and may rot further in storage. Plants can collapse within days in wet weather.",
-        "tn": "Dintho tse di botlhole tse di fifetseng tse di tshitlhilweng ke metsi mo matlharen, gantsi go simolola mo mathomong a matlhare. Obomela o o tshweu o bonala mo tlase ga matlhare fa go na le bomolelo. Dintho tse di fifetseng mo matlhobong. Mabela a bontsha go bola jo bo bohibidu-bosootho ka fa tlase ga letlalo mme a ka tswelela go bola fa a bolokwa. Dimela di ka we mo malatsi a sele fa bosa bo na le pula.",
-        "sw": "Vidonda vya mafuta vyenye giza vilivyolowa maji kwenye majani, mara nyingi vikianza kingoni mwa majani. Ukungu mweupe unaoonekana chini ya majani katika hali ya unyevu. Vidonda vya giza kwenye mashina. Viazi vinaonyesha kuoza kavu kwa rangi nyekundu-hudhurungi chini ya ngozi na vinaweza kuendelea kuoza katika uhifadhi. Mimea inaweza kuanguka ndani ya siku chache katika hali ya unyevu.",
-        "pt": "Lesões escuras e oleosas encharcadas de água nas folhas, muitas vezes começando nas bordas. Bolor branco visível na parte inferior das folhas em condições húmidas. Lesões escuras nos caules. Os tubérculos apresentam podridão seca castanho-avermelhada sob a pele e podem continuar a apodrecer no armazenamento. As plantas podem colapsar em poucos dias em tempo húmido."
+        "en": "Greasy dark water-soaked lesions on leaves, often starting at leaf edges. White mould visible on leaf undersides in humid conditions. Dark lesions on stems. Tubers show reddish-brown dry rot beneath the skin and may rot further in storage. Plants can collapse within days in wet weather."
       },
       "behavioral_questions": [
         {
           "id": "humidity",
           "question": {
-            "en": "How have weather conditions been over the past week?",
-            "tn": "Maemo a bosa a ne jang mo dibikeng tse di fetileng?",
-            "sw": "Hali ya hewa imekuwaje wiki iliyopita?",
-            "pt": "Como têm estado as condições meteorológicas na última semana?"
+            "en": "How have weather conditions been over the past week?"
           },
           "options": {
-            "en": ["Hot and dry", "Cool with some rain or morning dew", "Cool, wet and overcast for several days"],
-            "tn": ["Go tjhesa le go oma", "Go tonya le pula e sele kgotsa majwe a masa", "Go tonya, go na le metsi le go fifala mo malatsi a mmalwa"],
-            "sw": ["Joto na kavu", "Baridi na mvua kidogo au umande wa asubuhi", "Baridi, na unyevu na mawingu kwa siku kadhaa"],
-            "pt": ["Quente e seco", "Fresco com alguma chuva ou orvalho matinal", "Fresco, húmido e nublado durante vários dias"]
+            "en": [
+              "Hot and dry",
+              "Cool with some rain or morning dew",
+              "Cool, wet and overcast for several days"
+            ]
           },
           "weights": {
             "Hot and dry": 0,
@@ -846,16 +633,14 @@
         {
           "id": "spread_speed",
           "question": {
-            "en": "How quickly are the lesions spreading?",
-            "tn": "Dintho di phatlalala ka bonako jang?",
-            "sw": "Vidonda vinaenea kwa kasi gani?",
-            "pt": "Com que rapidez as lesões estão a espalhar-se?"
+            "en": "How quickly are the lesions spreading?"
           },
           "options": {
-            "en": ["Slowly, over weeks", "Spreading over days", "Very rapid spread within 24-48 hours"],
-            "tn": ["Ka bonenepi, mo dibikeng", "Go phatlalala mo malatsi", "Go phatlalala ka bonako thata mo diureng tse 24-48"],
-            "sw": ["Polepole, kwa wiki", "Kuenea kwa siku", "Kuenea kwa kasi sana ndani ya masaa 24-48"],
-            "pt": ["Lentamente, ao longo de semanas", "A espalhar-se ao longo de dias", "Propagação muito rápida em 24-48 horas"]
+            "en": [
+              "Slowly, over weeks",
+              "Spreading over days",
+              "Very rapid spread within 24-48 hours"
+            ]
           },
           "weights": {
             "Slowly, over weeks": 0,
@@ -866,16 +651,14 @@
         {
           "id": "tuber_affected",
           "question": {
-            "en": "When you dig up tubers, do any show rot or discolouration?",
-            "tn": "Fa o epa mabela, a mangwe a bontsha go bola kgotsa go fetoga mmala?",
-            "sw": "Unapochimba viazi, je, baadhi yanaonyesha kuoza au kubadilika rangi?",
-            "pt": "Quando desenterra os tubérculos, algum apresenta podridão ou descoloração?"
+            "en": "When you dig up tubers, do any show rot or discolouration?"
           },
           "options": {
-            "en": ["No tubers checked or all look fine", "A few tubers affected", "Many tubers rotting"],
-            "tn": ["Ga go na mabela a a lekodilweng kgotsa otlhe a bonala sentle", "Mabela a sele a amegile", "Mabela a mantsi a bola"],
-            "sw": ["Hakuna viazi vilivyoangaliwa au vyote vinaonekana sawa", "Viazi vichache vimeathirika", "Viazi vingi vinaoza"],
-            "pt": ["Nenhum tubérculo verificado ou todos parecem bem", "Alguns tubérculos afectados", "Muitos tubérculos a apodrecer"]
+            "en": [
+              "No tubers checked or all look fine",
+              "A few tubers affected",
+              "Many tubers rotting"
+            ]
           },
           "weights": {
             "No tubers checked or all look fine": 0,
@@ -891,84 +674,51 @@
       },
       "recommendations": {
         "low": {
-          "en": "Early blight signs. Apply copper-based fungicide or mancozeb immediately. Remove infected leaves. Improve air circulation between plants. Avoid wetting foliage when watering. Monitor daily, especially after rain.",
-          "tn": "Matshwao a ntlha a blight. Diriisa setlhare sa obomela sa go thewa mo kopore kgotsa mancozeb ka bonako. Tlose matlhare a a konaletsweng. Tokafatsa go gololosega ga mowa magareng ga dimela. Efoga go kgotsa matlhare fa o nesa. Lebelela letsatsi le letsatsi, segolo bogolo morago ga pula.",
-          "sw": "Dalili za awali za baka. Paka dawa ya fangasi yenye shaba au mancozeb mara moja. Ondoa majani yaliyoambukizwa. Boresha mzunguko wa hewa kati ya mimea. Epuka kulowanisha majani wakati wa kumwagilia. Fuatilia kila siku, hasa baada ya mvua.",
-          "pt": "Sinais iniciais de míldio. Aplique fungicida à base de cobre ou mancozebe imediatamente. Remova as folhas infectadas. Melhore a circulação de ar entre as plantas. Evite molhar a folhagem ao regar. Monitorize diariamente, especialmente após a chuva."
+          "en": "Early blight signs. Apply copper-based fungicide or mancozeb immediately. Remove infected leaves. Improve air circulation between plants. Avoid wetting foliage when watering. Monitor daily, especially after rain."
         },
         "medium": {
-          "en": "Active late blight on potatoes. Apply systemic fungicide (metalaxyl or cymoxanil) every 5-7 days. Stop overhead irrigation. Remove and destroy all infected plant material away from the field. Avoid harvesting tubers in wet soil, as this spreads spores onto healthy tubers.",
-          "tn": "Blight e e tshwereng mo mabeleng a lefatshe. Diriisa setlhare sa obomela sa systemic (metalaxyl kgotsa cymoxanil) dikgwedi tse 5-7 le dikgwedi tse 5-7. Khutlisa go nesa go go tswang godimo. Tlose mme o senya dithoto tsotlhe tsa semela tse di konaletsweng kwa ntle ga tshimo. Efoga go epa mabela mo mmung o o metsi, gonne se anamisa dipora mo mabeleng a a itekanetseng.",
-          "sw": "Baka marehemu hai kwenye viazi. Paka dawa ya fangasi ya kimfumo (metalaxyl au cymoxanil) kila siku 5-7. Acha umwagiliaji wa juu. Ondoa na uharibu sehemu zote za mimea zilizoambukizwa mbali na shamba. Epuka kuvuna viazi kwenye udongo wenye unyevu, kwani hii inasambaza spora kwenye viazi vyenye afya.",
-          "pt": "Míldio activo nas batatas. Aplique fungicida sistémico (metalaxil ou cimoxanil) a cada 5-7 dias. Pare a rega aérea. Remova e destrua todo o material vegetal infectado, longe do campo. Evite colher tubérculos em solo húmido, pois isto espalha esporos para tubérculos saudáveis."
+          "en": "Active late blight on potatoes. Apply systemic fungicide (metalaxyl or cymoxanil) every 5-7 days. Stop overhead irrigation. Remove and destroy all infected plant material away from the field. Avoid harvesting tubers in wet soil, as this spreads spores onto healthy tubers."
         },
         "high": {
-          "en": "SEVERE: Emergency action needed. Apply systemic fungicide immediately, or desiccate and harvest vines early to prevent spores reaching tubers. Harvest tubers only once foliage is dead and soil has dried somewhat. Do not store any tubers with signs of rot. Do not plant potatoes or tomatoes in this area for at least 2 seasons.",
-          "tn": "GO MASISI: Go hlokafalela ga tiro ya tshoganyetso. Diriisa setlhare sa obomela sa systemic ka bonako, kgotsa o omise mme o kotule dintlha pele go thibela dipora go fitlhela mabela. Kotula mabela fela fa matlhare a sule mme mmung o omile go le gonye. O se ka wa boloka mabela ape a a nang le matshwao a go bola. O se ka wa jala mabela a lefatshe kgotsa dimatamatisi mo tikologong eno go ya bonnye go ya go dikgwedi tse 2.",
-          "sw": "KALI: Hatua za dharura zinahitajika. Paka dawa ya fangasi ya kimfumo mara moja, au kausha na uvune mizabibu mapema kuzuia spora kufikia viazi. Vuna viazi tu baada ya majani kufa na udongo kukauka kiasi. Usihifadhi viazi vyovyote vyenye dalili za kuoza. Usipande viazi au nyanya katika eneo hili kwa angalau misimu 2.",
-          "pt": "GRAVE: É necessária acção de emergência. Aplique fungicida sistémico imediatamente, ou dessique e colha a folhagem cedo para evitar que os esporos atinjam os tubérculos. Colha os tubérculos apenas quando a folhagem estiver morta e o solo tiver secado um pouco. Não armazene tubérculos com sinais de podridão. Não plante batatas ou tomates nesta área durante pelo menos 2 épocas."
+          "en": "SEVERE: Emergency action needed. Apply systemic fungicide immediately, or desiccate and harvest vines early to prevent spores reaching tubers. Harvest tubers only once foliage is dead and soil has dried somewhat. Do not store any tubers with signs of rot. Do not plant potatoes or tomatoes in this area for at least 2 seasons."
         }
       },
       "treatment": {
-        "en": "Same fungicides as tomato late blight: metalaxyl, cymoxanil, fenamidone for curative action. Mancozeb and chlorothalonil for preventive protection. Always alternate products to prevent fungicide resistance. Cure harvested tubers (dry, well-ventilated storage) before long-term storage to reduce rot spread.",
-        "tn": "Disetlhare tse di tshwanang le tsa blight ya moragonyana ya tamati: metalaxyl, cymoxanil, fenamidone go tiro ya go alafa. Mancozeb le chlorothalonil go tshireletso ya thibelo. Fetola dikolo nako yotlhe go thibela kgaolo ya setlhare sa obomela. Omisa mabela a a kotulweng (poloko e e omileng, e e fefolang sentle) pele ga poloko ya nako e telele go fokotsa go anamela ga go bola.",
-        "sw": "Dawa za fangasi sawa na baka marehemu ya nyanya: metalaxyl, cymoxanil, fenamidone kwa hatua ya tiba. Mancozeb na chlorothalonil kwa ulinzi wa kuzuia. Badilisha bidhaa daima kuzuia ukinzani wa dawa ya fangasi. Ponya viazi vilivyovunwa (uhifadhi kavu, wenye mzunguko mzuri wa hewa) kabla ya uhifadhi wa muda mrefu kupunguza kuenea kwa kuoza.",
-        "pt": "Os mesmos fungicidas do míldio do tomate: metalaxil, cimoxanil, fenamidona para acção curativa. Mancozebe e clorotalonil para protecção preventiva. Alterne sempre os produtos para evitar resistência ao fungicida. Cure os tubérculos colhidos (armazenamento seco e bem ventilado) antes do armazenamento de longa duração para reduzir a propagação da podridão."
+        "en": "Same fungicides as tomato late blight: metalaxyl, cymoxanil, fenamidone for curative action. Mancozeb and chlorothalonil for preventive protection. Always alternate products to prevent fungicide resistance. Cure harvested tubers (dry, well-ventilated storage) before long-term storage to reduce rot spread."
       },
       "prevention": {
-        "en": "Use certified, disease-free seed potatoes. Plant blight-resistant varieties. Hill soil over rows to protect developing tubers from spores. Apply preventive fungicide before wet weather. 3-year crop rotation with non-solanaceous crops.",
-        "tn": "Dirisa mabela a peo a a netefaditsweng, a a se nang bolwetsi. Jala mefuta e e ganang blight. Roba mmung mo mela go sireletsa mabela a a golang go tswa mo diporeng. Diriisa setlhare sa thibelo sa obomela pele ga bossa jo bo na le pula. Phuthologo ya dibjalo ya dingwaga tse 3 le dibjalo tse di sa amaneng le solanaceous.",
-        "sw": "Tumia viazi vya mbegu vilivyothibitishwa, visivyo na ugonjwa. Panda aina zinazostahimili baka. Funika udongo juu ya mistari kulinda viazi vinavyoendelea kukua kutokana na spora. Paka dawa ya fangasi ya kuzuia kabla ya hali ya hewa yenye unyevu. Mzunguko wa mazao wa miaka 3 na mazao yasiyo ya familia ya solanaceous.",
-        "pt": "Use batata-semente certificada e isenta de doenças. Plante variedades resistentes ao míldio. Amontoe terra sobre as fileiras para proteger os tubérculos em desenvolvimento dos esporos. Aplique fungicida preventivo antes de tempo húmido. Rotação de culturas de 3 anos com culturas não solanáceas."
+        "en": "Use certified, disease-free seed potatoes. Plant blight-resistant varieties. Hill soil over rows to protect developing tubers from spores. Apply preventive fungicide before wet weather. 3-year crop rotation with non-solanaceous crops."
       },
       "when_to_call_vet": {
-        "en": "Contact an agricultural extension officer immediately. Potato late blight can destroy an entire crop, both foliage and tubers in storage, within days in cool, wet conditions — act fast.",
-        "tn": "Ikgolaganya le mokwaledi wa temo ka bonako. Blight ya mabela a lefatshe e ka senya dibjalo tsotlhe, matlhare le mabela a a bolokweng, mo malatsing a sele fa maemo a tonya le a na le metsi — dira ka bonako.",
-        "sw": "Wasiliana na afisa ugani wa kilimo mara moja. Baka marehemu ya viazi inaweza kuharibu zao zima, majani na viazi vilivyohifadhiwa, ndani ya siku chache katika hali ya baridi na unyevu — fanya haraka.",
-        "pt": "Contacte um técnico de extensão agrícola imediatamente. O míldio da batata pode destruir toda a cultura, tanto a folhagem como os tubérculos armazenados, em poucos dias em condições frescas e húmidas — aja rapidamente."
+        "en": "Contact an agricultural extension officer immediately. Potato late blight can destroy an entire crop, both foliage and tubers in storage, within days in cool, wet conditions — act fast."
       }
     },
-
     "tomato late blight": {
       "display_name": {
-        "en": "Tomato Late Blight",
-        "tn": "Bolwetsi jwa Blight ya Dimatamatisi",
-        "sw": "Ugonjwa wa Baka Marehemu wa Nyanya",
-        "pt": "Míldio do Tomate"
+        "en": "Tomato Late Blight"
       },
       "risk_level": "high",
       "affects": {
-        "en": "Tomatoes, potatoes",
-        "tn": "Dimatamatisi, mabela a lefatshe",
-        "sw": "Nyanya, viazi",
-        "pt": "Tomates, batatas"
+        "en": "Tomatoes, potatoes"
       },
       "spreads_by": {
-        "en": "Wind-borne spores, water splash, infected transplants",
-        "tn": "Dipora tse di isiswang ke mowa, go tshilafala ga metsi, dipuno tse di konaletsweng",
-        "sw": "Spora zinazobebwa na upepo, kurusha kwa maji, miche iliyoambukizwa",
-        "pt": "Esporos transportados pelo vento, salpicos de água, plantas transplantadas infectadas"
+        "en": "Wind-borne spores, water splash, infected transplants"
       },
       "visual_symptoms": {
-        "en": "Greasy dark water-soaked lesions on leaves. White mould on leaf undersides. Dark brown lesions on stems. Fruit shows firm brown rot from outside in. Plants can collapse within days.",
-        "tn": "Dintho tse di botlhole tse di fifetseng tse di tshitlhilweng ke metsi mo matlharen. Obomela o o tshweu mo tlase ga matlhare. Dintho tse di fiswa mo matlhobong. Leungo le bontsha go bola ko go fiswa ko gare go tswa kwa ntle. Dimela di ka we mo malatsi a sele.",
-        "sw": "Vidonda vya mafuta vyenye giza vilivyolowa maji kwenye majani. Ukungu mweupe chini ya majani. Vidonda ya hudhurungi giza kwenye mashina. Tunda linaonyesha kuoza imara kwa rangi ya hudhurungi kutoka nje kuingia ndani. Mimea inaweza kuanguka ndani ya siku chache.",
-        "pt": "Lesões escuras e oleosas encharcadas de água nas folhas. Bolor branco na parte inferior das folhas. Lesões castanho-escuras nos caules. O fruto apresenta podridão castanha firme de fora para dentro. As plantas podem colapsar em poucos dias."
+        "en": "Greasy dark water-soaked lesions on leaves. White mould on leaf undersides. Dark brown lesions on stems. Fruit shows firm brown rot from outside in. Plants can collapse within days."
       },
       "behavioral_questions": [
         {
           "id": "humidity",
           "question": {
-            "en": "How have weather conditions been over the past week?",
-            "tn": "Maemo a bosa a ne jang mo dibikeng tse di fetileng?",
-            "sw": "Hali ya hewa imekuwaje wiki iliyopita?",
-            "pt": "Como têm estado as condições meteorológicas na última semana?"
+            "en": "How have weather conditions been over the past week?"
           },
           "options": {
-            "en": ["Hot and dry", "Cool with some rain or morning dew", "Cool, wet and overcast for several days"],
-            "tn": ["Go tjhesa le go oma", "Go tonya le pula e sele kgotsa majwe a masa", "Go tonya, go na le metsi le go fifala mo malatsi a mmalwa"],
-            "sw": ["Joto na kavu", "Baridi na mvua kidogo au umande wa asubuhi", "Baridi, na unyevu na mawingu kwa siku kadhaa"],
-            "pt": ["Quente e seco", "Fresco com alguma chuva ou orvalho matinal", "Fresco, húmido e nublado durante vários dias"]
+            "en": [
+              "Hot and dry",
+              "Cool with some rain or morning dew",
+              "Cool, wet and overcast for several days"
+            ]
           },
           "weights": {
             "Hot and dry": 0,
@@ -979,16 +729,14 @@
         {
           "id": "spread_speed",
           "question": {
-            "en": "How quickly are the lesions spreading?",
-            "tn": "Dintho di phatlalala ka bonako jang?",
-            "sw": "Vidonda vinaenea kwa kasi gani?",
-            "pt": "Com que rapidez as lesões estão a espalhar-se?"
+            "en": "How quickly are the lesions spreading?"
           },
           "options": {
-            "en": ["Slowly, over weeks", "Spreading over days", "Very rapid spread within 24-48 hours"],
-            "tn": ["Ka bonenepi, mo dibikeng", "Go phatlalala mo malatsi", "Go phatlalala ka bonako thata mo diureng tse 24-48"],
-            "sw": ["Polepole, kwa wiki", "Kuenea kwa siku", "Kuenea kwa kasi sana ndani ya masaa 24-48"],
-            "pt": ["Lentamente, ao longo de semanas", "A espalhar-se ao longo de dias", "Propagação muito rápida em 24-48 horas"]
+            "en": [
+              "Slowly, over weeks",
+              "Spreading over days",
+              "Very rapid spread within 24-48 hours"
+            ]
           },
           "weights": {
             "Slowly, over weeks": 0,
@@ -999,16 +747,14 @@
         {
           "id": "fruit_affected",
           "question": {
-            "en": "Are the fruit also showing signs of rot or lesions?",
-            "tn": "A leungo le bontsha matshwao a go bola kgotsa dintho?",
-            "sw": "Je, matunda pia yanaonyesha dalili za kuoza au vidonda?",
-            "pt": "Os frutos também apresentam sinais de podridão ou lesões?"
+            "en": "Are the fruit also showing signs of rot or lesions?"
           },
           "options": {
-            "en": ["No fruit affected", "A few fruit with lesions", "Most fruit rotting"],
-            "tn": ["Ga go na leungo le le amegeng", "Leungo le sele le na le dintho", "Leungo le le mantsi le bola"],
-            "sw": ["Hakuna tunda lililoathirika", "Matunda machache yenye vidonda", "Matunda mengi yanaoza"],
-            "pt": ["Nenhum fruto afectado", "Alguns frutos com lesões", "A maioria dos frutos a apodrecer"]
+            "en": [
+              "No fruit affected",
+              "A few fruit with lesions",
+              "Most fruit rotting"
+            ]
           },
           "weights": {
             "No fruit affected": 0,
@@ -1024,89 +770,64 @@
       },
       "recommendations": {
         "low": {
-          "en": "Early blight signs. Apply copper-based fungicide or mancozeb immediately. Remove infected leaves. Improve air circulation. Avoid wetting foliage when watering. Monitor daily.",
-          "tn": "Matshwao a ntlha a blight. Diriisa setlhare sa obomela sa go thewa mo kopore kgotsa mancozeb ka bonako. Tlose matlhare a a konaletsweng. Tokafatsa go gololosega ga mowa. Efoga go kgotsa matlhare fa o nesa. Lebelela letsatsi le letsatsi.",
-          "sw": "Dalili za awali za baka. Paka dawa ya fangasi yenye shaba au mancozeb mara moja. Ondoa majani yaliyoambukizwa. Boresha mzunguko wa hewa. Epuka kulowanisha majani wakati wa kumwagilia. Fuatilia kila siku.",
-          "pt": "Sinais iniciais de míldio. Aplique fungicida à base de cobre ou mancozebe imediatamente. Remova as folhas infectadas. Melhore a circulação de ar. Evite molhar a folhagem ao regar. Monitorize diariamente."
+          "en": "Early blight signs. Apply copper-based fungicide or mancozeb immediately. Remove infected leaves. Improve air circulation. Avoid wetting foliage when watering. Monitor daily."
         },
         "medium": {
-          "en": "Active late blight on tomatoes. Apply systemic fungicide (metalaxyl or cymoxanil) every 5-7 days. Harvest any ripe fruit immediately before it becomes infected. Remove all infected plant material from the field and destroy it.",
-          "tn": "Blight e e tshwereng ya moragonyana mo dimatamatising. Diriisa setlhare sa obomela sa systemic (metalaxyl kgotsa cymoxanil) dikgwedi tse 5-7 le dikgwedi tse 5-7. Kotula leungo lipe le le butsweng ka bonako pele le konaletsiwa. Tlose dithoto tsotlhe tsa semela tse di konaletsweng go tswa tshimong mme o di senya.",
-          "sw": "Baka marehemu hai kwenye nyanya. Paka dawa ya fangasi ya kimfumo (metalaxyl au cymoxanil) kila siku 5-7. Vuna tunda lolote lililoiva mara moja kabla halijaambukizwa. Ondoa sehemu zote za mimea zilizoambukizwa kutoka shambani na uziharibu.",
-          "pt": "Míldio activo nos tomates. Aplique fungicida sistémico (metalaxil ou cimoxanil) a cada 5-7 dias. Colha qualquer fruto maduro imediatamente antes de ficar infectado. Remova todo o material vegetal infectado do campo e destrua-o."
+          "en": "Active late blight on tomatoes. Apply systemic fungicide (metalaxyl or cymoxanil) every 5-7 days. Harvest any ripe fruit immediately before it becomes infected. Remove all infected plant material from the field and destroy it."
         },
         "high": {
-          "en": "SEVERE: Emergency action needed. Apply systemic fungicide immediately. Harvest all marketable fruit now. Remove and burn all crop residue. Do not plant tomatoes or potatoes in this area for at least 2 seasons. Disinfect stakes and equipment.",
-          "tn": "GO MASISI: Go hlokafalela ga tiro ya tshoganyetso. Diriisa setlhare sa obomela sa systemic ka bonako. Kotula leungo lotlhe le le rekisiwang jaanong. Tlose mme o tshube moretlwa wotlhe wa dibjalo. O se ka wa jala dimatamatisi kgotsa mabela a lefatshe mo tikologong eno go ya bonnye go ya go dikgwedi tse 2. Tshidisa dithomero le dithulaganyo.",
-          "sw": "KALI: Hatua za dharura zinahitajika. Paka dawa ya fangasi ya kimfumo mara moja. Vuna matunda yote yanayoweza kuuzwa sasa. Ondoa na uchome mabaki yote ya zao. Usipande nyanya au viazi katika eneo hili kwa angalau misimu 2. Disinfekti vigingi na vifaa.",
-          "pt": "GRAVE: É necessária acção de emergência. Aplique fungicida sistémico imediatamente. Colha agora todos os frutos comercializáveis. Remova e queime todos os resíduos da cultura. Não plante tomates ou batatas nesta área durante pelo menos 2 épocas. Desinfecte estacas e equipamento."
+          "en": "SEVERE: Emergency action needed. Apply systemic fungicide immediately. Harvest all marketable fruit now. Remove and burn all crop residue. Do not plant tomatoes or potatoes in this area for at least 2 seasons. Disinfect stakes and equipment."
         }
       },
       "treatment": {
-        "en": "Same fungicides as potato late blight: metalaxyl, cymoxanil, fenamidone for curative action. Mancozeb and chlorothalonil for preventive protection. Always alternate products to prevent fungicide resistance.",
-        "tn": "Disetlhare tse di tshwanang le tsa blight ya moragonyana ya mabela a lefatshe: metalaxyl, cymoxanil, fenamidone go tiro ya go alafa. Mancozeb le chlorothalonil go tshireletso ya thibelo. Fetola dikolo nako yotlhe go thibela kgaolo ya setlhare sa obomela.",
-        "sw": "Dawa za fangasi sawa na baka marehemu ya viazi: metalaxyl, cymoxanil, fenamidone kwa hatua ya tiba. Mancozeb na chlorothalonil kwa ulinzi wa kuzuia. Badilisha bidhaa daima kuzuia ukinzani wa dawa ya fangasi.",
-        "pt": "Os mesmos fungicidas do míldio da batata: metalaxil, cimoxanil, fenamidona para acção curativa. Mancozebe e clorotalonil para protecção preventiva. Alterne sempre os produtos para evitar resistência ao fungicida."
+        "en": "Same fungicides as potato late blight: metalaxyl, cymoxanil, fenamidone for curative action. Mancozeb and chlorothalonil for preventive protection. Always alternate products to prevent fungicide resistance."
       },
       "prevention": {
-        "en": "Use blight-resistant tomato varieties. Stake plants to improve air circulation. Use drip irrigation. Apply preventive fungicide before wet weather. 3-year crop rotation with non-solanaceous crops.",
-        "tn": "Diriisa mefuta ya tamati e e ganang blight. Tshomela dimela go tokafatsa go gololosega ga mowa. Diriisa go nesa go mo tseleng. Diriisa setlhare sa thibelo sa obomela pele ga bossa jo bo na le pula. Phuthologo ya dibjalo ya dingwaga tse 3 le dibjalo tse di sa amaneng le solanaceous.",
-        "sw": "Tumia aina za nyanya zinazostahimili baka. Funga mimea kwa vigingi kuboresha mzunguko wa hewa. Tumia umwagiliaji wa matone. Paka dawa ya fangasi ya kuzuia kabla ya hali ya hewa yenye unyevu. Mzunguko wa mazao wa miaka 3 na mazao yasiyo ya familia ya solanaceous.",
-        "pt": "Use variedades de tomate resistentes ao míldio. Estaqueie as plantas para melhorar a circulação de ar. Use rega gota-a-gota. Aplique fungicida preventivo antes de tempo húmido. Rotação de culturas de 3 anos com culturas não solanáceas."
+        "en": "Use blight-resistant tomato varieties. Stake plants to improve air circulation. Use drip irrigation. Apply preventive fungicide before wet weather. 3-year crop rotation with non-solanaceous crops."
       },
       "when_to_call_vet": {
-        "en": "Contact an agricultural extension officer immediately. Tomato late blight can wipe out an entire crop in less than a week in humid conditions — act fast.",
-        "tn": "Ikgolaganya le mokwaledi wa temo ka bonako. Blight ya moragonyana ya tamati e ka senya dibjalo tsotlhe mo dibikeng e ka nna go se kwa go na le bomolelo — dira ka bonako.",
-        "sw": "Wasiliana na afisa ugani wa kilimo mara moja. Baka marehemu ya nyanya inaweza kuharibu zao zima ndani ya chini ya wiki moja katika hali ya unyevu — fanya haraka.",
-        "pt": "Contacte um técnico de extensão agrícola imediatamente. O míldio do tomate pode destruir toda a cultura em menos de uma semana em condições húmidas — aja rapidamente."
+        "en": "Contact an agricultural extension officer immediately. Tomato late blight can wipe out an entire crop in less than a week in humid conditions — act fast."
       }
     },
-
     "healthy": {
       "display_name": {
-        "en": "Healthy Plant",
-        "tn": "Semela se se Itekanetseng",
-        "sw": "Mmea Wenye Afya",
-        "pt": "Planta Saudável"
+        "en": "Healthy Plant"
       },
       "risk_level": "none",
-      "affects": { "en": "N/A", "tn": "Ga go amege sepe", "sw": "Haitumiki", "pt": "N/A" },
-      "spreads_by": { "en": "N/A", "tn": "Ga go anamele sepe", "sw": "Haitumiki", "pt": "N/A" },
+      "affects": {
+        "en": "N/A"
+      },
+      "spreads_by": {
+        "en": "N/A"
+      },
       "visual_symptoms": {
-        "en": "No disease symptoms detected. Plant appears healthy with normal leaf colour and growth.",
-        "tn": "Ga go na matshwao a bolwetsi a bonweng. Semela se bonala se itekanetseng le mmala o tlwaelegang wa matlhare le go gola.",
-        "sw": "Hakuna dalili za ugonjwa zilizogunduliwa. Mmea unaonekana wenye afya na rangi ya kawaida ya majani na ukuaji.",
-        "pt": "Não foram detectados sintomas de doença. A planta parece saudável, com cor de folhas e crescimento normais."
+        "en": "No disease symptoms detected. Plant appears healthy with normal leaf colour and growth."
       },
       "behavioral_questions": [],
-      "risk_thresholds": { "low": 0, "medium": 0, "high": 1 },
+      "risk_thresholds": {
+        "low": 0,
+        "medium": 0,
+        "high": 1
+      },
       "recommendations": {
         "low": {
-          "en": "Your crop looks healthy! Continue regular monitoring. Ensure consistent irrigation, balanced fertilisation, good drainage, and weed control. Scout for pests and disease signs weekly, and rotate crops each season.",
-          "tn": "Dibjalo tsa gago di bonala di itekanetseng! Tswelela go lebelela ka metlha. Netefatsa go nesa go go tshwanang, go fepa ka kelotlhoko, go ntsha metsi go go siameng, le taolo ya magora. Batlhela dikeledi le matshwao a bolwetsi dibeke le dibeke, le go phuthologa ga dibjalo kotulo le kotulo.",
-          "sw": "Zao lako linaonekana lenye afya! Endelea na ufuatiliaji wa mara kwa mara. Hakikisha umwagiliaji thabiti, urutubishaji uliosawazishwa, mifereji mzuri, na udhibiti wa magugu. Chunguza wadudu na dalili za ugonjwa kila wiki, na zungusha mazao kila msimu.",
-          "pt": "A sua cultura parece saudável! Continue a monitorização regular. Garanta rega consistente, fertilização equilibrada, boa drenagem e controlo de ervas daninhas. Procure pragas e sinais de doença semanalmente, e faça rotação de culturas a cada época."
+          "en": "Your crop looks healthy! Continue regular monitoring. Ensure consistent irrigation, balanced fertilisation, good drainage, and weed control. Scout for pests and disease signs weekly, and rotate crops each season."
         },
-        "medium": { "en": "", "tn": "", "sw": "", "pt": "" },
-        "high": { "en": "", "tn": "", "sw": "", "pt": "" }
+        "medium": {
+          "en": ""
+        },
+        "high": {
+          "en": ""
+        }
       },
       "treatment": {
-        "en": "No treatment needed.",
-        "tn": "Ga go hlokafalele kalafi.",
-        "sw": "Hakuna matibabu yanayohitajika.",
-        "pt": "Não é necessário tratamento."
+        "en": "No treatment needed."
       },
       "prevention": {
-        "en": "Maintain weed control, monitor for pests weekly, ensure good drainage, use resistant varieties where available, and rotate crops each season.",
-        "tn": "Boloka taolo ya magora, lebelela dikeledi dibeke le dibeke, netefatsa go ntsha metsi go go siameng, dirisa mefuta e e ganang bolwetsi fa e teng, le go phuthologa ga dibjalo kotulo le kotulo.",
-        "sw": "Dumisha udhibiti wa magugu, fuatilia wadudu kila wiki, hakikisha mifereji mzuri, tumia aina zinazostahimili pale zinapopatikana, na zungusha mazao kila msimu.",
-        "pt": "Mantenha o controlo de ervas daninhas, monitorize pragas semanalmente, garanta boa drenagem, use variedades resistentes quando disponíveis, e faça rotação de culturas a cada época."
+        "en": "Maintain weed control, monitor for pests weekly, ensure good drainage, use resistant varieties where available, and rotate crops each season."
       },
       "when_to_call_vet": {
-        "en": "Contact an agricultural extension officer if you notice yellowing, wilting, unusual spots or lesions, rot, or significant pest activity.",
-        "tn": "Ikgolaganya le mokwaledi wa temo fa o lemoga go ntshwa mmala, go fela, dintshi kgotsa dintho tse di sa tlwaelegang, go bola, kgotsa tiro e ntsi ya dikeledi.",
-        "sw": "Wasiliana na afisa ugani wa kilimo ikiwa utagundua manjano, kunyauka, madoa au vidonda visivyo vya kawaida, kuoza, au shughuli kubwa za wadudu.",
-        "pt": "Contacte um técnico de extensão agrícola se notar amarelecimento, murchidão, manchas ou lesões invulgares, podridão, ou actividade significativa de pragas."
+        "en": "Contact an agricultural extension officer if you notice yellowing, wilting, unusual spots or lesions, rot, or significant pest activity."
       }
     }
   }

@@ -4,22 +4,11 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:intl/intl.dart';
 import 'make_pal_screen.dart';
+import '../theme/palette.dart';
 
 // Self-contained palette for the redesign — matcha green / almond / rust.
 // Matches the palette used across the other redesigned screens. Fold into
 // a shared AppColors in main.dart later if you want it app-wide.
-class _C {
-  static const matchaDark = Color(0xFF374530);
-  static const matchaHeader = Color(0xFF4A5B41);
-  static const matcha = Color(0xFF5C7148);
-  static const matchaTint = Color(0xFFD6E0C4);
-  static const almond = Color(0xFFF6EFE2);
-  static const ink = Color(0xFF2B2820);
-  static const inkSoft = Color(0xFF726C5C);
-  static const rust = Color(0xFFC1703E);
-  static const rustBg = Color(0xFFF1DECB);
-}
-
 /// FMD/Livestock read as urgent (rust), Crops/General/anything else reads
 /// calm (matcha) — same two-tone accent logic used on every other screen.
 bool _isUrgentTag(String tag) => tag == 'FMD' || tag == 'Livestock';
@@ -29,8 +18,8 @@ bool _isUrgentTag(String tag) => tag == 'FMD' || tag == 'Livestock';
 ({Color bg, Color fg}) _avatarColors(String uid) {
   final even = uid.isEmpty || uid.hashCode.isEven;
   return even
-      ? (bg: _C.matchaTint, fg: _C.matchaDark)
-      : (bg: _C.rustBg, fg: _C.rust);
+      ? (bg: Bg.matchaTint, fg: Fg.matchaDark)
+      : (bg: Bg.rustBg, fg: Fg.rust);
 }
 
 class CommunityScreen extends StatefulWidget {
@@ -97,7 +86,7 @@ class _CommunityScreenState extends State<CommunityScreen> {
     const tags = ['FMD', 'Crops', 'Livestock', 'General'];
 
     return Scaffold(
-      backgroundColor: _C.almond,
+      backgroundColor: Bg.almond,
       body: Stack(
         children: [
           Positioned.fill(
@@ -107,7 +96,7 @@ class _CommunityScreenState extends State<CommunityScreen> {
             slivers: [
               SliverToBoxAdapter(
                 child: _WavyHeader(
-                  height: MediaQuery.of(context).padding.top + 96,
+                  height: MediaQuery.of(context).padding.top + 80,
                   child: Padding(
                     padding: EdgeInsets.fromLTRB(
                       20,
@@ -115,7 +104,7 @@ class _CommunityScreenState extends State<CommunityScreen> {
                       20,
                       0,
                     ),
-                    child: const Column(
+                    child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
@@ -123,13 +112,8 @@ class _CommunityScreenState extends State<CommunityScreen> {
                           style: TextStyle(
                             fontSize: 22,
                             fontWeight: FontWeight.w600,
-                            color: _C.almond,
+                            color: Fg.almond,
                           ),
-                        ),
-                        SizedBox(height: 6),
-                        Text(
-                          'Share knowledge with other farmers',
-                          style: TextStyle(fontSize: 12, color: _C.matchaTint),
                         ),
                       ],
                     ),
@@ -143,17 +127,17 @@ class _CommunityScreenState extends State<CommunityScreen> {
                   child: _GlassCard(
                     child: Row(
                       children: [
-                        Icon(Icons.search_rounded, color: _C.inkSoft, size: 18),
+                        Icon(Icons.search_rounded, color: Fg.inkSoft, size: 18),
                         const SizedBox(width: 8),
                         Expanded(
                           child: TextField(
                             controller: _searchController,
-                            style: TextStyle(color: _C.ink, fontSize: 13),
+                            style: TextStyle(color: Fg.ink, fontSize: 13),
                             decoration: InputDecoration(
                               isDense: true,
                               border: InputBorder.none,
                               hintText: 'Search posts...',
-                              hintStyle: TextStyle(color: _C.inkSoft, fontSize: 13),
+                              hintStyle: TextStyle(color: Fg.inkSoft, fontSize: 13),
                             ),
                             onChanged: (v) => setState(() => _searchQuery = v),
                           ),
@@ -164,7 +148,7 @@ class _CommunityScreenState extends State<CommunityScreen> {
                               _searchController.clear();
                               setState(() => _searchQuery = '');
                             },
-                            child: Icon(Icons.close_rounded, color: _C.inkSoft, size: 16),
+                            child: Icon(Icons.close_rounded, color: Fg.inkSoft, size: 16),
                           ),
                       ],
                     ),
@@ -213,7 +197,7 @@ class _CommunityScreenState extends State<CommunityScreen> {
                   if (snapshot.connectionState == ConnectionState.waiting) {
                     return SliverFillRemaining(
                       child: Center(
-                        child: CircularProgressIndicator(color: _C.matcha),
+                        child: CircularProgressIndicator(color: Fg.matcha),
                       ),
                     );
                   }
@@ -232,21 +216,21 @@ class _CommunityScreenState extends State<CommunityScreen> {
                                   ? Icons.search_off_rounded
                                   : Icons.people_outline_rounded,
                               size: 44,
-                              color: _C.inkSoft.withOpacity(0.5),
+                              color: Fg.inkSoft.withOpacity(0.5),
                             ),
                             const SizedBox(height: 12),
                             Text(
                               _searchQuery.isNotEmpty || _filterTag.isNotEmpty
                                   ? 'No posts match your search'
                                   : 'No posts yet',
-                              style: TextStyle(fontSize: 15, color: _C.inkSoft),
+                              style: TextStyle(fontSize: 15, color: Fg.inkSoft),
                             ),
                             const SizedBox(height: 4),
                             Text(
                               _searchQuery.isNotEmpty || _filterTag.isNotEmpty
                                   ? 'Try a different keyword or tag'
                                   : 'Be the first to share something.',
-                              style: TextStyle(fontSize: 13, color: _C.inkSoft),
+                              style: TextStyle(fontSize: 13, color: Fg.inkSoft),
                             ),
                           ],
                         ),
@@ -288,18 +272,18 @@ class _CommunityScreenState extends State<CommunityScreen> {
               children: [
                 _CircleFab(
                   size: 44,
-                  background: _C.almond,
-                  border: Colors.white.withOpacity(0.9),
+                  background: Bg.almond,
+                  border: Bg.surface.withOpacity(0.9),
                   icon: Icons.group_add_rounded,
-                  iconColor: _C.matchaDark,
+                  iconColor: Fg.matchaDark,
                   onTap: _openMakePal,
                 ),
                 const SizedBox(height: 12),
                 _CircleFab(
                   size: 56,
-                  background: _C.rust,
+                  background: Bg.rust,
                   icon: Icons.add_rounded,
-                  iconColor: _C.rustBg,
+                  iconColor: Fg.almond,
                   iconSize: 24,
                   onTap: _showNewPost,
                 ),
@@ -330,7 +314,7 @@ class _WavyHeader extends StatelessWidget {
         children: [
           ClipPath(
             clipper: _WavyHeaderClipper(),
-            child: Container(color: _C.matchaHeader.withOpacity(0.88)),
+            child: Container(color: Bg.matchaHeader.withOpacity(0.88)),
           ),
           child,
         ],
@@ -361,7 +345,7 @@ class _WavyHeaderClipper extends CustomClipper<Path> {
 class _BottomFieldWavePainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
-    final paint = Paint()..color = _C.matchaTint.withOpacity(0.5);
+    final paint = Paint()..color = Bg.matchaTint.withOpacity(0.5);
     final path = Path()
       ..moveTo(0, size.height * 0.82)
       ..cubicTo(size.width * 0.17, size.height * 0.76, size.width * 0.36,
@@ -402,10 +386,10 @@ class _GlassCard extends StatelessWidget {
         filter: ImageFilter.blur(sigmaX: 18, sigmaY: 18),
         child: Container(
           decoration: BoxDecoration(
-            color: Colors.white.withOpacity(0.5),
+            color: Bg.surface.withOpacity(0.5),
             borderRadius: BorderRadius.circular(borderRadius),
             border: Border.all(
-              color: borderColor ?? Colors.white.withOpacity(0.85),
+              color: borderColor ?? Bg.surface.withOpacity(0.85),
               width: 0.8,
             ),
           ),
@@ -419,7 +403,7 @@ class _GlassCard extends StatelessWidget {
                   heightFactor: 0.44,
                   child: Container(
                     decoration: BoxDecoration(
-                      color: (glossTint ?? Colors.white).withOpacity(0.4),
+                      color: (glossTint ?? Bg.surface).withOpacity(0.4),
                       borderRadius: BorderRadius.vertical(
                         top: Radius.circular(borderRadius),
                       ),
@@ -494,9 +478,9 @@ class _TagFilterChip extends StatelessWidget {
         duration: const Duration(milliseconds: 150),
         padding: const EdgeInsets.symmetric(vertical: 8),
         decoration: BoxDecoration(
-          color: selected ? _C.matchaHeader : Colors.white.withOpacity(0.5),
+          color: selected ? Bg.matchaHeader : Bg.surface.withOpacity(0.5),
           borderRadius: BorderRadius.circular(999),
-          border: selected ? null : Border.all(color: Colors.white.withOpacity(0.85)),
+          border: selected ? null : Border.all(color: Bg.surface.withOpacity(0.85)),
         ),
         child: Text(
           label,
@@ -504,7 +488,7 @@ class _TagFilterChip extends StatelessWidget {
           style: TextStyle(
             fontSize: 11.5,
             fontWeight: FontWeight.w500,
-            color: selected ? _C.almond : _C.ink,
+            color: selected ? Fg.almond : Fg.ink,
           ),
         ),
       ),
@@ -587,7 +571,7 @@ class _PostCardState extends State<_PostCard> {
               child: const Text('Cancel')),
           TextButton(
             onPressed: () => Navigator.pop(context, true),
-            style: TextButton.styleFrom(foregroundColor: _C.rust),
+            style: TextButton.styleFrom(foregroundColor: Fg.rust),
             child: const Text('Delete'),
           ),
         ],
@@ -611,7 +595,7 @@ class _PostCardState extends State<_PostCard> {
     await FirebaseFirestore.instance
         .collection('users')
         .doc(widget.uid)
-        .update({'postCount': FieldValue.increment(-1)});
+        .set({'postCount': FieldValue.increment(-1)}, SetOptions(merge: true));
   }
 
   void _editPost(BuildContext context) {
@@ -652,7 +636,7 @@ class _PostCardState extends State<_PostCard> {
     final tag = widget.data['tag'] ?? '';
     final ts = widget.data['createdAt'] as Timestamp?;
     final authorUid = widget.data['uid'] ?? '';
-    final accent = _isUrgentTag(tag) ? _C.rust : _C.matcha;
+    final accent = _isUrgentTag(tag) ? Bg.rust : Bg.matcha;
     final avatar = _avatarColors(authorUid);
 
     return _GlassCard(
@@ -692,12 +676,12 @@ class _PostCardState extends State<_PostCard> {
                                   name,
                                   style: TextStyle(
                                     fontSize: 13.5,
-                                    color: _C.ink,
+                                    color: Fg.ink,
                                   ),
                                 ),
                                 Text(
                                   '${widget.data['location'] ?? ''} · ${_timeAgo(ts)}',
-                                  style: TextStyle(fontSize: 10.5, color: _C.inkSoft),
+                                  style: TextStyle(fontSize: 10.5, color: Fg.inkSoft),
                                 ),
                               ],
                             ),
@@ -725,7 +709,7 @@ class _PostCardState extends State<_PostCard> {
                       ),
                     if (_isOwner)
                       PopupMenuButton<String>(
-                        icon: Icon(Icons.more_vert, size: 18, color: _C.inkSoft),
+                        icon: Icon(Icons.more_vert, size: 18, color: Fg.inkSoft),
                         onSelected: (value) {
                           if (value == 'edit') _editPost(context);
                           if (value == 'delete') _deletePost(context);
@@ -745,9 +729,9 @@ class _PostCardState extends State<_PostCard> {
                             value: 'delete',
                             child: Row(
                               children: [
-                                Icon(Icons.delete_outline, size: 16, color: _C.rust),
+                                Icon(Icons.delete_outline, size: 16, color: Fg.rust),
                                 const SizedBox(width: 8),
-                                Text('Delete post', style: TextStyle(color: _C.rust)),
+                                Text('Delete post', style: TextStyle(color: Fg.rust)),
                               ],
                             ),
                           ),
@@ -758,16 +742,16 @@ class _PostCardState extends State<_PostCard> {
                 const SizedBox(height: 10),
                 Text(
                   widget.data['content'] ?? '',
-                  style: TextStyle(fontSize: 13.5, color: _C.ink, height: 1.5),
+                  style: TextStyle(fontSize: 13.5, color: Fg.ink, height: 1.5),
                 ),
                 if (widget.data['edited'] == true)
                   Padding(
                     padding: const EdgeInsets.only(top: 4),
                     child: Text('edited',
-                        style: TextStyle(fontSize: 11, color: _C.inkSoft)),
+                        style: TextStyle(fontSize: 11, color: Fg.inkSoft)),
                   ),
                 const SizedBox(height: 12),
-                Divider(height: 1, color: Colors.white.withOpacity(0.7)),
+                Divider(height: 1, color: Bg.surface.withOpacity(0.7)),
                 const SizedBox(height: 10),
                 Row(
                   children: [
@@ -778,11 +762,11 @@ class _PostCardState extends State<_PostCard> {
                           Icon(
                             _isLiked ? Icons.favorite_rounded : Icons.favorite_border_rounded,
                             size: 17,
-                            color: _isLiked ? _C.rust : _C.inkSoft,
+                            color: _isLiked ? Fg.rust : Fg.inkSoft,
                           ),
                           const SizedBox(width: 4),
                           Text('${likes.length}',
-                              style: TextStyle(fontSize: 12.5, color: _C.inkSoft)),
+                              style: TextStyle(fontSize: 12.5, color: Fg.inkSoft)),
                         ],
                       ),
                     ),
@@ -791,11 +775,11 @@ class _PostCardState extends State<_PostCard> {
                       onTap: () => setState(() => _showComments = !_showComments),
                       child: Row(
                         children: [
-                          Icon(Icons.chat_bubble_outline_rounded, size: 17, color: _C.inkSoft),
+                          Icon(Icons.chat_bubble_outline_rounded, size: 17, color: Fg.inkSoft),
                           const SizedBox(width: 4),
                           Text(
                             '$commentCount ${commentCount == 1 ? 'reply' : 'replies'}',
-                            style: TextStyle(fontSize: 12.5, color: _C.inkSoft),
+                            style: TextStyle(fontSize: 12.5, color: Fg.inkSoft),
                           ),
                         ],
                       ),
@@ -964,7 +948,7 @@ class _CommentsSectionState extends State<_CommentsSection> {
     return Container(
       decoration: BoxDecoration(
         color: Colors.white.withOpacity(0.25),
-        border: Border(top: BorderSide(color: Colors.white.withOpacity(0.7))),
+        border: Border(top: BorderSide(color: Bg.surface.withOpacity(0.7))),
       ),
       child: Column(
         children: [
@@ -990,7 +974,7 @@ class _CommentsSectionState extends State<_CommentsSection> {
                 return Padding(
                   padding: const EdgeInsets.all(14),
                   child: Text('No replies yet. Be the first!',
-                      style: TextStyle(fontSize: 13, color: _C.inkSoft)),
+                      style: TextStyle(fontSize: 13, color: Fg.inkSoft)),
                 );
               }
               return Column(
@@ -1015,19 +999,19 @@ class _CommentsSectionState extends State<_CommentsSection> {
           if (_editingCommentId != null || _replyingToCommentId != null)
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
-              color: _C.rustBg.withOpacity(0.6),
+              color: Bg.rustBg.withOpacity(0.6),
               child: Row(
                 children: [
                   Icon(
                     _editingCommentId != null ? Icons.edit : Icons.reply_rounded,
                     size: 14,
-                    color: _C.rust,
+                    color: Fg.rust,
                   ),
                   const SizedBox(width: 6),
                   Expanded(
                     child: Text(
                       _editingCommentId != null ? 'Editing reply' : 'Replying to comment',
-                      style: TextStyle(fontSize: 12, color: _C.rust),
+                      style: TextStyle(fontSize: 12, color: Fg.rust),
                     ),
                   ),
                   GestureDetector(
@@ -1035,7 +1019,7 @@ class _CommentsSectionState extends State<_CommentsSection> {
                     child: Text(
                       'Cancel',
                       style: TextStyle(
-                          fontSize: 12, color: _C.rust, fontWeight: FontWeight.w600),
+                          fontSize: 12, color: Fg.rust, fontWeight: FontWeight.w600),
                     ),
                   ),
                 ],
@@ -1048,17 +1032,17 @@ class _CommentsSectionState extends State<_CommentsSection> {
                 Expanded(
                   child: Container(
                     decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.55),
+                      color: Bg.surface.withOpacity(0.55),
                       borderRadius: BorderRadius.circular(20),
-                      border: Border.all(color: Colors.white.withOpacity(0.85)),
+                      border: Border.all(color: Bg.surface.withOpacity(0.85)),
                     ),
                     child: TextField(
                       controller: _controller,
-                      style: TextStyle(fontSize: 13, color: _C.ink),
+                      style: TextStyle(fontSize: 13, color: Fg.ink),
                       decoration: InputDecoration(
                         hintText:
                             _editingCommentId != null ? 'Edit your reply...' : 'Write a reply...',
-                        hintStyle: TextStyle(fontSize: 13, color: _C.inkSoft),
+                        hintStyle: TextStyle(fontSize: 13, color: Fg.inkSoft),
                         contentPadding:
                             const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
                         border: InputBorder.none,
@@ -1072,13 +1056,13 @@ class _CommentsSectionState extends State<_CommentsSection> {
                   child: Container(
                     width: 38,
                     height: 38,
-                    decoration: const BoxDecoration(color: _C.rust, shape: BoxShape.circle),
+                    decoration: BoxDecoration(color: Bg.rust, shape: BoxShape.circle),
                     child: _submitting
                         ? Padding(
                             padding: const EdgeInsets.all(10),
-                            child: CircularProgressIndicator(strokeWidth: 2, color: _C.rustBg),
+                            child: CircularProgressIndicator(strokeWidth: 2, color: Fg.almond),
                           )
-                        : Icon(Icons.send_rounded, color: _C.rustBg, size: 18),
+                        : Icon(Icons.send_rounded, color: Fg.almond, size: 18),
                   ),
                 ),
               ],
@@ -1117,7 +1101,7 @@ class _CommentTile extends StatelessWidget {
   Widget build(BuildContext context) {
     final avatar = _avatarColors(data['uid'] ?? '');
     return Container(
-      color: (isEditing || isReplyTarget) ? _C.rustBg.withOpacity(0.4) : null,
+      color: (isEditing || isReplyTarget) ? Bg.rustBg.withOpacity(0.4) : null,
       padding: const EdgeInsets.fromLTRB(14, 10, 14, 0),
       child: FutureBuilder<String>(
         future: getName(data['uid'] ?? ''),
@@ -1143,19 +1127,19 @@ class _CommentTile extends StatelessWidget {
                       children: [
                         Text(name,
                             style: TextStyle(
-                                fontSize: 12, fontWeight: FontWeight.w600, color: _C.ink)),
+                                fontSize: 12, fontWeight: FontWeight.w600, color: Fg.ink)),
                         if (data['edited'] == true)
                           Padding(
                             padding: const EdgeInsets.only(left: 6),
                             child: Text('edited',
-                                style: TextStyle(fontSize: 10, color: _C.inkSoft)),
+                                style: TextStyle(fontSize: 10, color: Fg.inkSoft)),
                           ),
                         const Spacer(),
                         GestureDetector(
                           onTap: onReply,
                           child: Padding(
                             padding: const EdgeInsets.only(left: 10),
-                            child: Icon(Icons.reply_rounded, size: 14, color: _C.inkSoft),
+                            child: Icon(Icons.reply_rounded, size: 14, color: Fg.inkSoft),
                           ),
                         ),
                         if (isOwner)
@@ -1166,14 +1150,14 @@ class _CommentTile extends StatelessWidget {
                                 child: Padding(
                                   padding: const EdgeInsets.only(left: 10),
                                   child:
-                                      Icon(Icons.edit_outlined, size: 14, color: _C.inkSoft),
+                                      Icon(Icons.edit_outlined, size: 14, color: Fg.inkSoft),
                                 ),
                               ),
                               GestureDetector(
                                 onTap: onDelete,
                                 child: Padding(
                                   padding: const EdgeInsets.only(left: 10),
-                                  child: Icon(Icons.delete_outline, size: 14, color: _C.rust),
+                                  child: Icon(Icons.delete_outline, size: 14, color: Fg.rust),
                                 ),
                               ),
                             ],
@@ -1183,7 +1167,7 @@ class _CommentTile extends StatelessWidget {
                     const SizedBox(height: 2),
                     Text(
                       data['content'] ?? '',
-                      style: TextStyle(fontSize: 13, color: _C.ink, height: 1.4),
+                      style: TextStyle(fontSize: 13, color: Fg.ink, height: 1.4),
                     ),
                     const SizedBox(height: 10),
                   ],
@@ -1264,13 +1248,25 @@ class _PostSheetState extends State<_PostSheet> {
           'commentCount': 0,
           'createdAt': FieldValue.serverTimestamp(),
         });
-        await FirebaseFirestore.instance
-            .collection('users')
-            .doc(widget.uid)
-            .update({'postCount': FieldValue.increment(1)});
+        // The post is saved; a failed counter bump must not keep the sheet open.
+        try {
+          await FirebaseFirestore.instance
+              .collection('users')
+              .doc(widget.uid)
+              .set({'postCount': FieldValue.increment(1)}, SetOptions(merge: true));
+        } catch (e) {
+          debugPrint('Post count not updated: $e');
+        }
       }
 
       if (mounted) Navigator.of(context).pop();
+    } catch (e) {
+      debugPrint('Post failed: $e');
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Could not post. Check your connection and try again.')),
+        );
+      }
     } finally {
       if (mounted) setState(() => _submitting = false);
     }
@@ -1282,8 +1278,8 @@ class _PostSheetState extends State<_PostSheet> {
 
     return Container(
       padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
-      decoration: const BoxDecoration(
-        color: _C.almond,
+      decoration: BoxDecoration(
+        color: Bg.almond,
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
       child: Padding(
@@ -1298,7 +1294,7 @@ class _PostSheetState extends State<_PostSheet> {
                 height: 4,
                 margin: const EdgeInsets.only(bottom: 14),
                 decoration: BoxDecoration(
-                  color: _C.matcha.withOpacity(0.3),
+                  color: Bg.matcha.withOpacity(0.3),
                   borderRadius: BorderRadius.circular(999),
                 ),
               ),
@@ -1307,7 +1303,7 @@ class _PostSheetState extends State<_PostSheet> {
               children: [
                 Text(
                   _isEdit ? 'Edit post' : 'New post',
-                  style: TextStyle(fontSize: 17, fontWeight: FontWeight.w600, color: _C.ink),
+                  style: TextStyle(fontSize: 17, fontWeight: FontWeight.w600, color: Fg.ink),
                 ),
                 const Spacer(),
                 GestureDetector(
@@ -1316,10 +1312,10 @@ class _PostSheetState extends State<_PostSheet> {
                     width: 30,
                     height: 30,
                     decoration: BoxDecoration(
-                      color: _C.matcha.withOpacity(0.12),
+                      color: Bg.matcha.withOpacity(0.12),
                       borderRadius: BorderRadius.circular(10),
                     ),
-                    child: Icon(Icons.close_rounded, color: _C.inkSoft, size: 16),
+                    child: Icon(Icons.close_rounded, color: Fg.inkSoft, size: 16),
                   ),
                 ),
               ],
@@ -1331,10 +1327,10 @@ class _PostSheetState extends State<_PostSheet> {
               child: TextField(
                 controller: _controller,
                 maxLines: 4,
-                style: TextStyle(fontSize: 13.5, color: _C.ink),
+                style: TextStyle(fontSize: 13.5, color: Fg.ink),
                 decoration: InputDecoration(
                   hintText: "What's happening on your farm?",
-                  hintStyle: TextStyle(fontSize: 13.5, color: _C.inkSoft),
+                  hintStyle: TextStyle(fontSize: 13.5, color: Fg.inkSoft),
                   border: InputBorder.none,
                 ),
               ),
@@ -1342,7 +1338,7 @@ class _PostSheetState extends State<_PostSheet> {
             const SizedBox(height: 14),
             Row(
               children: [
-                Text('Tag:', style: TextStyle(fontSize: 13, color: _C.inkSoft)),
+                Text('Tag:', style: TextStyle(fontSize: 13, color: Fg.inkSoft)),
                 const SizedBox(width: 10),
                 ...tags.map((t) {
                   final selected = _tag == t;
@@ -1353,11 +1349,11 @@ class _PostSheetState extends State<_PostSheet> {
                       child: Container(
                         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                         decoration: BoxDecoration(
-                          color: selected ? _C.matchaHeader : Colors.white.withOpacity(0.55),
+                          color: selected ? Bg.matchaHeader : Bg.surface.withOpacity(0.55),
                           borderRadius: BorderRadius.circular(999),
                           border: Border.all(
                             color:
-                                selected ? _C.matchaHeader : Colors.white.withOpacity(0.85),
+                                selected ? Bg.matchaHeader : Bg.surface.withOpacity(0.85),
                           ),
                         ),
                         child: Text(
@@ -1365,7 +1361,7 @@ class _PostSheetState extends State<_PostSheet> {
                           style: TextStyle(
                             fontSize: 12,
                             fontWeight: FontWeight.w500,
-                            color: selected ? _C.almond : _C.inkSoft,
+                            color: selected ? Fg.almond : Fg.inkSoft,
                           ),
                         ),
                       ),
@@ -1380,15 +1376,15 @@ class _PostSheetState extends State<_PostSheet> {
               padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 4),
               child: Row(
                 children: [
-                  Icon(Icons.location_on_outlined, size: 17, color: _C.inkSoft),
+                  Icon(Icons.location_on_outlined, size: 17, color: Fg.inkSoft),
                   const SizedBox(width: 8),
                   Expanded(
                     child: TextField(
                       controller: _locationController,
-                      style: TextStyle(fontSize: 13.5, color: _C.ink),
+                      style: TextStyle(fontSize: 13.5, color: Fg.ink),
                       decoration: InputDecoration(
                         hintText: 'Your location (optional)',
-                        hintStyle: TextStyle(fontSize: 13.5, color: _C.inkSoft),
+                        hintStyle: TextStyle(fontSize: 13.5, color: Fg.inkSoft),
                         border: InputBorder.none,
                       ),
                       onChanged: (v) => _location = v,
@@ -1403,8 +1399,8 @@ class _PostSheetState extends State<_PostSheet> {
               child: ElevatedButton(
                 onPressed: _submitting ? null : _submit,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: _C.rust,
-                  foregroundColor: _C.rustBg,
+                  backgroundColor: Bg.rust,
+                  foregroundColor: Fg.almond,
                   padding: const EdgeInsets.symmetric(vertical: 14),
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
                   elevation: 0,
@@ -1413,7 +1409,7 @@ class _PostSheetState extends State<_PostSheet> {
                     ? SizedBox(
                         height: 20,
                         width: 20,
-                        child: CircularProgressIndicator(strokeWidth: 2, color: _C.rustBg),
+                        child: CircularProgressIndicator(strokeWidth: 2, color: Fg.almond),
                       )
                     : Text(
                         _isEdit ? 'Save changes' : 'Post',

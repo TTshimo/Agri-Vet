@@ -3,11 +3,22 @@ name: News Scraper
 on:
   schedule:
     - cron: "*/30 * * * *"   # every 30 minutes
-  workflow_dispatch:           # allow manual trigger from GitHub UI
+  workflow_dispatch:           # manual run from the Actions tab
+    inputs:
+      prune:
+        description: "Delete stored articles that are no longer considered agricultural"
+        type: boolean
+        default: false
+
+# Never let two scrapes overlap (a slow run + the next cron tick).
+concurrency:
+  group: news-scraper
+  cancel-in-progress: false
 
 jobs:
   scrape:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
 
     steps:
       - name: Checkout repo
@@ -19,7 +30,16 @@ jobs:
           python-version: "3.11"
 
       - name: Install dependencies
-        run: pip install feedparser firebase-admin
+        run: pip install -r scraper/requirements.txt
+
+      - name: Check relevance rules
+        run: python scraper/test_relevance.py
+
+      - name: Remove off-topic articles
+        if: github.event_name == 'workflow_dispatch' && inputs.prune
+        env:
+          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+        run: python scraper/news_scraper.py --prune
 
       - name: Run scraper
         env:

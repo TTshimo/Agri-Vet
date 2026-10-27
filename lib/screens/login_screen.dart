@@ -1,25 +1,11 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'home_screen.dart';
+import 'shell_screen.dart';
+import '../services/google_auth.dart';
 import 'register_screen.dart';
 import 'forgot_password_screen.dart';
-
-class _C {
-  static const bgDark = Color(0xFF1F2A1A);
-  static const waveDark = Color(0xFF2C3A23);
-  static const waveDarkSoft = Color(0xFF374530);
-  static const almond = Color(0xFFF6EFE2);
-  static const almondSoft = Color(0xFFB9C4A6);
-  static const almondMuted = Color(0xFF8E9A7C);
-  static const rust = Color(0xFFC1703E);
-  static const ink = Color(0xFF2B2820);
-  static const glassFill = Color(0x14FFFFFF);
-  static const glassBorder = Color(0x2EFFFFFF);
-  static const fieldFill = Color(0x1EFFFFFF);
-  static const fieldBorder = Color(0x33FFFFFF);
-}
-
+import '../theme/palette.dart';
 
 class _FieldWavesPainter extends CustomPainter {
   @override
@@ -39,7 +25,7 @@ class _FieldWavesPainter extends CustomPainter {
       ..lineTo(size.width, 0)
       ..lineTo(0, 0)
       ..close();
-    canvas.drawPath(p1, Paint()..color = _C.waveDark);
+    canvas.drawPath(p1, Paint()..color = Bg.waveDark);
 
     final p2 = Path()
       ..moveTo(0, size.height * 0.30)
@@ -51,7 +37,7 @@ class _FieldWavesPainter extends CustomPainter {
       ..lineTo(size.width, 0)
       ..lineTo(0, 0)
       ..close();
-    canvas.drawPath(p2, Paint()..color = _C.waveDarkSoft.withOpacity(0.7));
+    canvas.drawPath(p2, Paint()..color = Bg.waveDarkSoft.withOpacity(0.7));
   }
 
   @override
@@ -73,9 +59,9 @@ class _GlassCard extends StatelessWidget {
         child: Container(
           padding: padding,
           decoration: BoxDecoration(
-            color: _C.glassFill,
+            color: Bg.glassFill,
             borderRadius: BorderRadius.circular(20),
-            border: Border.all(color: _C.glassBorder, width: 0.8),
+            border: Border.all(color: Bg.glassBorder, width: 0.8),
           ),
           child: child,
         ),
@@ -105,21 +91,21 @@ class _AuthField extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: _C.fieldFill,
+        color: Bg.fieldFill,
         borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: _C.fieldBorder, width: 0.8),
+        border: Border.all(color: Bg.fieldBorder, width: 0.8),
       ),
       child: TextField(
         controller: controller,
         obscureText: obscure,
         keyboardType: keyboardType,
-        style: const TextStyle(color: _C.almond, fontSize: 14),
+        style: TextStyle(color: Fg.almond, fontSize: 14),
         decoration: InputDecoration(
           hintText: hint,
-          hintStyle: TextStyle(color: _C.almondMuted.withOpacity(0.8), fontSize: 13.5),
+          hintStyle: TextStyle(color: Fg.almondSoft, fontSize: 13.5),
           prefixIcon: icon == null
               ? null
-              : Icon(icon, size: 18, color: _C.almondSoft),
+              : Icon(icon, size: 18, color: Fg.almondSoft),
           suffixIcon: suffix,
           border: InputBorder.none,
           contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
@@ -141,7 +127,32 @@ class _LoginScreenState extends State<LoginScreen> {
   final _passCtrl = TextEditingController();
   bool _obscure = true;
   bool _loading = false;
+  bool _googleLoading = false;
   String? _error;
+
+  Future<void> _signInWithGoogle() async {
+    setState(() {
+      _googleLoading = true;
+      _error = null;
+    });
+    try {
+      final user = await GoogleAuth.signIn();
+      if (user == null || !mounted) return; // picker closed
+      Navigator.of(context).pushAndRemoveUntil(
+        MaterialPageRoute(builder: (_) => const ShellScreen()),
+        (route) => false,
+      );
+    } on FirebaseAuthException catch (e) {
+      setState(() => _error = e.code == 'account-exists-with-different-credential'
+          ? 'This email already has an AgroLens password. Log in with your password.'
+          : 'Google sign-in failed. Try again.');
+    } catch (e) {
+      debugPrint('Google sign-in failed: $e');
+      setState(() => _error = 'Google sign-in failed. Try again.');
+    } finally {
+      if (mounted) setState(() => _googleLoading = false);
+    }
+  }
 
   @override
   void dispose() {
@@ -168,7 +179,8 @@ class _LoginScreenState extends State<LoginScreen> {
       );
       if (!mounted) return;
       Navigator.of(context).pushAndRemoveUntil(
-        MaterialPageRoute(builder: (_) => const HomeScreen()),
+        // The full app (bottom navigation, notifications), same as on launch.
+        MaterialPageRoute(builder: (_) => const ShellScreen()),
         (route) => false,
       );
     } on FirebaseAuthException catch (e) {
@@ -199,7 +211,7 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: _C.bgDark,
+      backgroundColor: Bg.bgDark,
       body: Stack(
         children: [
           Positioned(
@@ -222,10 +234,10 @@ class _LoginScreenState extends State<LoginScreen> {
                         width: 44,
                         height: 44,
                         decoration: BoxDecoration(
-                          color: _C.rust,
+                          color: Bg.rust,
                           borderRadius: BorderRadius.circular(14),
                         ),
-                        child: const Icon(Icons.eco_outlined, color: _C.almond),
+                        child: Icon(Icons.eco_outlined, color: Fg.almond),
                       ),
                       const SizedBox(width: 12),
                       Column(
@@ -233,11 +245,11 @@ class _LoginScreenState extends State<LoginScreen> {
                         children: [
                           Text('AgroLens',
                               style: TextStyle(
-                                  color: _C.almond,
+                                  color: Fg.almond,
                                   fontSize: 18,
                                   fontWeight: FontWeight.w600)),
                           Text('The vet in your pocket',
-                              style: TextStyle(color: _C.almondMuted, fontSize: 11.5)),
+                              style: TextStyle(color: Fg.almondMuted, fontSize: 11.5)),
                         ],
                       ),
                     ],
@@ -245,7 +257,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   const SizedBox(height: 36),
                   Text('Welcome back',
                       style: TextStyle(
-                          color: _C.almond,
+                          color: Fg.almond,
                           fontSize: 24,
                           fontWeight: FontWeight.w600)),
                   const SizedBox(height: 6),
@@ -271,7 +283,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             icon: Icon(
                               _obscure ? Icons.visibility_outlined : Icons.visibility_off_outlined,
                               size: 18,
-                              color: _C.almondSoft,
+                              color: Fg.almondSoft,
                             ),
                             onPressed: () => setState(() => _obscure = !_obscure),
                           ),
@@ -283,7 +295,7 @@ class _LoginScreenState extends State<LoginScreen> {
                               MaterialPageRoute(builder: (_) => const ForgotPasswordScreen()),
                             ),
                             child: Text('Forgot password?',
-                                style: TextStyle(color: _C.almondSoft, fontSize: 12.5)),
+                                style: TextStyle(color: Fg.almondSoft, fontSize: 12.5)),
                           ),
                         ),
                         if (_error != null) ...[
@@ -297,18 +309,18 @@ class _LoginScreenState extends State<LoginScreen> {
                           child: ElevatedButton(
                             onPressed: _loading ? null : _login,
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: _C.rust,
-                              foregroundColor: _C.ink,
+                              backgroundColor: Bg.rust,
+                              foregroundColor: Fg.almond,
                               padding: const EdgeInsets.symmetric(vertical: 14),
                               shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(12)),
                             ),
                             child: _loading
-                                ? const SizedBox(
+                                ? SizedBox(
                                     height: 18,
                                     width: 18,
                                     child: CircularProgressIndicator(
-                                        strokeWidth: 2, color: _C.ink),
+                                        strokeWidth: 2, color: Fg.almond),
                                   )
                                 : const Text('Log in',
                                     style: TextStyle(fontWeight: FontWeight.w600)),
@@ -320,22 +332,21 @@ class _LoginScreenState extends State<LoginScreen> {
                   const SizedBox(height: 18),
                   Row(
                     children: [
-                      Expanded(child: Divider(color: _C.fieldBorder, height: 0.8)),
+                      Expanded(child: Divider(color: Bg.fieldBorder, height: 0.8)),
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 10),
                         child: Text('or continue with',
-                            style: TextStyle(color: _C.almondMuted, fontSize: 11)),
+                            style: TextStyle(color: Fg.almondMuted, fontSize: 11)),
                       ),
-                      Expanded(child: Divider(color: _C.fieldBorder, height: 0.8)),
+                      Expanded(child: Divider(color: Bg.fieldBorder, height: 0.8)),
                     ],
                   ),
                   const SizedBox(height: 14),
-                  Row(
-                    children: [
-                      Expanded(child: _SocialButton(icon: Icons.g_mobiledata, label: 'Google', onTap: () {})),
-                      const SizedBox(width: 10),
-                      Expanded(child: _SocialButton(icon: Icons.phone_outlined, label: 'Phone', onTap: () {})),
-                    ],
+                  _SocialButton(
+                    icon: Icons.g_mobiledata,
+                    label: 'Continue with Google',
+                    loading: _googleLoading,
+                    onTap: _loading || _googleLoading ? null : _signInWithGoogle,
                   ),
                   const SizedBox(height: 22),
                   Center(
@@ -343,14 +354,14 @@ class _LoginScreenState extends State<LoginScreen> {
                       onTap: () => Navigator.of(context).push(
                         MaterialPageRoute(builder: (_) => const RegisterScreen()),
                       ),
-                      child: RichText(
-                        text: TextSpan(
-                          style: TextStyle(color: _C.almondSoft, fontSize: 12.5),
+                      child: Text.rich(
+                        TextSpan(
+                          style: TextStyle(color: Fg.almondSoft, fontSize: 12.5),
                           children: [
                             const TextSpan(text: "Don't have an account? "),
                             TextSpan(
                               text: 'Sign up',
-                              style: const TextStyle(color: _C.almond, fontWeight: FontWeight.w600),
+                              style: TextStyle(color: Fg.almond, fontWeight: FontWeight.w600),
                             ),
                           ],
                         ),
@@ -368,11 +379,17 @@ class _LoginScreenState extends State<LoginScreen> {
 }
 
 class _SocialButton extends StatelessWidget {
-  const _SocialButton({required this.icon, required this.label, required this.onTap});
+  const _SocialButton({
+    required this.icon,
+    required this.label,
+    required this.onTap,
+    this.loading = false,
+  });
 
   final IconData icon;
   final String label;
-  final VoidCallback onTap;
+  final VoidCallback? onTap;
+  final bool loading;
 
   @override
   Widget build(BuildContext context) {
@@ -382,16 +399,25 @@ class _SocialButton extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 12),
         decoration: BoxDecoration(
-          color: _C.fieldFill,
+          color: Bg.fieldFill,
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: _C.fieldBorder, width: 0.8),
+          border: Border.all(color: Bg.fieldBorder, width: 0.8),
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(icon, size: 18, color: _C.almond),
+            if (loading)
+              SizedBox(
+                width: 16,
+                height: 16,
+                child: CircularProgressIndicator(strokeWidth: 2, color: Fg.almond),
+              )
+            else
+              Icon(icon, size: 22, color: Fg.almond),
             const SizedBox(width: 6),
-            Text(label, style: TextStyle(color: _C.almond, fontSize: 12.5)),
+            Text(label,
+                style: TextStyle(
+                    color: Fg.almond, fontSize: 13.5, fontWeight: FontWeight.w500)),
           ],
         ),
       ),
